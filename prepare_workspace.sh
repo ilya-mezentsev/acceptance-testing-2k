@@ -19,12 +19,12 @@ fi
 declare -A env=(
   ['ENV_VARS_WERE_SET']="1"
   ['PROJECT_ROOT']="${rootFolder}"
-  ['REPORT_FOLDER']="${rootFolder}/test_report"
-  ['GOPATH']="${rootFolder}"
+  ['REPORT_FOLDER']="${rootFolder}/backend/test_report"
+  ['GOPATH']="${rootFolder}"/backend
 )
 
 prepareFolders "${rootFolder}"/backend
-prepareFiles "${rootFolder}"/backend
+prepareFiles "${rootFolder}"
 
 for envKey in "${!env[@]}"
 do
