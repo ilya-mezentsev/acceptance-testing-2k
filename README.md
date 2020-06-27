@@ -1,0 +1,1 @@
+# Project for manage and run acceptance tests
