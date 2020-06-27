@@ -2,7 +2,6 @@
 
 function prepareFolders() {
   mkdir -p "$1"/test_report
-  mkdir -p "$1"/data
 }
 
 function prepareFiles() {
