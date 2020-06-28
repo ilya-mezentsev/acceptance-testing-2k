@@ -10,15 +10,15 @@ var parser Parser
 
 func TestParser_InitSuccess(t *testing.T) {
 	testCases := `
-		{
+		BEGIN
 			// some comment (will be ignored)
-			CREATE USER hash:'some-hash' userName:'Piter'
+			CREATE USER {"hash": "some-hash", "userName": "Piter"}
 	
-			user = GET USER hash:'some-hash'
+			user = GET USER {"hash": "some-hash"}
 	
 			ASSERT user.hash EQUALS 'some-hash'
 			ASSERT user.userName EQUALS 'Piter'
-		}
+		END
 	`
 	err := parser.Init(testCases)
 
@@ -27,22 +27,22 @@ func TestParser_InitSuccess(t *testing.T) {
 
 func TestParser_InitCoupleTestCases(t *testing.T) {
 	testCases := `
-		{
+		BEGIN
 			// some comment (will be ignored)
-			CREATE USER hash:'some-hash' userName:'Piter'
+			CREATE USER {"hash": "some-hash", "userName": "Piter"}
 	
-			user = GET USER hash:'some-hash'
+			user = GET USER {"hash": "some-hash"}
 	
 			ASSERT user.hash EQUALS 'some-hash'
 			ASSERT user.userName EQUALS 'Piter'
-		}
-		{
-			UPDATE USER hash:'hash-1' userName:'Ron'
+		END
+		BEGIN
+			UPDATE USER {"hash": "hash-1", "userName": "Ron"}
 	
 			user = GET USER hash:'hash-1'
 	
 			ASSERT user.userName EQUALS 'Ron'
-		}
+		END
 	`
 	_ = parser.Init(testCases)
 
@@ -64,26 +64,26 @@ func TestParser_InitError(t *testing.T) {
 
 func TestParser_Next(t *testing.T) {
 	testCases := `
-		{
+		BEGIN
 			// some comment (will be ignored)
-			CREATE USER hash:'some-hash' userName:'Piter'
+			CREATE USER {"hash": "some-hash", "userName": "Piter"}
 	
-			user = GET USER hash:'some-hash'
+			user = GET USER {"hash": "some-hash"}
 	
 			ASSERT user.hash EQUALS 'some-hash'
 			ASSERT user.userName EQUALS 'Piter'
-		}
+		END
 	`
 	_ = parser.Init(testCases)
 	testCase := parser.NextTransactions()
 
 	utils.AssertEqual(
-		`CREATE USER hash:'some-hash' userName:'Piter'`,
+		`CREATE USER {"hash": "some-hash", "userName": "Piter"}`,
 		testCase[0],
 		t,
 	)
 	utils.AssertEqual(
-		`user = GET USER hash:'some-hash'`,
+		`user = GET USER {"hash": "some-hash"}`,
 		testCase[1],
 		t,
 	)
@@ -101,15 +101,15 @@ func TestParser_Next(t *testing.T) {
 
 func TestParser_Done(t *testing.T) {
 	testCases := `
-		{
+		BEGIN
 			// some comment (will be ignored)
-			CREATE USER hash:'some-hash' userName:'Piter'
+			CREATE USER {"hash": "some-hash", "userName": "Piter"}
 	
-			user = GET USER hash:'some-hash'
+			user = GET USER {"hash": "some-hash"}
 	
 			ASSERT user.hash EQUALS 'some-hash'
 			ASSERT user.userName EQUALS 'Piter'
-		}
+		END
 	`
 	_ = parser.Init(testCases)
 

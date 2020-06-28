@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	testCasePattern = regexp.MustCompile(`(?ms){(.+?)}`)
+	testCasePattern = regexp.MustCompile(`(?msi)BEGIN(.+?)END`)
 )
 
 type Parser struct {
