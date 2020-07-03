@@ -8,7 +8,7 @@ import (
 
 var parser Parser
 
-func TestParser_InitSuccess(t *testing.T) {
+func TestParser_ParseOneTestCase(t *testing.T) {
 	testCases := `
 		BEGIN
 			// some comment (will be ignored)
@@ -20,12 +20,14 @@ func TestParser_InitSuccess(t *testing.T) {
 			ASSERT user.userName EQUALS 'Piter'
 		END
 	`
-	err := parser.Init(testCases)
+	iterator, err := parser.Parse(testCases)
 
 	utils.AssertNil(err, t)
+	utils.AssertNotNil(iterator, t)
+	utils.AssertEqual(1, len(iterator), t)
 }
 
-func TestParser_InitCoupleTestCases(t *testing.T) {
+func TestParser_ParseTwoTestCases(t *testing.T) {
 	testCases := `
 		BEGIN
 			// some comment (will be ignored)
@@ -37,32 +39,26 @@ func TestParser_InitCoupleTestCases(t *testing.T) {
 			ASSERT user.userName EQUALS 'Piter'
 		END
 		BEGIN
-			UPDATE USER {"hash": "hash-1", "userName": "Ron"}
+			user = GET USER {"hash": "some-hash"}
 	
-			user = GET USER hash:'hash-1'
-	
-			ASSERT user.userName EQUALS 'Ron'
+			ASSERT user.hash EQUALS 'some-hash'
+			ASSERT user.userName EQUALS 'Piter'
 		END
 	`
-	_ = parser.Init(testCases)
+	iterator, err := parser.Parse(testCases)
 
-	utils.AssertEqual(2, len(parser.testCases), t)
-	testCaseTransactions := parser.NextTransactions()
-	for ; !parser.Done(); testCaseTransactions = parser.NextTransactions() {
-		for _, transaction := range testCaseTransactions {
-			utils.AssertNotEqual("//", transaction[:2], t)
-			utils.AssertNotEqual("", transaction, t)
-		}
-	}
+	utils.AssertNil(err, t)
+	utils.AssertNotNil(iterator, t)
+	utils.AssertEqual(2, len(iterator), t)
 }
 
-func TestParser_InitError(t *testing.T) {
-	err := parser.Init(``)
+func TestParser_ParseEmptyTestCases(t *testing.T) {
+	_, err := parser.Parse(``)
 
 	utils.AssertErrorsEqual(errors.NoTestCases, err, t)
 }
 
-func TestParser_Next(t *testing.T) {
+func TestTestCaseIterator_HasTransactionsTrue(t *testing.T) {
 	testCases := `
 		BEGIN
 			// some comment (will be ignored)
@@ -74,32 +70,23 @@ func TestParser_Next(t *testing.T) {
 			ASSERT user.userName EQUALS 'Piter'
 		END
 	`
-	_ = parser.Init(testCases)
-	testCase := parser.NextTransactions()
+	iterator, _ := parser.Parse(testCases)
 
-	utils.AssertEqual(
-		`CREATE USER {"hash": "some-hash", "userName": "Piter"}`,
-		testCase[0],
-		t,
-	)
-	utils.AssertEqual(
-		`user = GET USER {"hash": "some-hash"}`,
-		testCase[1],
-		t,
-	)
-	utils.AssertEqual(
-		`ASSERT user.hash EQUALS 'some-hash'`,
-		testCase[2],
-		t,
-	)
-	utils.AssertEqual(
-		`ASSERT user.userName EQUALS 'Piter'`,
-		testCase[3],
-		t,
-	)
+	utils.AssertTrue(iterator[0].HasTransactions(), t)
 }
 
-func TestParser_Done(t *testing.T) {
+func TestTestCaseIterator_HasTransactionsFalse(t *testing.T) {
+	testCases := `
+		BEGIN
+			// some comment (will be ignored)
+		END
+	`
+	iterator, _ := parser.Parse(testCases)
+
+	utils.AssertFalse(iterator[0].HasTransactions(), t)
+}
+
+func TestTestCaseIterator_GetTestCaseTransactions(t *testing.T) {
 	testCases := `
 		BEGIN
 			// some comment (will be ignored)
@@ -111,9 +98,20 @@ func TestParser_Done(t *testing.T) {
 			ASSERT user.userName EQUALS 'Piter'
 		END
 	`
-	_ = parser.Init(testCases)
+	expectedTransactions := []string{
+		`CREATE USER {"hash": "some-hash", "userName": "Piter"}`,
+		`user = GET USER {"hash": "some-hash"}`,
+		`ASSERT user.hash EQUALS 'some-hash'`,
+		`ASSERT user.userName EQUALS 'Piter'`,
+	}
+	iterators, _ := parser.Parse(testCases)
+	iterator := iterators[0].(*TestCaseTransactionsIterator)
 
-	utils.AssertFalse(parser.Done(), t)
-	_ = parser.NextTransactions()
-	utils.AssertTrue(parser.Done(), t)
+	for iterator.HasTransactions() {
+		utils.AssertEqual(
+			expectedTransactions[iterator.currentTransactionIndex-1],
+			iterator.GetTestCaseTransaction(),
+			t,
+		)
+	}
 }

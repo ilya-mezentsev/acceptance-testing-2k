@@ -23,3 +23,7 @@ func (d *AssignmentTransactionData) SetField(name, value string) {
 		d.SimpleTransactionData.SetField(name, value)
 	}
 }
+
+func IsAssignment(transaction string) bool {
+	return AssignmentTransactionPattern.MatchString(transaction)
+}

@@ -1,9 +1,12 @@
 package interfaces
 
 type (
-	TestCasesIterator interface {
-		Init(testCases string) error
-		Done() bool
-		NextTransactions() []string
+	TestCasesParser interface {
+		Parse(testCases string) ([]TestCaseTransactionsIterator, error)
+	}
+
+	TestCaseTransactionsIterator interface {
+		HasTransactions() bool
+		GetTestCaseTransaction() string
 	}
 )

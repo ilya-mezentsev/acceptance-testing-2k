@@ -32,3 +32,7 @@ func (d *AssertionTransactionData) SetField(name, value string) {
 		d.newValue = value
 	}
 }
+
+func IsAssertion(transaction string) bool {
+	return AssertionTransactionPattern.MatchString(transaction)
+}

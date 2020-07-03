@@ -1,6 +1,7 @@
 package test_case
 
 import (
+	"interfaces"
 	"parsers/errors"
 	"regexp"
 	"strings"
@@ -15,19 +16,21 @@ type Parser struct {
 	testCases       [][]string
 }
 
-func (p *Parser) Init(testCases string) error {
+func (p Parser) Parse(testCases string) ([]interfaces.TestCaseTransactionsIterator, error) {
 	matches := testCasePattern.FindAllStringSubmatch(testCases, -1)
 	if len(matches) == 0 {
-		return errors.NoTestCases
+		return nil, errors.NoTestCases
 	}
 
-	p.testCases = nil
+	var testCasesIterators []interfaces.TestCaseTransactionsIterator
 	for _, match := range matches {
-		p.testCases = append(p.testCases, p.getMeaningRows(match[1]))
+		testCasesIterators = append(
+			testCasesIterators,
+			&TestCaseTransactionsIterator{transactions: p.getMeaningRows(match[1])},
+		)
 	}
 
-	p.currentTestCase = 0
-	return nil
+	return testCasesIterators, nil
 }
 
 func (p Parser) getMeaningRows(testCase string) []string {
@@ -47,15 +50,4 @@ func (p Parser) getMeaningRows(testCase string) []string {
 
 func (p Parser) shouldSkipRow(row string) bool {
 	return row == "" || len(row) == 1 || row[:2] == "//"
-}
-
-func (p Parser) Done() bool {
-	return p.currentTestCase == len(p.testCases)
-}
-
-func (p *Parser) NextTransactions() []string {
-	testCaseTransactions := p.testCases[p.currentTestCase]
-	p.currentTestCase++
-
-	return testCaseTransactions
 }

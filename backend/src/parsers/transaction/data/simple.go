@@ -32,3 +32,7 @@ func (d *SimpleTransactionData) SetField(name, value string) {
 		d.arguments = value
 	}
 }
+
+func IsSimple(transaction string) bool {
+	return SimpleTransactionPattern.MatchString(transaction)
+}

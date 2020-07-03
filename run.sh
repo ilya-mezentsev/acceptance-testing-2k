@@ -6,8 +6,6 @@ declare -A scriptsDescriptions=(
   ['calc_go_lines']='calculate lines of *.go files'
   ['tests']='run go tests'
   ['push_all']='push all files to repository'
-  ['cli']='run application in cli mode (logging included)'
-  ['tg']='run application in telegram mode'
 )
 
 function run() {
