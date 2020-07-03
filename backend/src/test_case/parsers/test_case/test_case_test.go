@@ -1,7 +1,7 @@
 package test_case
 
 import (
-	"parsers/errors"
+	"test_case/parsers/errors"
 	"testing"
 	"utils"
 )

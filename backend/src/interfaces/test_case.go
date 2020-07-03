@@ -3,12 +3,19 @@ package interfaces
 import "models"
 
 type (
-	TestCase interface {
+	TestCaseFactory interface {
+		GetAll(testCases string) ([]TestCaseRunner, error)
+	}
+
+	TestCaseRunner interface {
 		Run(processing models.TestsRun)
 	}
 
 	Transaction interface {
 		Execute(context TestCaseContext)
+	}
+
+	TransactionRepository interface {
 	}
 
 	TestCaseContext interface {

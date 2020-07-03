@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"parsers/errors"
-	"parsers/transaction/data"
+	"test_case/parsers/errors"
+	"test_case/parsers/transaction/data"
 	"testing"
 	"utils"
 )

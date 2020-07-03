@@ -2,8 +2,8 @@ package parser
 
 import (
 	"interfaces"
-	"parsers/errors"
 	"regexp"
+	"test_case/parsers/errors"
 )
 
 func Parse(

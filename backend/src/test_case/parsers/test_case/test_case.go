@@ -2,9 +2,9 @@ package test_case
 
 import (
 	"interfaces"
-	"parsers/errors"
 	"regexp"
 	"strings"
+	"test_case/parsers/errors"
 )
 
 var (
