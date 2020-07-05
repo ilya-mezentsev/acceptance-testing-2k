@@ -5,15 +5,15 @@ import (
 )
 
 type Transaction struct {
-	repository interfaces.TransactionRepository
-	data       interfaces.AssertionTransactionData
+	commandBuilder interfaces.CommandBuilder
+	data           interfaces.AssertionTransactionData
 }
 
 func New(
-	repository interfaces.TransactionRepository,
+	commandBuilder interfaces.CommandBuilder,
 	data interfaces.AssertionTransactionData,
 ) interfaces.Transaction {
-	return Transaction{repository, data}
+	return Transaction{commandBuilder, data}
 }
 
 func (t Transaction) Execute(context interfaces.TestCaseContext) {

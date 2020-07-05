@@ -15,10 +15,8 @@ type (
 		Execute(context TestCaseContext)
 	}
 
-	TransactionRepository interface {
-	}
-
 	TestCaseContext interface {
+		SetVariable(name string, value map[string]interface{})
 		GetVariable(name string) map[string]interface{}
 		GetProcessingChannels() models.TestsRun
 	}

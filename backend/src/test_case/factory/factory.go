@@ -13,14 +13,14 @@ import (
 
 type Factory struct {
 	testCasesParser interfaces.TestCasesParser
-	repository      interfaces.TransactionRepository
+	commandFactory  interfaces.CommandBuilder
 }
 
 func New(
 	testCasesParser interfaces.TestCasesParser,
-	repository interfaces.TransactionRepository,
+	commandFactory interfaces.CommandBuilder,
 ) interfaces.TestCaseFactory {
-	return Factory{testCasesParser, repository}
+	return Factory{testCasesParser, commandFactory}
 }
 
 func (f Factory) GetAll(testCasesData string) ([]interfaces.TestCaseRunner, error) {
@@ -72,7 +72,7 @@ func (f Factory) getAssertionTransaction(transactionData string) (interfaces.Tra
 		return nil, err
 	}
 
-	return assertion.New(f.repository, &assertionTransactionData), nil
+	return assertion.New(f.commandFactory, &assertionTransactionData), nil
 }
 
 func (f Factory) getAssignmentTransaction(transactionData string) (interfaces.Transaction, error) {
@@ -86,7 +86,7 @@ func (f Factory) getAssignmentTransaction(transactionData string) (interfaces.Tr
 		return nil, err
 	}
 
-	return assignment.New(f.repository, &assignmentTransactionData), nil
+	return assignment.New(f.commandFactory, &assignmentTransactionData), nil
 }
 
 func (f Factory) getSimpleTransaction(transactionData string) (interfaces.Transaction, error) {
@@ -100,5 +100,5 @@ func (f Factory) getSimpleTransaction(transactionData string) (interfaces.Transa
 		return nil, err
 	}
 
-	return simple.New(f.repository, &simpleTransactionData), nil
+	return simple.New(f.commandFactory, &simpleTransactionData), nil
 }

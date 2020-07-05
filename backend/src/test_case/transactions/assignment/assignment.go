@@ -3,15 +3,15 @@ package assignment
 import "interfaces"
 
 type Transaction struct {
-	repository interfaces.TransactionRepository
-	data       interfaces.AssignmentTransactionData
+	commandBuilder interfaces.CommandBuilder
+	data           interfaces.AssignmentTransactionData
 }
 
 func New(
-	repository interfaces.TransactionRepository,
+	commandBuilder interfaces.CommandBuilder,
 	data interfaces.AssignmentTransactionData,
 ) interfaces.Transaction {
-	return Transaction{repository, data}
+	return Transaction{commandBuilder, data}
 }
 
 func (t Transaction) Execute(context interfaces.TestCaseContext) {
