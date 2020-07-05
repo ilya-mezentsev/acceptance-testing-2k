@@ -15,5 +15,21 @@ func New(
 }
 
 func (t Transaction) Execute(context interfaces.TestCaseContext) {
-	panic("implement me")
+	command, err := t.commandBuilder.Build(t.data.GetObject(), t.data.GetCommand())
+	if err != nil {
+		context.GetProcessingChannels().Error <- err
+		return
+	}
+
+	result, err := command.Run(t.data.GetArguments())
+	if err != nil {
+		context.GetProcessingChannels().Error <- err
+		return
+	}
+
+	for key, value := range result {
+		context.SetVariable(key, value)
+	}
+
+	context.GetProcessingChannels().Success <- true
 }

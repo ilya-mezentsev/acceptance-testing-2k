@@ -6,6 +6,6 @@ type (
 	}
 
 	Command interface {
-		Run(arguments string) (map[string]string, error)
+		Run(arguments string) (map[string]interface{}, error)
 	}
 )

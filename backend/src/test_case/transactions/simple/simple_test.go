@@ -1,10 +1,14 @@
 package simple
 
 import (
+	mockConst "mock/transaction/constant"
+	mockContext "mock/transaction/context"
 	"mock/transaction/simple"
 	"testing"
 	"utils"
 )
+
+var context = mockContext.Mock
 
 func TestTransaction_ExecuteSuccess(t *testing.T) {
 	transaction := New(
@@ -12,14 +16,14 @@ func TestTransaction_ExecuteSuccess(t *testing.T) {
 		&simple.MockData,
 	)
 
-	go transaction.Execute(simple.Context)
+	go transaction.Execute(context)
 
 	for {
 		select {
-		case err := <-simple.Context.GetProcessingChannels().Error:
+		case err := <-context.GetProcessingChannels().Error:
 			t.Log(err)
 			t.Fail()
-		case res := <-simple.Context.GetProcessingChannels().Success:
+		case res := <-context.GetProcessingChannels().Success:
 			utils.AssertTrue(res, t)
 			return
 		}
@@ -32,13 +36,16 @@ func TestTransaction_ExecuteBuildCommandError(t *testing.T) {
 		&simple.MockData,
 	)
 
-	go transaction.Execute(simple.Context)
+	go transaction.Execute(context)
 
 	for {
 		select {
-		case err := <-simple.Context.GetProcessingChannels().Error:
-			utils.AssertErrorsEqual(simple.BuildCommandError, err, t)
+		case err := <-context.GetProcessingChannels().Error:
+			utils.AssertErrorsEqual(mockConst.BuildCommandError, err, t)
 			return
+		case <-context.GetProcessingChannels().Success:
+			t.Log("Should not got success result")
+			t.Fail()
 		}
 	}
 }
@@ -49,13 +56,16 @@ func TestTransaction_ExecuteCommandRunError(t *testing.T) {
 		&simple.MockData,
 	)
 
-	go transaction.Execute(simple.Context)
+	go transaction.Execute(context)
 
 	for {
 		select {
-		case err := <-simple.Context.GetProcessingChannels().Error:
-			utils.AssertErrorsEqual(simple.RunCommandError, err, t)
+		case err := <-context.GetProcessingChannels().Error:
+			utils.AssertErrorsEqual(mockConst.RunCommandError, err, t)
 			return
+		case <-context.GetProcessingChannels().Success:
+			t.Log("Should not got success result")
+			t.Fail()
 		}
 	}
 }

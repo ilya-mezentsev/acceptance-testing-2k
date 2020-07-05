@@ -1,15 +1,22 @@
-package simple
+package assignment
 
 import (
 	"interfaces"
 	"mock/transaction/constant"
 )
 
-type MockCommandBuilder struct {
+type MockNilResultCommandBuilder struct {
 }
 
-func (b MockCommandBuilder) Build(string, string) (interfaces.Command, error) {
-	return MockCommand{}, nil
+func (b MockNilResultCommandBuilder) Build(string, string) (interfaces.Command, error) {
+	return MockCommandEmptyResult{}, nil
+}
+
+type MockNotNilResultCommandBuilder struct {
+}
+
+func (b MockNotNilResultCommandBuilder) Build(string, string) (interfaces.Command, error) {
+	return MockCommandSomeResult{}, nil
 }
 
 type MockCommandBuilderWithError struct {

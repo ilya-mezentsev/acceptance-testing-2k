@@ -16,8 +16,8 @@ type (
 	}
 
 	TestCaseContext interface {
-		SetVariable(name string, value map[string]interface{})
-		GetVariable(name string) map[string]interface{}
+		SetVariable(name string, value interface{})
+		GetVariable(name string) interface{}
 		GetProcessingChannels() models.TestsRun
 	}
 )
