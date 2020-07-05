@@ -72,7 +72,7 @@ func (f Factory) getAssertionTransaction(transactionData string) (interfaces.Tra
 		return nil, err
 	}
 
-	return assertion.New(f.commandFactory, &assertionTransactionData), nil
+	return assertion.New(&assertionTransactionData), nil
 }
 
 func (f Factory) getAssignmentTransaction(transactionData string) (interfaces.Transaction, error) {

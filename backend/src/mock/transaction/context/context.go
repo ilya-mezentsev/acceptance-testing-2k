@@ -9,6 +9,10 @@ type MockContext struct {
 	ProcessingChannels models.TestsRun
 }
 
+func (c *MockContext) ClearScope() {
+	c.Scope = map[string]interface{}{}
+}
+
 func (c MockContext) SetVariable(name string, data interface{}) {
 	c.Scope[name] = data
 }

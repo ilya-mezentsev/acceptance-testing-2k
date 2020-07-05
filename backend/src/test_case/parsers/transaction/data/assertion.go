@@ -3,7 +3,7 @@ package data
 import "regexp"
 
 var AssertionTransactionPattern = regexp.MustCompile(
-	`(?i)^ASSERT (?P<variableName>[a-zA-Z0-9_]+)(?P<dataPath>[a-zA-Z0-9_.]+?)? EQUALS (?P<newValue>.+)$`,
+	`(?i)^ASSERT (?P<variableName>[a-zA-Z0-9_]+)(?:\.(?P<dataPath>[a-zA-Z0-9_.]+?))? EQUALS (?P<newValue>.+)$`,
 )
 
 type AssertionTransactionData struct {

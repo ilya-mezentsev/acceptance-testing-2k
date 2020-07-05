@@ -110,7 +110,7 @@ func TestParseAssertionTransactionWithDataPath(t *testing.T) {
 	utils.AssertNil(err, t)
 	utils.AssertEqual("user", transactionData.GetVariableName(), t)
 	utils.AssertEqual("Ron", transactionData.GetNewValue(), t)
-	utils.AssertEqual(".userName", transactionData.GetDataPath(), t)
+	utils.AssertEqual("userName", transactionData.GetDataPath(), t)
 }
 
 func TestParseAssertionTransactionWithLongDataPath(t *testing.T) {
@@ -124,7 +124,7 @@ func TestParseAssertionTransactionWithLongDataPath(t *testing.T) {
 	utils.AssertNil(err, t)
 	utils.AssertEqual("user", transactionData.GetVariableName(), t)
 	utils.AssertEqual("Ron", transactionData.GetNewValue(), t)
-	utils.AssertEqual(".data.name.value", transactionData.GetDataPath(), t)
+	utils.AssertEqual("data.name.value", transactionData.GetDataPath(), t)
 }
 
 func TestParseAssertionTransactionInvalidTransactionFormat(t *testing.T) {
