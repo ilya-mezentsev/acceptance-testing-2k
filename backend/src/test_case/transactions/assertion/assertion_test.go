@@ -58,9 +58,33 @@ func TestTransaction_ExecuteSuccessArrayValue(t *testing.T) {
 	defer context.ClearScope()
 
 	context.SetVariable("response", map[string]interface{}{
-		"data": "[1, 2, 3]",
+		"data": []interface{}{"1", "2", "3"},
 	})
 	transaction := New(&mockAssertion.MockDataArray)
+
+	go transaction.Execute(context)
+
+	for {
+		select {
+		case <-context.GetProcessingChannels().Success:
+			return
+		case err := <-context.GetProcessingChannels().Error:
+			t.Log(err)
+			t.Fail()
+			return
+		}
+	}
+}
+
+func TestTransaction_ExecuteSuccessArrayWithMap(t *testing.T) {
+	defer context.ClearScope()
+
+	context.SetVariable("response", map[string]interface{}{
+		"data": []interface{}{map[string]interface{}{
+			"x": "1", "y": "2",
+		}},
+	})
+	transaction := New(&mockAssertion.MockDataArrayWithMap)
 
 	go transaction.Execute(context)
 
@@ -94,6 +118,31 @@ func TestTransaction_ExecuteCannotAccessValue(t *testing.T) {
 			return
 		case err := <-context.GetProcessingChannels().Error:
 			utils.AssertErrorsEqual(cannotAccessValueByPath, err, t)
+			return
+		}
+	}
+}
+
+func TestTransaction_ExecuteAssertionFailedByTypes(t *testing.T) {
+	defer context.ClearScope()
+
+	context.SetVariable("response", map[string]interface{}{
+		"data": []interface{}{map[string]interface{}{
+			"x": "1", "y": []interface{}{"0", "1"},
+		}},
+	})
+	transaction := New(&mockAssertion.MockDataArrayWithMap)
+
+	go transaction.Execute(context)
+
+	for {
+		select {
+		case <-context.GetProcessingChannels().Success:
+			t.Log("Should not got success result")
+			t.Fail()
+			return
+		case err := <-context.GetProcessingChannels().Error:
+			utils.AssertErrorsEqual(assertionFailed, err, t)
 			return
 		}
 	}
@@ -135,6 +184,42 @@ func TestTransaction_GetValueByPathDotSeparated(t *testing.T) {
 
 	utils.AssertNil(err, t)
 	utils.AssertEqual(10, value.(int), t)
+}
+
+func TestTransaction_GetValueByPathArray(t *testing.T) {
+	value, err := getValueByPath(map[string]interface{}{
+		"x": []interface{}{1},
+	}, "x.0")
+
+	utils.AssertNil(err, t)
+	utils.AssertEqual(1, value.(int), t)
+}
+
+func TestTransaction_GetValueByPathArrayWithMap(t *testing.T) {
+	value, err := getValueByPath(map[string]interface{}{
+		"x": []interface{}{map[string]interface{}{
+			"y": 1,
+		}},
+	}, "x.0.y")
+
+	utils.AssertNil(err, t)
+	utils.AssertEqual(1, value.(int), t)
+}
+
+func TestTransaction_GetValueByPathArrayIndexOutOfBounds(t *testing.T) {
+	_, err := getValueByPath(map[string]interface{}{
+		"x": []interface{}{1},
+	}, "x.1")
+
+	utils.AssertErrorsEqual(indexOutOfBounds, err, t)
+}
+
+func TestTransaction_GetValueByPathArrayInvalidIndex(t *testing.T) {
+	_, err := getValueByPath(map[string]interface{}{
+		"x": []interface{}{1},
+	}, "x.a")
+
+	utils.AssertErrorsEqual(invalidNumberForIndex, err, t)
 }
 
 func TestTransaction_GetValueByPathInvalidPath(t *testing.T) {
