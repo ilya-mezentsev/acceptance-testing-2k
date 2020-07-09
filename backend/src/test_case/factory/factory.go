@@ -42,7 +42,7 @@ func (f Factory) GetAll(testCasesData string) ([]interfaces.TestCaseRunner, erro
 			testCaseRunner.AddTransaction(transaction)
 		}
 
-		testCaseRunners = append(testCaseRunners, testCaseRunner)
+		testCaseRunners = append(testCaseRunners, &testCaseRunner)
 	}
 
 	return testCaseRunners, nil
