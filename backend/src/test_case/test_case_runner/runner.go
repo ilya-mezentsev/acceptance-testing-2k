@@ -13,7 +13,7 @@ type Runner struct {
 
 func (r *Runner) Run(processing models.TestsRun) {
 	if len(r.transactions) < 1 {
-		processing.Error <- errors.NoTransactionsInTestCase
+		processing.Error <- models.TransactionError{Code: errors.NoTransactionsInTestCase.Error()}
 		return
 	}
 
@@ -43,7 +43,7 @@ func (r *Runner) initTestCaseContext() {
 		Scope: map[string]interface{}{},
 		ProcessingChannels: models.TestsRun{
 			Success: make(chan bool),
-			Error:   make(chan error),
+			Error:   make(chan models.TransactionError),
 		},
 	}
 }

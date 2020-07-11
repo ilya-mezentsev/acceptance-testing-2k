@@ -1,16 +1,21 @@
 package interfaces
 
 type (
-	TransactionData interface {
-		SetField(name, value string)
+	transactionTextGetter interface {
+		GetTransactionText() string
 	}
 
 	variableContainer interface {
 		GetVariableName() string
 	}
 
+	TransactionDataSetter interface {
+		SetTransactionText(text string)
+		SetField(name, value string)
+	}
+
 	SimpleTransactionData interface {
-		TransactionData
+		transactionTextGetter
 		GetCommand() string
 		GetObject() string
 		GetArguments() string
@@ -22,7 +27,7 @@ type (
 	}
 
 	AssertionTransactionData interface {
-		TransactionData
+		transactionTextGetter
 		variableContainer
 		GetDataPath() string
 		GetNewValue() string

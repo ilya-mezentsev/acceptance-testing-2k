@@ -65,7 +65,9 @@ func TestTransaction_ExecuteBuildCommandError(t *testing.T) {
 	for {
 		select {
 		case err := <-context.GetProcessingChannels().Error:
-			utils.AssertErrorsEqual(constant.BuildCommandError, err, t)
+			utils.AssertEqual(constant.BuildCommandError.Error(), err.Code, t)
+			utils.AssertEqual(unableToBuildCommand, err.Description, t)
+			utils.AssertEqual(assignment.MockData.GetTransactionText(), err.TransactionText, t)
 			return
 		case <-context.GetProcessingChannels().Success:
 			t.Log("Should not got success result")
@@ -85,7 +87,9 @@ func TestTransaction_ExecuteCommandRunError(t *testing.T) {
 	for {
 		select {
 		case err := <-context.GetProcessingChannels().Error:
-			utils.AssertErrorsEqual(constant.RunCommandError, err, t)
+			utils.AssertEqual(constant.RunCommandError.Error(), err.Code, t)
+			utils.AssertEqual(unableToRunCommand, err.Description, t)
+			utils.AssertEqual(assignment.MockData.GetTransactionText(), err.TransactionText, t)
 			return
 		case <-context.GetProcessingChannels().Success:
 			t.Log("Should not got success result")

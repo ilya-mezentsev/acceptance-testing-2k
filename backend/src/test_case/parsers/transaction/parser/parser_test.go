@@ -8,10 +8,11 @@ import (
 )
 
 func TestParseSimpleTransactionWithArguments(t *testing.T) {
-	var transactionData = data.SimpleTransactionData{}
+	var transactionData data.SimpleTransactionData
+	transactionText := `CREATE USER {"hash": "some-hash", "userName": "Piter"}`
 	err := Parse(
 		data.SimpleTransactionPattern,
-		`CREATE USER {"hash": "some-hash", "userName": "Piter"}`,
+		transactionText,
 		&transactionData,
 	)
 
@@ -19,13 +20,15 @@ func TestParseSimpleTransactionWithArguments(t *testing.T) {
 	utils.AssertEqual("CREATE", transactionData.GetCommand(), t)
 	utils.AssertEqual("USER", transactionData.GetObject(), t)
 	utils.AssertEqual(`{"hash": "some-hash", "userName": "Piter"}`, transactionData.GetArguments(), t)
+	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
 }
 
 func TestParseSimpleTransactionWithoutArguments(t *testing.T) {
-	var transactionData = data.SimpleTransactionData{}
+	var transactionData data.SimpleTransactionData
+	transactionText := `CREATE USER`
 	err := Parse(
 		data.SimpleTransactionPattern,
-		`CREATE USER`,
+		transactionText,
 		&transactionData,
 	)
 
@@ -33,6 +36,7 @@ func TestParseSimpleTransactionWithoutArguments(t *testing.T) {
 	utils.AssertEqual("CREATE", transactionData.GetCommand(), t)
 	utils.AssertEqual("USER", transactionData.GetObject(), t)
 	utils.AssertEqual(``, transactionData.GetArguments(), t)
+	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
 }
 
 func TestParseSimpleTransactionInvalidTransactionFormat(t *testing.T) {
@@ -46,10 +50,11 @@ func TestParseSimpleTransactionInvalidTransactionFormat(t *testing.T) {
 }
 
 func TestParseAssignmentTransactionWithArguments(t *testing.T) {
-	var transactionData = data.AssignmentTransactionData{}
+	var transactionData data.AssignmentTransactionData
+	transactionText := `x = GET USER {"hash": "hash-1"}`
 	err := Parse(
 		data.AssignmentTransactionPattern,
-		`x = GET USER {"hash": "hash-1"}`,
+		transactionText,
 		&transactionData,
 	)
 
@@ -58,13 +63,15 @@ func TestParseAssignmentTransactionWithArguments(t *testing.T) {
 	utils.AssertEqual("GET", transactionData.GetCommand(), t)
 	utils.AssertEqual("USER", transactionData.GetObject(), t)
 	utils.AssertEqual(`{"hash": "hash-1"}`, transactionData.GetArguments(), t)
+	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
 }
 
 func TestParseAssignmentTransactionWithoutArguments(t *testing.T) {
-	var transactionData = data.AssignmentTransactionData{}
+	var transactionData data.AssignmentTransactionData
+	transactionText := `x = GET USER`
 	err := Parse(
 		data.AssignmentTransactionPattern,
-		`x = GET USER`,
+		transactionText,
 		&transactionData,
 	)
 
@@ -73,6 +80,7 @@ func TestParseAssignmentTransactionWithoutArguments(t *testing.T) {
 	utils.AssertEqual("GET", transactionData.GetCommand(), t)
 	utils.AssertEqual("USER", transactionData.GetObject(), t)
 	utils.AssertEqual(``, transactionData.GetArguments(), t)
+	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
 }
 
 func TestParseAssignmentTransactionInvalidTransactionFormat(t *testing.T) {
@@ -86,10 +94,11 @@ func TestParseAssignmentTransactionInvalidTransactionFormat(t *testing.T) {
 }
 
 func TestParseAssertionTransactionWithoutDataPath(t *testing.T) {
-	var transactionData = data.AssertionTransactionData{}
+	var transactionData data.AssertionTransactionData
+	transactionText := `ASSERT user EQUALS Ron`
 	err := Parse(
 		data.AssertionTransactionPattern,
-		`ASSERT user EQUALS Ron`,
+		transactionText,
 		&transactionData,
 	)
 
@@ -97,10 +106,11 @@ func TestParseAssertionTransactionWithoutDataPath(t *testing.T) {
 	utils.AssertEqual("user", transactionData.GetVariableName(), t)
 	utils.AssertEqual("Ron", transactionData.GetNewValue(), t)
 	utils.AssertEqual("", transactionData.GetDataPath(), t)
+	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
 }
 
 func TestParseAssertionTransactionWithDataPath(t *testing.T) {
-	var transactionData = data.AssertionTransactionData{}
+	var transactionData data.AssertionTransactionData
 	err := Parse(
 		data.AssertionTransactionPattern,
 		`ASSERT user.userName EQUALS Ron`,
@@ -114,10 +124,11 @@ func TestParseAssertionTransactionWithDataPath(t *testing.T) {
 }
 
 func TestParseAssertionTransactionWithLongDataPath(t *testing.T) {
-	var transactionData = data.AssertionTransactionData{}
+	var transactionData data.AssertionTransactionData
+	transactionText := `ASSERT user.data.name.value EQUALS Ron`
 	err := Parse(
 		data.AssertionTransactionPattern,
-		`ASSERT user.data.name.value EQUALS Ron`,
+		transactionText,
 		&transactionData,
 	)
 
@@ -125,6 +136,7 @@ func TestParseAssertionTransactionWithLongDataPath(t *testing.T) {
 	utils.AssertEqual("user", transactionData.GetVariableName(), t)
 	utils.AssertEqual("Ron", transactionData.GetNewValue(), t)
 	utils.AssertEqual("data.name.value", transactionData.GetDataPath(), t)
+	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
 }
 
 func TestParseAssertionTransactionInvalidTransactionFormat(t *testing.T) {

@@ -3,6 +3,10 @@ package models
 type (
 	TestsRun struct {
 		Success chan bool
-		Error   chan error
+		Error   chan TransactionError
+	}
+
+	TransactionError struct {
+		Code, Description, TransactionText string
 	}
 )

@@ -7,6 +7,7 @@ var AssignmentTransactionPattern = regexp.MustCompile(
 )
 
 type AssignmentTransactionData struct {
+	transactionTextContainer
 	SimpleTransactionData
 	variableName string
 }

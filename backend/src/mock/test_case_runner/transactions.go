@@ -1,6 +1,9 @@
 package test_case_runner
 
-import "interfaces"
+import (
+	"interfaces"
+	"models"
+)
 
 type baseMockTransaction struct {
 	previousCallContext interfaces.TestCaseContext
@@ -25,5 +28,5 @@ type MockErroredTransaction struct {
 
 func (t *MockErroredTransaction) Execute(context interfaces.TestCaseContext) {
 	t.previousCallContext = context
-	context.GetProcessingChannels().Error <- SomeTransactionError
+	context.GetProcessingChannels().Error <- models.TransactionError{Code: SomeTransactionError.Error()}
 }

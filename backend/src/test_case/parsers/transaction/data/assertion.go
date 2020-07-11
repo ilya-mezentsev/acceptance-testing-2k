@@ -7,6 +7,7 @@ var AssertionTransactionPattern = regexp.MustCompile(
 )
 
 type AssertionTransactionData struct {
+	transactionTextContainer
 	variableName, dataPath, newValue string
 }
 

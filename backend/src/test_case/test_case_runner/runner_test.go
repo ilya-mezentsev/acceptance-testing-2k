@@ -12,7 +12,7 @@ func TestRunner_RunOneSimpleTransaction(t *testing.T) {
 	var runner Runner
 	processing := models.TestsRun{
 		Success: make(chan bool),
-		Error:   make(chan error),
+		Error:   make(chan models.TransactionError),
 	}
 	transaction := mockTestCaseRunner.MockTransaction{}
 
@@ -36,7 +36,7 @@ func TestRunner_RunFewSimpleTransactions(t *testing.T) {
 	var runner Runner
 	processing := models.TestsRun{
 		Success: make(chan bool),
-		Error:   make(chan error),
+		Error:   make(chan models.TransactionError),
 	}
 	transaction1 := mockTestCaseRunner.MockTransaction{}
 	transaction2 := mockTestCaseRunner.MockTransaction{}
@@ -63,7 +63,7 @@ func TestRunner_RunOneErroredTransaction(t *testing.T) {
 	var runner Runner
 	processing := models.TestsRun{
 		Success: make(chan bool),
-		Error:   make(chan error),
+		Error:   make(chan models.TransactionError),
 	}
 	transaction := mockTestCaseRunner.ErroredMockTransaction
 
@@ -78,7 +78,7 @@ func TestRunner_RunOneErroredTransaction(t *testing.T) {
 			t.Fail()
 			return
 		case err := <-processing.Error:
-			utils.AssertErrorsEqual(mockTestCaseRunner.SomeTransactionError, err, t)
+			utils.AssertEqual(mockTestCaseRunner.SomeTransactionError.Error(), err.Code, t)
 			utils.AssertTrue(transaction.CalledWith(runner.context), t)
 			return
 		}
@@ -89,7 +89,7 @@ func TestRunner_RunFirstSimpleThenErroredTransactions(t *testing.T) {
 	var runner Runner
 	processing := models.TestsRun{
 		Success: make(chan bool),
-		Error:   make(chan error),
+		Error:   make(chan models.TransactionError),
 	}
 	simpleTransaction := mockTestCaseRunner.SimpleMockTransaction
 	erroredTransaction := mockTestCaseRunner.ErroredMockTransaction
@@ -106,7 +106,7 @@ func TestRunner_RunFirstSimpleThenErroredTransactions(t *testing.T) {
 			t.Fail()
 			return
 		case err := <-processing.Error:
-			utils.AssertErrorsEqual(mockTestCaseRunner.SomeTransactionError, err, t)
+			utils.AssertEqual(mockTestCaseRunner.SomeTransactionError.Error(), err.Code, t)
 			utils.AssertTrue(simpleTransaction.CalledWith(runner.context), t)
 			utils.AssertTrue(erroredTransaction.CalledWith(runner.context), t)
 			return
@@ -118,7 +118,7 @@ func TestRunner_RunFirstErroredThenSimpleTransactions(t *testing.T) {
 	var runner Runner
 	processing := models.TestsRun{
 		Success: make(chan bool),
-		Error:   make(chan error),
+		Error:   make(chan models.TransactionError),
 	}
 	simpleTransaction := mockTestCaseRunner.SimpleMockTransaction
 	erroredTransaction := mockTestCaseRunner.ErroredMockTransaction
@@ -135,7 +135,7 @@ func TestRunner_RunFirstErroredThenSimpleTransactions(t *testing.T) {
 			t.Fail()
 			return
 		case err := <-processing.Error:
-			utils.AssertErrorsEqual(mockTestCaseRunner.SomeTransactionError, err, t)
+			utils.AssertEqual(mockTestCaseRunner.SomeTransactionError.Error(), err.Code, t)
 			utils.AssertFalse(simpleTransaction.CalledWith(runner.context), t)
 			utils.AssertTrue(erroredTransaction.CalledWith(runner.context), t)
 			return
@@ -147,7 +147,7 @@ func TestRunner_RunNoTransactions(t *testing.T) {
 	var runner Runner
 	processing := models.TestsRun{
 		Success: make(chan bool),
-		Error:   make(chan error),
+		Error:   make(chan models.TransactionError),
 	}
 
 	go runner.Run(processing)
@@ -159,7 +159,7 @@ func TestRunner_RunNoTransactions(t *testing.T) {
 			t.Fail()
 			return
 		case err := <-processing.Error:
-			utils.AssertErrorsEqual(errors.NoTransactionsInTestCase, err, t)
+			utils.AssertEqual(errors.NoTransactionsInTestCase.Error(), err.Code, t)
 			return
 		}
 	}

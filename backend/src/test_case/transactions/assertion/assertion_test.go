@@ -48,7 +48,9 @@ func TestTransaction_ExecuteSuccessAssertionFailed(t *testing.T) {
 			t.Fail()
 			return
 		case err := <-context.GetProcessingChannels().Error:
-			utils.AssertErrorsEqual(assertionFailed, err, t)
+			utils.AssertEqual(assertionFailed.Error(), err.Code, t)
+			utils.AssertEqual("Expected: 10, but got: 11", err.Description, t)
+			utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
 			return
 		}
 	}
@@ -117,7 +119,9 @@ func TestTransaction_ExecuteCannotAccessValue(t *testing.T) {
 			t.Fail()
 			return
 		case err := <-context.GetProcessingChannels().Error:
-			utils.AssertErrorsEqual(cannotAccessValueByPath, err, t)
+			utils.AssertEqual(cannotAccessValueByPath.Error(), err.Code, t)
+			utils.AssertEqual("Unable to get value by path: "+mockAssertion.MockDataScore10.GetDataPath(), err.Description, t)
+			utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
 			return
 		}
 	}
@@ -142,7 +146,9 @@ func TestTransaction_ExecuteAssertionFailedByTypes(t *testing.T) {
 			t.Fail()
 			return
 		case err := <-context.GetProcessingChannels().Error:
-			utils.AssertErrorsEqual(assertionFailed, err, t)
+			utils.AssertEqual(assertionFailed.Error(), err.Code, t)
+			utils.AssertEqual("Expected: 2, but got: [0 1]", err.Description, t)
+			utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
 			return
 		}
 	}
@@ -160,7 +166,9 @@ func TestTransaction_ExecuteVariableIsNotDefined(t *testing.T) {
 			t.Fail()
 			return
 		case err := <-context.GetProcessingChannels().Error:
-			utils.AssertErrorsEqual(variableIsNotDefined, err, t)
+			utils.AssertEqual(variableIsNotDefined.Error(), err.Code, t)
+			utils.AssertEqual("Unable to find variable: response", err.Description, t)
+			utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
 			return
 		}
 	}
