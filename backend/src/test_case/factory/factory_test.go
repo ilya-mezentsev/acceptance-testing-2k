@@ -3,15 +3,11 @@ package factory
 import (
 	"test_case/errors"
 	parseErrors "test_case/parsers/errors"
-	"test_case/parsers/test_case"
 	"testing"
 	"utils"
 )
 
-var factory = New(
-	test_case.Parser{},
-	nil,
-)
+var factory = New(nil)
 
 func TestFactory_GetAllSuccess(t *testing.T) {
 	testCases := `

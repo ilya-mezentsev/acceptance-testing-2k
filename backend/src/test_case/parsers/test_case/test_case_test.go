@@ -6,8 +6,6 @@ import (
 	"utils"
 )
 
-var parser Parser
-
 func TestParser_ParseOneTestCase(t *testing.T) {
 	testCases := `
 		BEGIN
@@ -20,7 +18,7 @@ func TestParser_ParseOneTestCase(t *testing.T) {
 			ASSERT user.userName EQUALS 'Piter'
 		END
 	`
-	iterator, err := parser.Parse(testCases)
+	iterator, err := Parse(testCases)
 
 	utils.AssertNil(err, t)
 	utils.AssertNotNil(iterator, t)
@@ -45,7 +43,7 @@ func TestParser_ParseTwoTestCases(t *testing.T) {
 			ASSERT user.userName EQUALS 'Piter'
 		END
 	`
-	iterator, err := parser.Parse(testCases)
+	iterator, err := Parse(testCases)
 
 	utils.AssertNil(err, t)
 	utils.AssertNotNil(iterator, t)
@@ -53,7 +51,7 @@ func TestParser_ParseTwoTestCases(t *testing.T) {
 }
 
 func TestParser_ParseEmptyTestCases(t *testing.T) {
-	_, err := parser.Parse(``)
+	_, err := Parse(``)
 
 	utils.AssertErrorsEqual(errors.NoTestCases, err, t)
 }
@@ -70,7 +68,7 @@ func TestTestCaseIterator_HasTransactionsTrue(t *testing.T) {
 			ASSERT user.userName EQUALS 'Piter'
 		END
 	`
-	iterator, _ := parser.Parse(testCases)
+	iterator, _ := Parse(testCases)
 
 	utils.AssertTrue(iterator[0].HasTransactions(), t)
 }
@@ -81,7 +79,7 @@ func TestTestCaseIterator_HasTransactionsFalse(t *testing.T) {
 			// some comment (will be ignored)
 		END
 	`
-	iterator, _ := parser.Parse(testCases)
+	iterator, _ := Parse(testCases)
 
 	utils.AssertFalse(iterator[0].HasTransactions(), t)
 }
@@ -104,8 +102,8 @@ func TestTestCaseIterator_GetTestCaseTransactions(t *testing.T) {
 		`ASSERT user.hash EQUALS 'some-hash'`,
 		`ASSERT user.userName EQUALS 'Piter'`,
 	}
-	iterators, _ := parser.Parse(testCases)
-	iterator := iterators[0].(*TestCaseTransactionsIterator)
+	iterators, _ := Parse(testCases)
+	iterator := iterators[0]
 
 	for iterator.HasTransactions() {
 		utils.AssertEqual(

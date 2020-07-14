@@ -3,6 +3,7 @@ package factory
 import (
 	"interfaces"
 	"test_case/errors"
+	"test_case/parsers/test_case"
 	"test_case/parsers/transaction/data"
 	"test_case/parsers/transaction/parser"
 	"test_case/test_case_runner"
@@ -12,19 +13,15 @@ import (
 )
 
 type Factory struct {
-	testCasesParser interfaces.TestCasesParser
-	commandFactory  interfaces.CommandBuilder
+	commandBuilder interfaces.CommandBuilder
 }
 
-func New(
-	testCasesParser interfaces.TestCasesParser,
-	commandFactory interfaces.CommandBuilder,
-) interfaces.TestCaseFactory {
-	return Factory{testCasesParser, commandFactory}
+func New(commandBuilder interfaces.CommandBuilder) interfaces.TestCaseFactory {
+	return Factory{commandBuilder}
 }
 
 func (f Factory) GetAll(testCasesData string) ([]interfaces.TestCaseRunner, error) {
-	testCasesIterators, err := f.testCasesParser.Parse(testCasesData)
+	testCasesIterators, err := test_case.Parse(testCasesData)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +83,7 @@ func (f Factory) getAssignmentTransaction(transactionData string) (interfaces.Tr
 		return nil, err
 	}
 
-	return assignment.New(f.commandFactory, &assignmentTransactionData), nil
+	return assignment.New(f.commandBuilder, &assignmentTransactionData), nil
 }
 
 func (f Factory) getSimpleTransaction(transactionData string) (interfaces.Transaction, error) {
@@ -100,5 +97,5 @@ func (f Factory) getSimpleTransaction(transactionData string) (interfaces.Transa
 		return nil, err
 	}
 
-	return simple.New(f.commandFactory, &simpleTransactionData), nil
+	return simple.New(f.commandBuilder, &simpleTransactionData), nil
 }
