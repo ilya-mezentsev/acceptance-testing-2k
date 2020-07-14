@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"utils"
 )
 
 func Parse(response http.Response) (map[string]interface{}, error) {
@@ -57,7 +58,7 @@ func processValue(value interface{}) (interface{}, error) {
 	case bool:
 		return fmt.Sprintf("%v", value), nil
 	default:
-		return nil, nil
+		return processComplexValue(value)
 	}
 }
 
@@ -78,4 +79,43 @@ func removeUselessZeros(num string) string {
 	}
 
 	return num
+}
+
+func processComplexValue(value interface{}) (interface{}, error) {
+	switch {
+	case utils.IsGenericSlice(value):
+		return getValueFromSlice(value.([]interface{}))
+	case utils.IsGenericMap(value):
+		return getValueFromMap(value.(map[string]interface{}))
+	default:
+		return nil, nil
+	}
+}
+
+func getValueFromSlice(value []interface{}) ([]interface{}, error) {
+	var values []interface{}
+	for _, item := range value {
+		newValue, err := processValue(item)
+		if err != nil {
+			return nil, err
+		}
+
+		values = append(values, newValue)
+	}
+
+	return values, nil
+}
+
+func getValueFromMap(value map[string]interface{}) (map[string]interface{}, error) {
+	values := map[string]interface{}{}
+	for key, val := range value {
+		newValue, err := processValue(val)
+		if err != nil {
+			return nil, err
+		}
+
+		values[key] = newValue
+	}
+
+	return values, nil
 }

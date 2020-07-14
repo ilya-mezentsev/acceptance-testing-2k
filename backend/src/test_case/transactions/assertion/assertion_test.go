@@ -243,11 +243,3 @@ func TestTransaction_GetValueByPathInvalidValue(t *testing.T) {
 
 	utils.AssertErrorsEqual(cannotAccessValueByPath, err, t)
 }
-
-func TestTransaction_IsMapTrue(t *testing.T) {
-	utils.AssertTrue(isMap(map[string]interface{}{}), t)
-}
-
-func TestTransaction_IsMapFalse(t *testing.T) {
-	utils.AssertFalse(isMap(""), t)
-}
