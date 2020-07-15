@@ -1,23 +1,37 @@
 package response_parser
 
 import (
+	"command/http/errors"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"plugins/logger"
+	"strings"
 	"utils"
 )
 
 func Parse(response http.Response) (map[string]interface{}, error) {
 	responseData := map[string]interface{}{}
-
 	err := unmarshalRequestBody(response.Body, responseData)
 	if err != nil {
-		return nil, err
+		logger.WithFields(logger.Fields{
+			MessageTemplate: "Unable to parse JSON from response body: %v",
+			Args: []interface{}{
+				err,
+			},
+			Optional: map[string]interface{}{
+				"response_body": response.Body,
+			},
+		}, logger.Error)
+
+		return nil, errors.NoJSONInResponse
 	}
 
-	err = processValues(responseData)
+	for key, value := range responseData {
+		responseData[key] = processValue(value)
+	}
 
 	return responseData, err
 }
@@ -36,86 +50,67 @@ func unmarshalRequestBody(closer io.ReadCloser, dest map[string]interface{}) err
 	return nil
 }
 
-func processValues(data map[string]interface{}) error {
-	for key, value := range data {
-		newValue, err := processValue(value)
-		if err != nil {
-			return err
-		}
-
-		data[key] = newValue
-	}
-
-	return nil
-}
-
-func processValue(value interface{}) (interface{}, error) {
+func processValue(value interface{}) interface{} {
 	switch value.(type) {
-	case int, int32, int64, uint, uint32:
-		return fmt.Sprintf("%d", value), nil
+	case string:
+		return value
 	case float32, float64:
-		return removeUselessZeros(fmt.Sprintf("%.5f", value)), nil
+		return removeUselessZeros(fmt.Sprintf("%.5f", value))
 	case bool:
-		return fmt.Sprintf("%v", value), nil
-	default:
-		return processComplexValue(value)
-	}
-}
-
-func removeUselessZeros(num string) string {
-	for i := len(num) - 1; i >= 0; i-- {
-		currentSymbol := string(num[i])
-		if currentSymbol == "0" {
-			continue
-		}
-
-		if currentSymbol == "." {
-			if currentSymbol == "0" {
-				return num[:i-1]
-			} else {
-				return num[:i]
-			}
-		}
+		return fmt.Sprintf("%v", value)
 	}
 
-	return num
-}
-
-func processComplexValue(value interface{}) (interface{}, error) {
 	switch {
 	case utils.IsGenericSlice(value):
 		return getValueFromSlice(value.([]interface{}))
 	case utils.IsGenericMap(value):
 		return getValueFromMap(value.(map[string]interface{}))
-	default:
-		return nil, nil
+	}
+
+	logger.WithFields(logger.Fields{
+		MessageTemplate: "Unable to process value.",
+		Optional: map[string]interface{}{
+			"type":  fmt.Sprintf("%T", value),
+			"value": fmt.Sprintf("%v", value),
+		},
+	}, logger.Warning)
+	return nil
+}
+
+func removeUselessZeros(num string) string {
+	splatted := strings.Split(num, ".")
+	whole, fractional := splatted[0], splatted[1]
+	var newFractional string
+
+	for i := len(fractional) - 1; i >= 0; i-- {
+		currentSymbol := string(fractional[i])
+
+		if currentSymbol != "0" {
+			newFractional = fractional[:i+1]
+		}
+	}
+
+	if newFractional == "" {
+		return whole
+	} else {
+		return strings.Join([]string{whole, newFractional}, ".")
 	}
 }
 
-func getValueFromSlice(value []interface{}) ([]interface{}, error) {
+func getValueFromSlice(value []interface{}) []interface{} {
 	var values []interface{}
 	for _, item := range value {
-		newValue, err := processValue(item)
-		if err != nil {
-			return nil, err
-		}
-
-		values = append(values, newValue)
+		values = append(values, processValue(item))
 	}
 
-	return values, nil
+	return values
 }
 
-func getValueFromMap(value map[string]interface{}) (map[string]interface{}, error) {
+func getValueFromMap(value map[string]interface{}) map[string]interface{} {
 	values := map[string]interface{}{}
 	for key, val := range value {
-		newValue, err := processValue(val)
-		if err != nil {
-			return nil, err
-		}
-
-		values[key] = newValue
+		values[key] = processValue(val)
 	}
 
-	return values, nil
+	return values
 }
