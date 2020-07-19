@@ -13,6 +13,7 @@ type (
 
 	Arguments interface {
 		Value() string
+		IsSlashSeparated() bool
 		AmpersandSeparated() (string, error)
 	}
 )

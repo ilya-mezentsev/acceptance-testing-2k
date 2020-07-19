@@ -40,10 +40,10 @@ func Init(router *mux.Router) {
 	h := handler{users: map[string]user{}}
 
 	router.HandleFunc("/", h.getAllUsers).Methods(http.MethodGet)
-	router.HandleFunc("/?{hash:[0-9]+}", h.getUser).Methods(http.MethodGet)
+	router.HandleFunc("/{hash:[a-zA-Z0-9]+}", h.getUser).Methods(http.MethodGet)
 	router.HandleFunc("/", h.createUser).Methods(http.MethodPost)
-	router.HandleFunc("/?{hash:[0-9]+}", h.patchUser).Methods(http.MethodPatch)
-	router.HandleFunc("/?{hash:[0-9]+}", h.deleteUser).Methods(http.MethodDelete)
+	router.HandleFunc("/{hash:[a-zA-Z0-9]+}", h.patchUser).Methods(http.MethodPatch)
+	router.HandleFunc("/{hash:[a-zA-Z0-9]+}", h.deleteUser).Methods(http.MethodDelete)
 }
 
 func (h handler) getAllUsers(w http.ResponseWriter, r *http.Request) {

@@ -3,7 +3,7 @@ package data
 import "regexp"
 
 var SimpleTransactionPattern = regexp.MustCompile(
-	`(?P<command>[a-zA-Z_]+?) (?P<object>[a-zA-Z_]+?) ?(?P<arguments>{.+})?$`,
+	`(?P<command>[a-zA-Z_]+?) (?P<object>[a-zA-Z_]+?)(?: (?P<arguments>.+))?$`,
 )
 
 type SimpleTransactionData struct {

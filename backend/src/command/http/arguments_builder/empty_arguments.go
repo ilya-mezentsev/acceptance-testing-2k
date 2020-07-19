@@ -10,3 +10,7 @@ func (a emptyArguments) Value() string {
 func (a emptyArguments) AmpersandSeparated() (string, error) {
 	return "", nil
 }
+
+func (a emptyArguments) IsSlashSeparated() bool {
+	return false
+}

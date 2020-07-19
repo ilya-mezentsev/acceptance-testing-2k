@@ -5,7 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"plugins/logger"
+	"regexp"
 	"strings"
+)
+
+var slashSeparatedPattern = regexp.MustCompile(
+	`^(/?\w+?/?)+$`,
 )
 
 type arguments struct {
@@ -14,6 +19,10 @@ type arguments struct {
 
 func (a arguments) Value() string {
 	return a.data
+}
+
+func (a arguments) IsSlashSeparated() bool {
+	return slashSeparatedPattern.MatchString(a.data)
 }
 
 func (a arguments) AmpersandSeparated() (string, error) {

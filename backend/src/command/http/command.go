@@ -58,21 +58,45 @@ func (c *Command) createRequest() error {
 func (c Command) getURLAndBody() (string, io.Reader, error) {
 	switch c.settings.GetMethod() {
 	case http.MethodGet, http.MethodDelete:
-		ampersandSeparatedArguments, err := c.arguments.AmpersandSeparated()
-		return fmt.Sprintf(
-			"%s/%s?%s",
-			c.settings.GetBaseURL(),
-			c.settings.GetEndpoint(),
-			ampersandSeparatedArguments,
-		), nil, err
+		if c.arguments.IsSlashSeparated() {
+			return c.buildURLForSlashSeparatedArguments(), nil, nil
+		} else {
+			url, err := c.tryBuildURLForAmpersandSeparatedArguments()
+
+			return url, nil, err
+		}
 
 	default:
-		return fmt.Sprintf(
-			"%s/%s",
-			c.settings.GetBaseURL(),
-			c.settings.GetEndpoint(),
-		), bytes.NewBufferString(c.arguments.Value()), nil
+		return c.buildDefaultURL(), bytes.NewBufferString(c.arguments.Value()), nil
 	}
+}
+
+func (c Command) buildURLForSlashSeparatedArguments() string {
+	return fmt.Sprintf(
+		"%s/%s/%s",
+		c.settings.GetBaseURL(),
+		c.settings.GetEndpoint(),
+		c.arguments.Value(),
+	)
+}
+
+func (c Command) tryBuildURLForAmpersandSeparatedArguments() (string, error) {
+	ampersandSeparatedArguments, err := c.arguments.AmpersandSeparated()
+
+	return fmt.Sprintf(
+		"%s/%s?%s",
+		c.settings.GetBaseURL(),
+		c.settings.GetEndpoint(),
+		ampersandSeparatedArguments,
+	), err
+}
+
+func (c Command) buildDefaultURL() string {
+	return fmt.Sprintf(
+		"%s/%s",
+		c.settings.GetBaseURL(),
+		c.settings.GetEndpoint(),
+	)
 }
 
 func (c Command) setDefaultHeaders() {

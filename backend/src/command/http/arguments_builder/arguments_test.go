@@ -22,6 +22,7 @@ func TestBuild_EmptyArguments(t *testing.T) {
 	utils.AssertNil(err, t)
 	utils.AssertEqual(``, args.Value(), t)
 	utils.AssertEqual(``, ampersandSeparated, t)
+	utils.AssertFalse(args.IsSlashSeparated(), t)
 }
 
 func TestBuild_WithFlatJSONArguments(t *testing.T) {
@@ -32,6 +33,7 @@ func TestBuild_WithFlatJSONArguments(t *testing.T) {
 	utils.AssertNil(err, t)
 	utils.AssertEqual(`{"x": 1}`, args.Value(), t)
 	utils.AssertEqual(`x=1`, ampersandSeparated, t)
+	utils.AssertFalse(args.IsSlashSeparated(), t)
 }
 
 func TestArguments_AmpersandSeparatedWithComplexJSON(t *testing.T) {
@@ -51,4 +53,10 @@ func TestBuild_WithNoJSONArguments(t *testing.T) {
 
 	utils.AssertErrorsEqual(errors.NoJSONInArguments, err, t)
 	utils.AssertEqual(`1`, args.Value(), t)
+}
+
+func TestBuild_WithSlashSeparatedArguments(t *testing.T) {
+	args := Build(`id/nickname`)
+
+	utils.AssertTrue(args.IsSlashSeparated(), t)
 }

@@ -7,7 +7,7 @@ import (
 	"utils"
 )
 
-func TestParseSimpleTransactionWithArguments(t *testing.T) {
+func TestParseSimpleTransactionWithJSONArguments(t *testing.T) {
 	var transactionData data.SimpleTransactionData
 	transactionText := `CREATE USER {"hash": "some-hash", "userName": "Piter"}`
 	err := Parse(
@@ -20,6 +20,22 @@ func TestParseSimpleTransactionWithArguments(t *testing.T) {
 	utils.AssertEqual("CREATE", transactionData.GetCommand(), t)
 	utils.AssertEqual("USER", transactionData.GetObject(), t)
 	utils.AssertEqual(`{"hash": "some-hash", "userName": "Piter"}`, transactionData.GetArguments(), t)
+	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
+}
+
+func TestParseSimpleTransactionWithSlashSeparatedArguments(t *testing.T) {
+	var transactionData data.SimpleTransactionData
+	transactionText := `GET USER 12/nickname`
+	err := Parse(
+		data.SimpleTransactionPattern,
+		transactionText,
+		&transactionData,
+	)
+
+	utils.AssertNil(err, t)
+	utils.AssertEqual("GET", transactionData.GetCommand(), t)
+	utils.AssertEqual("USER", transactionData.GetObject(), t)
+	utils.AssertEqual(`12/nickname`, transactionData.GetArguments(), t)
 	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
 }
 
@@ -49,7 +65,7 @@ func TestParseSimpleTransactionInvalidTransactionFormat(t *testing.T) {
 	utils.AssertErrorsEqual(errors.InvalidTransactionFormat, err, t)
 }
 
-func TestParseAssignmentTransactionWithArguments(t *testing.T) {
+func TestParseAssignmentTransactionWithJSONArguments(t *testing.T) {
 	var transactionData data.AssignmentTransactionData
 	transactionText := `x = GET USER {"hash": "hash-1"}`
 	err := Parse(
@@ -63,6 +79,23 @@ func TestParseAssignmentTransactionWithArguments(t *testing.T) {
 	utils.AssertEqual("GET", transactionData.GetCommand(), t)
 	utils.AssertEqual("USER", transactionData.GetObject(), t)
 	utils.AssertEqual(`{"hash": "hash-1"}`, transactionData.GetArguments(), t)
+	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
+}
+
+func TestParseAssignmentTransactionWithSlashSeparatedArguments(t *testing.T) {
+	var transactionData data.AssignmentTransactionData
+	transactionText := `x = GET USER hash-1/nickname`
+	err := Parse(
+		data.AssignmentTransactionPattern,
+		transactionText,
+		&transactionData,
+	)
+
+	utils.AssertNil(err, t)
+	utils.AssertEqual("x", transactionData.GetVariableName(), t)
+	utils.AssertEqual("GET", transactionData.GetCommand(), t)
+	utils.AssertEqual("USER", transactionData.GetObject(), t)
+	utils.AssertEqual(`hash-1/nickname`, transactionData.GetArguments(), t)
 	utils.AssertEqual(transactionText, transactionData.GetTransactionText(), t)
 }
 

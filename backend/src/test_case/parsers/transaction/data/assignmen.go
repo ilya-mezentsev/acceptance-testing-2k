@@ -3,7 +3,7 @@ package data
 import "regexp"
 
 var AssignmentTransactionPattern = regexp.MustCompile(
-	`(?P<variableName>[a-zA-Z0-9_]+?) ?= ?(?P<command>[a-zA-Z_]+?) (?P<object>[a-zA-Z_]+?) ?(?P<arguments>{.+})?$`,
+	`(?P<variableName>[a-zA-Z0-9_]+?) ?= ?(?P<command>[a-zA-Z_]+?) (?P<object>[a-zA-Z_]+?)(?: (?P<arguments>.+))?$`,
 )
 
 type AssignmentTransactionData struct {
