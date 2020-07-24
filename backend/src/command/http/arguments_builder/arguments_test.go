@@ -60,3 +60,8 @@ func TestBuild_WithSlashSeparatedArguments(t *testing.T) {
 
 	utils.AssertTrue(args.IsSlashSeparated(), t)
 }
+
+func TestBuild_WithSlashSeparatedOneArgument(t *testing.T) {
+	utils.AssertTrue(Build(`hash-1`).IsSlashSeparated(), t)
+	utils.AssertTrue(Build(`hash_1`).IsSlashSeparated(), t)
+}

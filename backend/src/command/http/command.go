@@ -56,8 +56,8 @@ func (c *Command) createRequest() error {
 }
 
 func (c Command) getURLAndBody() (string, io.Reader, error) {
-	switch c.settings.GetMethod() {
-	case http.MethodGet, http.MethodDelete:
+	switch {
+	case c.settings.ShouldPassArgumentsInURL():
 		if c.arguments.IsSlashSeparated() {
 			return c.buildURLForSlashSeparatedArguments(), nil, nil
 		} else {

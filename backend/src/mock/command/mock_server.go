@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"plugins/logger"
-	"sync"
 )
 
 type (
@@ -18,45 +17,50 @@ type (
 
 	handler struct {
 		users map[string]user
-		*sync.Mutex
 	}
 
-	response struct {
-		status string
+	Response struct {
+		Status string
 	}
 
 	successResponse struct {
-		response
-		data interface{}
+		Response
+		Data interface{}
 	}
 
 	erroredResponse struct {
-		response
-		errorDetail string
+		Response
+		ErrorDetail string
 	}
 )
 
 func Init(router *mux.Router) {
-	h := handler{users: map[string]user{}}
+	h := handler{users: map[string]user{
+		"hash-1": {
+			Hash: "hash-1",
+			Name: "John",
+		},
+		"hash-2": {
+			Hash: "hash-2",
+			Name: "Nick",
+		},
+	}}
+	userAPI := router.PathPrefix("/user").Subrouter()
 
-	router.HandleFunc("/", h.getAllUsers).Methods(http.MethodGet)
-	router.HandleFunc("/{hash:[a-zA-Z0-9]+}", h.getUser).Methods(http.MethodGet)
-	router.HandleFunc("/", h.createUser).Methods(http.MethodPost)
-	router.HandleFunc("/{hash:[a-zA-Z0-9]+}", h.patchUser).Methods(http.MethodPatch)
-	router.HandleFunc("/{hash:[a-zA-Z0-9]+}", h.deleteUser).Methods(http.MethodDelete)
+	router.HandleFunc("/users", h.getAllUsers).Methods(http.MethodGet)
+	userAPI.HandleFunc("/{hash:[a-zA-Z0-9-]+}", h.getUser).Methods(http.MethodGet)
+	userAPI.HandleFunc("/", h.createUser).Methods(http.MethodPost)
+	userAPI.HandleFunc("/{hash:[a-zA-Z0-9-]+}", h.patchUser).Methods(http.MethodPatch)
+	userAPI.HandleFunc("/{hash:[a-zA-Z0-9-]+}", h.deleteUser).Methods(http.MethodDelete)
 }
 
 func (h handler) getAllUsers(w http.ResponseWriter, r *http.Request) {
-	h.Lock()
-	defer h.Unlock()
 	defer sendErrorIfPanicked(w)
 
 	encodeAndSendResponse(w, h.users)
 }
 
 func (h handler) getUser(w http.ResponseWriter, r *http.Request) {
-	h.Lock()
-	defer h.Unlock()
 	defer sendErrorIfPanicked(w)
 
 	userHash := mux.Vars(r)["hash"]
@@ -69,8 +73,6 @@ func (h handler) getUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
-	h.Lock()
-	defer h.Unlock()
 	defer sendErrorIfPanicked(w)
 
 	var u user
@@ -80,13 +82,12 @@ func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 	if userExists {
 		panic(errors.New("user-already-exists"))
 	} else {
+		h.users[u.Hash] = u
 		encodeAndSendResponse(w, nil)
 	}
 }
 
 func (h *handler) patchUser(w http.ResponseWriter, r *http.Request) {
-	h.Lock()
-	defer h.Unlock()
 	defer sendErrorIfPanicked(w)
 
 	var u user
@@ -101,8 +102,6 @@ func (h *handler) patchUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) deleteUser(w http.ResponseWriter, r *http.Request) {
-	h.Lock()
-	defer h.Unlock()
 	defer sendErrorIfPanicked(w)
 
 	delete(h.users, mux.Vars(r)["hash"])
@@ -114,8 +113,8 @@ func sendErrorIfPanicked(w http.ResponseWriter) {
 		logger.WarningF("Panicked: %v", err)
 
 		output, _ := json.Marshal(erroredResponse{
-			response:    response{status: "error"},
-			errorDetail: err.(error).Error(),
+			Response:    Response{Status: "error"},
+			ErrorDetail: err.(error).Error(),
 		})
 		makeResponse(w, output)
 	}
@@ -135,8 +134,8 @@ func decodeRequestBody(r *http.Request, target interface{}) {
 
 func encodeAndSendResponse(w http.ResponseWriter, v interface{}) {
 	output, _ := json.Marshal(successResponse{
-		response: response{status: "ok"},
-		data:     v,
+		Response: Response{Status: "ok"},
+		Data:     v,
 	})
 	makeResponse(w, output)
 }

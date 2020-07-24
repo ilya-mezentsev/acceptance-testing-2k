@@ -10,7 +10,7 @@ import (
 )
 
 var slashSeparatedPattern = regexp.MustCompile(
-	`^(/?\w+?/?)+$`,
+	`^(/?[\w-]+?/?)+$`,
 )
 
 type arguments struct {

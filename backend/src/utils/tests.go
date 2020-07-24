@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -60,4 +62,8 @@ func logExpectationAndFail(expected, actual interface{}, t *testing.T) {
 
 func GetExpectationString(e Expectation) string {
 	return fmt.Sprintf("expected: %v, got: %v\n", e.Expected, e.Actual)
+}
+
+func GetTestServer(r *mux.Router) *httptest.Server {
+	return httptest.NewServer(r)
 }
