@@ -11,8 +11,8 @@ import (
 
 type (
 	user struct {
-		Hash string
-		Name string
+		Hash string `json:"hash"`
+		Name string `json:"name"`
 	}
 
 	handler struct {
@@ -20,48 +20,65 @@ type (
 	}
 
 	Response struct {
-		Status string
+		Status string `json:"status"`
 	}
 
 	successResponse struct {
 		Response
-		Data interface{}
+		Data interface{} `json:"data"`
 	}
 
 	erroredResponse struct {
 		Response
-		ErrorDetail string
+		ErrorDetail string `json:"error_detail"`
 	}
 )
 
+const (
+	StatusOk    = "ok"
+	StatusError = "error"
+)
+
+var Users = map[string]user{
+	"hash-1": {
+		Hash: "hash-1",
+		Name: "John",
+	},
+	"hash-2": {
+		Hash: "hash-2",
+		Name: "Nick",
+	},
+}
+
 func Init(router *mux.Router) {
-	h := handler{users: map[string]user{
-		"hash-1": {
-			Hash: "hash-1",
-			Name: "John",
-		},
-		"hash-2": {
-			Hash: "hash-2",
-			Name: "Nick",
-		},
-	}}
+	h := handler{users: Users}
 	userAPI := router.PathPrefix("/user").Subrouter()
 
 	router.HandleFunc("/users", h.getAllUsers).Methods(http.MethodGet)
+	router.HandleFunc("/invalid-response", h.invalidResponse).Methods(http.MethodGet)
 	userAPI.HandleFunc("/{hash:[a-zA-Z0-9-]+}", h.getUser).Methods(http.MethodGet)
 	userAPI.HandleFunc("/", h.createUser).Methods(http.MethodPost)
 	userAPI.HandleFunc("/{hash:[a-zA-Z0-9-]+}", h.patchUser).Methods(http.MethodPatch)
 	userAPI.HandleFunc("/{hash:[a-zA-Z0-9-]+}", h.deleteUser).Methods(http.MethodDelete)
 }
 
+func (h handler) invalidResponse(w http.ResponseWriter, r *http.Request) {
+	defer sendErrorIfPanicked(w)
+	h.sendHeadersAndCookiesToConsumers(r)
+
+	makeResponse(w, nil)
+}
+
 func (h handler) getAllUsers(w http.ResponseWriter, r *http.Request) {
 	defer sendErrorIfPanicked(w)
+	h.sendHeadersAndCookiesToConsumers(r)
 
 	encodeAndSendResponse(w, h.users)
 }
 
 func (h handler) getUser(w http.ResponseWriter, r *http.Request) {
 	defer sendErrorIfPanicked(w)
+	h.sendHeadersAndCookiesToConsumers(r)
 
 	userHash := mux.Vars(r)["hash"]
 	user, found := h.users[userHash]
@@ -74,6 +91,7 @@ func (h handler) getUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 	defer sendErrorIfPanicked(w)
+	h.sendHeadersAndCookiesToConsumers(r)
 
 	var u user
 	decodeRequestBody(r, &u)
@@ -89,6 +107,7 @@ func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) patchUser(w http.ResponseWriter, r *http.Request) {
 	defer sendErrorIfPanicked(w)
+	h.sendHeadersAndCookiesToConsumers(r)
 
 	var u user
 	decodeRequestBody(r, &u)
@@ -103,9 +122,14 @@ func (h *handler) patchUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) deleteUser(w http.ResponseWriter, r *http.Request) {
 	defer sendErrorIfPanicked(w)
+	h.sendHeadersAndCookiesToConsumers(r)
 
 	delete(h.users, mux.Vars(r)["hash"])
 	encodeAndSendResponse(w, nil)
+}
+
+func (h handler) sendHeadersAndCookiesToConsumers(r *http.Request) {
+	Storage.Add(r.Cookies(), r.Header)
 }
 
 func sendErrorIfPanicked(w http.ResponseWriter) {
@@ -113,7 +137,7 @@ func sendErrorIfPanicked(w http.ResponseWriter) {
 		logger.WarningF("Panicked: %v", err)
 
 		output, _ := json.Marshal(erroredResponse{
-			Response:    Response{Status: "error"},
+			Response:    Response{StatusError},
 			ErrorDetail: err.(error).Error(),
 		})
 		makeResponse(w, output)
@@ -134,7 +158,7 @@ func decodeRequestBody(r *http.Request, target interface{}) {
 
 func encodeAndSendResponse(w http.ResponseWriter, v interface{}) {
 	output, _ := json.Marshal(successResponse{
-		Response: Response{Status: "ok"},
+		Response: Response{StatusOk},
 		Data:     v,
 	})
 	makeResponse(w, output)

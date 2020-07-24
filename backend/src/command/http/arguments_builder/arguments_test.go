@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"testing"
 	"utils"
 )
@@ -43,7 +44,9 @@ func TestArguments_AmpersandSeparatedWithComplexJSON(t *testing.T) {
 
 	utils.AssertNil(err, t)
 	utils.AssertEqual(`{"x": [1, 2, 3], "y": {"t1": 1, "t2": 2}}`, args.Value(), t)
-	utils.AssertEqual(`x=[1,2,3]&y={"t1":1,"t2":2}`, ampersandSeparated, t)
+	utils.AssertTrue(strings.Contains(ampersandSeparated, `x=[1,2,3]`), t)
+	utils.AssertTrue(strings.Contains(ampersandSeparated, `y={"t1":1,"t2":2}`), t)
+	utils.AssertTrue(strings.Contains(ampersandSeparated, `&`), t)
 }
 
 func TestBuild_WithNoJSONArguments(t *testing.T) {

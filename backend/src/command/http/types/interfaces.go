@@ -9,7 +9,7 @@ type (
 		GetEndpoint() string
 		ShouldPassArgumentsInURL() bool
 		GetHeaders() map[string]string
-		GetCookies() []http.Cookie
+		GetCookies() []*http.Cookie
 	}
 
 	Arguments interface {

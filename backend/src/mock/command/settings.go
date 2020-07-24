@@ -8,7 +8,7 @@ type MockSettings struct {
 	Method, BaseURL, Endpoint string
 	PassArgumentsInURL        bool
 	Headers                   map[string]string
-	Cookies                   []http.Cookie
+	Cookies                   []*http.Cookie
 }
 
 func (s MockSettings) GetMethod() string {
@@ -27,7 +27,7 @@ func (s MockSettings) GetHeaders() map[string]string {
 	return s.Headers
 }
 
-func (s MockSettings) GetCookies() []http.Cookie {
+func (s MockSettings) GetCookies() []*http.Cookie {
 	return s.Cookies
 }
 

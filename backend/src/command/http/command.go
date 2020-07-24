@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"command/http/arguments_builder"
+	"command/http/errors"
 	"command/http/types"
 	"encoding/json"
 	"fmt"
@@ -111,7 +112,7 @@ func (c Command) setHeadersFromSettings() {
 
 func (c Command) setCookiesFromSettings() {
 	for _, cookie := range c.settings.GetCookies() {
-		c.req.AddCookie(&cookie)
+		c.req.AddCookie(cookie)
 	}
 }
 
@@ -121,7 +122,11 @@ func (c Command) makeRequest() (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	return res.Body, nil
+	if 200 <= res.StatusCode && res.StatusCode <= 299 {
+		return res.Body, nil
+	} else {
+		return nil, errors.UnsuccessfulStatus(res.StatusCode)
+	}
 }
 
 func (c Command) decodeResponseBody(data io.ReadCloser) (map[string]interface{}, error) {
