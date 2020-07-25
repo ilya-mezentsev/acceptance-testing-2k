@@ -20,6 +20,7 @@ declare -A env=(
   ['ENV_VARS_WERE_SET']="1"
   ['PROJECT_ROOT']="${rootFolder}"
   ['REPORT_FOLDER']="${rootFolder}/backend/test_report"
+  ['DB_FILE']="${rootFolder}/backend/test_data/test.db"
   ['GOPATH']="${rootFolder}"/backend
 )
 
