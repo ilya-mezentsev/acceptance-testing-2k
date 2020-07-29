@@ -4,7 +4,7 @@ SCRIPTS_FOLDER=$(pwd)/scripts
 declare -A scriptsDescriptions=(
   ['help']='show this help'
   ['calc_go_lines']='calculate lines of *.go files'
-  ['tests']='run go tests'
+  ['test_runner_tests']='run tests of test runner'
   ['push_all']='push all files to repository'
 )
 
