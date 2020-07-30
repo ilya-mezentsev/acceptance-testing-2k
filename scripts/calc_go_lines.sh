@@ -4,19 +4,23 @@ if [[ ${ENV_VARS_WERE_SET} != '1' ]]; then
   exit 1
 fi
 
-cd "${GOPATH}" || exit
-
-(( linesCount=$(wc -l < main.go) ))
-
-cd src/ || exit
-
-for dir in $(ls)
+for appsDir in "${TEST_RUNNER_PATH}" "${BACKEND_LIBS_PATH}"
 do
-  if [[ ${dir} != github.com && ${dir} != golang.org ]]; then
-    cd "${dir}" || exit
-    (( linesCount=linesCount+$(find . -name '*.go' -type f -print0 | xargs -0 cat | wc -l) ))
-    cd ../
-  fi
+  cd "${appsDir}"/src || exit
+  for dir in $(ls)
+    do
+      if [[
+        ${dir} != github.com &&
+        ${dir} != golang.org &&
+        ${dir} != google.golang.org &&
+        ${dir} != bin &&
+        ${dir} != pkg
+      ]]; then
+        cd "${dir}" || exit
+        (( linesCount=linesCount+$(find . -name '*.go' -type f -print0 | xargs -0 cat | wc -l) ))
+        cd ../
+      fi
+    done
 done
 
 echo ${linesCount}
