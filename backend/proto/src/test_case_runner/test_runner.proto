@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package test_runner;
+option go_package = "test_case_runner";
+
+message testCasesRequest {
+  string accountHash = 1;
+  string testCasesFilename = 2;
+}
+
+message testCaseRunReport {
+  bool ok = 1;
+  string code = 2;
+  string description = 3;
+  string transactionText = 4;
+}
+
+message testsReport {
+  repeated testCaseRunReport report = 1;
+}
+
+service testRunnerService {
+  rpc Run(testCasesRequest) returns (testsReport) {};
+}

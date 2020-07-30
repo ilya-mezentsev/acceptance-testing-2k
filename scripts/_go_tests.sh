@@ -25,7 +25,7 @@ do
   reportFileName=$(echo -n "${dir}" | md5sum | awk '{print $1}')
   reportFilePath=${REPORT_FOLDER}/${reportFileName}
   cd "${GO_SRC}"/src/"${dir}" && \
-    GOPATH=${GOPATH}:${BACKEND_LIBS_PATH} go test -coverprofile="${reportFilePath}".out
+    GOPATH=${GOPATH}:${BACKEND_LIBS_PATH}:${PROTO_PATH} go test -coverprofile="${reportFilePath}".out
   if [[ $1 = html ]]; then # open reports in browser
     go tool cover -html="${reportFilePath}".out -o "${reportFilePath}".html
     chromium "${reportFilePath}".html >/dev/null 2>&1 &

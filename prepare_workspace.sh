@@ -20,6 +20,7 @@ fi
 declare -A env=(
   ['ENV_VARS_WERE_SET']="1"
   ['PROJECT_ROOT']="${rootFolder}"
+  ['PROTO_PATH']="${rootFolder}/backend/proto"
   ['TEST_RUNNER_REPORT_FOLDER']="${rootFolder}/backend/tests_runner/test_report"
   ['TEST_RUNNER_DB_FILE']="${rootFolder}/backend/tests_runner/test_data/test.db"
   ['TEST_RUNNER_PATH']="${rootFolder}"/backend/tests_runner
