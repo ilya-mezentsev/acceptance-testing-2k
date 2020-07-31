@@ -33,3 +33,6 @@ bin
 github.com
 golang.org
 google.golang.org
+
+# protoc generated
+*.pb.go
