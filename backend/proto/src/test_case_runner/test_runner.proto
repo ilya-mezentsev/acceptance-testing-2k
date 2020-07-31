@@ -9,16 +9,16 @@ message testCasesRequest {
 }
 
 message testCaseRunReport {
-  bool ok = 1;
+  enum result {
+    PASSED = 0;
+    ALL_DONE = 1;
+    ERROR = 2;
+  }
   string code = 2;
   string description = 3;
   string transactionText = 4;
 }
 
-message testsReport {
-  repeated testCaseRunReport report = 1;
-}
-
 service testRunnerService {
-  rpc Run(testCasesRequest) returns (testsReport) {};
+  rpc Run(testCasesRequest) returns (stream testCaseRunReport) {};
 }
