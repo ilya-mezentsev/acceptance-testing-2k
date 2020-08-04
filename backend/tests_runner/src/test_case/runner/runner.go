@@ -1,4 +1,4 @@
-package test_case_runner
+package runner
 
 import (
 	"interfaces"

@@ -6,7 +6,7 @@ import (
 	"test_case/parsers/test_case"
 	"test_case/parsers/transaction/data"
 	"test_case/parsers/transaction/parser"
-	"test_case/test_case_runner"
+	"test_case/runner"
 	"test_case/transactions/assertion"
 	"test_case/transactions/assignment"
 	"test_case/transactions/simple"
@@ -28,7 +28,7 @@ func (f Factory) GetAll(testCasesData string) ([]interfaces.TestCaseRunner, erro
 
 	var testCaseRunners []interfaces.TestCaseRunner
 	for _, testCasesIterator := range testCasesIterators {
-		testCaseRunner := test_case_runner.Runner{}
+		testCaseRunner := runner.Runner{}
 		for testCasesIterator.HasTransactions() {
 			transactionData := testCasesIterator.GetTestCaseTransaction()
 			transaction, err := f.getTransaction(transactionData)
