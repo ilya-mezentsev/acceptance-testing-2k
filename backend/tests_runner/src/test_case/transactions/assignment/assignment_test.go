@@ -21,7 +21,13 @@ func TestTransaction_ExecuteNilResultCommand(t *testing.T) {
 	for {
 		select {
 		case <-context.GetProcessingChannels().Success:
-			test_utils.AssertEqual(0, len(context.Scope), t)
+			test_utils.AssertEqual(
+				0,
+				len(
+					context.GetVariable(
+						assignment.MockData.GetVariableName()).(map[string]interface{})),
+				t,
+			)
 			return
 		case err := <-context.GetProcessingChannels().Error:
 			t.Log(err)
@@ -43,7 +49,12 @@ func TestTransaction_ExecuteNotNilResultCommand(t *testing.T) {
 		select {
 		case <-context.GetProcessingChannels().Success:
 			for key, value := range assignment.MockCommandResult {
-				test_utils.AssertEqual(value, context.GetVariable(key), t)
+				test_utils.AssertEqual(
+					value,
+					context.GetVariable(
+						assignment.MockData.GetVariableName()).(map[string]interface{})[key],
+					t,
+				)
 			}
 			return
 		case err := <-context.GetProcessingChannels().Error:

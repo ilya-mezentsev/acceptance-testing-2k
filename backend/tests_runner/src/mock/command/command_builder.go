@@ -49,50 +49,92 @@ const (
 	INSERT INTO commands_cookies(key, value, command_hash)
 	VALUES(:key, :value, :command_hash)`
 
-	CreatedObjectName  = "USER"
-	CreatedCommandName = "CREATE"
-	CreatedCommandHash = "hash-1"
+	ObjectName        = "USER"
+	CreateCommandName = "CREATE"
+	GetCommandName    = "GET"
+	PatchCommandName  = "PATCH"
+	DeleteCommandName = "DELETE"
+	CreateCommandHash = "hash-1"
+	GetCommandHash    = "hash-2"
+	PatchCommandHash  = "hash-3"
+	DeleteCommandHash = "hash-4"
 )
 
 var (
 	commands = []map[string]interface{}{
 		{
-			"name":        CreatedCommandName,
-			"hash":        CreatedCommandHash,
-			"object_name": CreatedObjectName,
+			"name":        CreateCommandName,
+			"hash":        CreateCommandHash,
+			"object_name": ObjectName,
+		},
+		{
+			"name":        GetCommandName,
+			"hash":        GetCommandHash,
+			"object_name": ObjectName,
+		},
+		{
+			"name":        PatchCommandName,
+			"hash":        PatchCommandHash,
+			"object_name": ObjectName,
+		},
+		{
+			"name":        DeleteCommandName,
+			"hash":        DeleteCommandHash,
+			"object_name": ObjectName,
 		},
 	}
 	Settings = []map[string]interface{}{
 		{
+			"method":                "POST",
+			"base_url":              "http://link.com",
+			"endpoint":              "user/",
+			"pass_arguments_in_url": false,
+			"command_hash":          CreateCommandHash,
+		},
+		{
 			"method":                "GET",
 			"base_url":              "http://link.com",
-			"endpoint":              "api/v2/user",
+			"endpoint":              "user",
 			"pass_arguments_in_url": true,
-			"command_hash":          CreatedCommandHash,
+			"command_hash":          GetCommandHash,
+		},
+		{
+			"method":                "PATCH",
+			"base_url":              "http://link.com",
+			"endpoint":              "user",
+			"pass_arguments_in_url": true,
+			"command_hash":          PatchCommandHash,
+		},
+		{
+			"method":                "DELETE",
+			"base_url":              "http://link.com",
+			"endpoint":              "user",
+			"pass_arguments_in_url": true,
+			"command_hash":          DeleteCommandHash,
 		},
 	}
 	Headers = []map[string]interface{}{
 		{
 			"key":          "X-Test-1",
 			"value":        "test1",
-			"command_hash": CreatedCommandHash,
+			"command_hash": CreateCommandHash,
 		},
 		{
 			"key":          "X-Test-2",
 			"value":        "test2",
-			"command_hash": CreatedCommandHash,
+			"command_hash": CreateCommandHash,
 		},
 	}
 	Cookies = []map[string]interface{}{
 		{
 			"key":          "Test-Value-1",
 			"value":        "test1",
-			"command_hash": CreatedCommandHash,
+			"command_hash": CreateCommandHash,
 		},
 		{
 			"key":          "Test-Value-2",
 			"value":        "test2",
-			"command_hash": CreatedCommandHash,
+			"command_hash": CreateCommandHash,
 		},
 	}
 
@@ -113,10 +155,6 @@ func DropTables(db *sqlx.DB) {
 	}
 }
 
-func DropCommands(db *sqlx.DB) {
-	exec(db, dropCommandsQuery)
-}
-
 func DropCommandsSettings(db *sqlx.DB) {
 	exec(db, dropCommandsSettingsQuery)
 }
@@ -127,6 +165,14 @@ func DropCommandsHeaders(db *sqlx.DB) {
 
 func DropCommandsCookies(db *sqlx.DB) {
 	exec(db, dropCommandsCookiesQuery)
+}
+
+func ReplaceBaseURLAndInitTables(db *sqlx.DB, baseURL string) {
+	for settingIndex := range Settings {
+		Settings[settingIndex]["base_url"] = baseURL
+	}
+
+	InitTables(db)
 }
 
 func InitTables(db *sqlx.DB) {

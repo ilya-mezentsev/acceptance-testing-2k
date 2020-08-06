@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -66,4 +67,13 @@ func GetExpectationString(e Expectation) string {
 
 func GetTestServer(r *mux.Router) *httptest.Server {
 	return httptest.NewServer(r)
+}
+
+func MustGetEnv(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		panic(fmt.Sprintf("%s is not provided", key))
+	}
+
+	return value
 }

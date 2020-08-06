@@ -43,9 +43,6 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) {
 		return
 	}
 
-	for key, value := range result {
-		context.SetVariable(key, value)
-	}
-
+	context.SetVariable(t.data.GetVariableName(), result)
 	context.GetProcessingChannels().Success <- true
 }

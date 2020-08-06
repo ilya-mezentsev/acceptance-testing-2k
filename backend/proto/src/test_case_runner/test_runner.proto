@@ -8,17 +8,22 @@ message testCasesRequest {
   string testCasesFilename = 2;
 }
 
+message transactionError {
+  string code = 1;
+  string description = 2;
+  string transactionText = 3;
+}
+
 message testCaseRunReport {
-  enum result {
-    PASSED = 0;
-    ALL_DONE = 1;
-    ERROR = 2;
-  }
-  string code = 2;
-  string description = 3;
-  string transactionText = 4;
+  int64 passedCount = 1;
+  int64 failedCount = 2;
+  repeated transactionError errors = 3;
+}
+
+message testsReport {
+  repeated testCaseRunReport report = 1;
 }
 
 service testRunnerService {
-  rpc Run(testCasesRequest) returns (stream testCaseRunReport) {};
+  rpc Run(testCasesRequest) returns (testsReport) {};
 }

@@ -5,7 +5,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"interfaces"
 	mockCommand "mock/command"
-	"os"
 	"test_utils"
 	"testing"
 )
@@ -16,10 +15,7 @@ var (
 )
 
 func init() {
-	dbFile := os.Getenv("TEST_RUNNER_DB_FILE")
-	if dbFile == "" {
-		panic("TEST_RUNNER_DB_FILE is not provided")
-	}
+	dbFile := test_utils.MustGetEnv("TEST_RUNNER_DB_FILE")
 
 	var err error
 	db, err = sqlx.Open("sqlite3", dbFile)
@@ -34,7 +30,7 @@ func TestBuilder_BuildSuccess(t *testing.T) {
 	mockCommand.InitTables(db)
 	defer mockCommand.DropTables(db)
 
-	command, err := builder.Build(mockCommand.CreatedObjectName, mockCommand.CreatedCommandName)
+	command, err := builder.Build(mockCommand.ObjectName, mockCommand.CreateCommandName)
 
 	test_utils.AssertNil(err, t)
 	test_utils.AssertNotNil(command, t)
@@ -43,7 +39,7 @@ func TestBuilder_BuildSuccess(t *testing.T) {
 func TestBuilder_BuildNoDB(t *testing.T) {
 	mockCommand.DropTables(db)
 
-	command, err := builder.Build(mockCommand.CreatedObjectName, mockCommand.CreatedCommandName)
+	command, err := builder.Build(mockCommand.ObjectName, mockCommand.CreateCommandName)
 
 	test_utils.AssertNotNil(err, t)
 	test_utils.AssertNil(command, t)
@@ -54,7 +50,7 @@ func TestBuilder_BuildNoTable(t *testing.T) {
 	mockCommand.DropCommandsSettings(db)
 	defer mockCommand.DropTables(db)
 
-	command, err := builder.Build(mockCommand.CreatedObjectName, mockCommand.CreatedCommandName)
+	command, err := builder.Build(mockCommand.ObjectName, mockCommand.CreateCommandName)
 
 	test_utils.AssertNotNil(err, t)
 	test_utils.AssertNil(command, t)
@@ -64,7 +60,7 @@ func TestBuilder_GetCommandSettingsSuccess(t *testing.T) {
 	mockCommand.InitTables(db)
 	defer mockCommand.DropTables(db)
 
-	settings, err := builder.(Builder).getCommandSettings(mockCommand.CreatedCommandHash)
+	settings, err := builder.(Builder).getCommandSettings(mockCommand.CreateCommandHash)
 
 	test_utils.AssertNil(err, t)
 	test_utils.AssertEqual(mockCommand.Settings[0]["method"], settings.GetMethod(), t)
@@ -85,7 +81,7 @@ func TestBuilder_GetCommandSettingsNoHeadersTable(t *testing.T) {
 	mockCommand.DropCommandsHeaders(db)
 	defer mockCommand.DropTables(db)
 
-	_, err := builder.(Builder).getCommandSettings(mockCommand.CreatedCommandHash)
+	_, err := builder.(Builder).getCommandSettings(mockCommand.CreateCommandHash)
 
 	test_utils.AssertNotNil(err, t)
 }
@@ -95,7 +91,7 @@ func TestBuilder_GetCommandSettingsNoCookiesTable(t *testing.T) {
 	mockCommand.DropCommandsCookies(db)
 	defer mockCommand.DropTables(db)
 
-	_, err := builder.(Builder).getCommandSettings(mockCommand.CreatedCommandHash)
+	_, err := builder.(Builder).getCommandSettings(mockCommand.CreateCommandHash)
 
 	test_utils.AssertNotNil(err, t)
 }
