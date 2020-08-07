@@ -1,12 +1,7 @@
 package context
 
-import (
-	"models"
-)
-
 type MockContext struct {
-	Scope              map[string]interface{}
-	ProcessingChannels models.TestsRun
+	Scope map[string]interface{}
 }
 
 func (c *MockContext) ClearScope() {
@@ -19,8 +14,4 @@ func (c MockContext) SetVariable(name string, data interface{}) {
 
 func (c MockContext) GetVariable(name string) interface{} {
 	return c.Scope[name]
-}
-
-func (c MockContext) GetProcessingChannels() models.TestsRun {
-	return c.ProcessingChannels
 }

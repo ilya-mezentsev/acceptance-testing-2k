@@ -1,10 +1,7 @@
 package runner
 
-import "models"
-
 type Context struct {
-	Scope              map[string]interface{}
-	ProcessingChannels models.TestsRun
+	Scope map[string]interface{}
 }
 
 func (c Context) SetVariable(name string, data interface{}) {
@@ -13,8 +10,4 @@ func (c Context) SetVariable(name string, data interface{}) {
 
 func (c Context) GetVariable(name string) interface{} {
 	return c.Scope[name]
-}
-
-func (c Context) GetProcessingChannels() models.TestsRun {
-	return c.ProcessingChannels
 }

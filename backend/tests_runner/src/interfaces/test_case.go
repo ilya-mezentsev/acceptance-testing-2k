@@ -12,12 +12,11 @@ type (
 	}
 
 	Transaction interface {
-		Execute(context TestCaseContext)
+		Execute(context TestCaseContext) models.TransactionError
 	}
 
 	TestCaseContext interface {
 		SetVariable(name string, value interface{})
 		GetVariable(name string) interface{}
-		GetProcessingChannels() models.TestsRun
 	}
 )

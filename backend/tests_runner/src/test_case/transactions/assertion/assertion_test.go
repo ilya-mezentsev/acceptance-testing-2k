@@ -3,6 +3,7 @@ package assertion
 import (
 	mockAssertion "mock/transaction/assertion"
 	mockContext "mock/transaction/context"
+	"test_case/errors"
 	"test_utils"
 	"testing"
 )
@@ -17,18 +18,9 @@ func TestTransaction_ExecuteSuccess(t *testing.T) {
 	})
 	transaction := New(&mockAssertion.MockDataScore10)
 
-	go transaction.Execute(context)
+	err := transaction.Execute(context)
 
-	for {
-		select {
-		case <-context.GetProcessingChannels().Success:
-			return
-		case err := <-context.GetProcessingChannels().Error:
-			t.Log(err)
-			t.Fail()
-			return
-		}
-	}
+	test_utils.AssertEqual(errors.EmptyTransactionError, err, t)
 }
 
 func TestTransaction_ExecuteSuccessAssertionFailed(t *testing.T) {
@@ -39,21 +31,11 @@ func TestTransaction_ExecuteSuccessAssertionFailed(t *testing.T) {
 	})
 	transaction := New(&mockAssertion.MockDataScore10)
 
-	go transaction.Execute(context)
+	err := transaction.Execute(context)
 
-	for {
-		select {
-		case <-context.GetProcessingChannels().Success:
-			t.Log("Should not got success result")
-			t.Fail()
-			return
-		case err := <-context.GetProcessingChannels().Error:
-			test_utils.AssertEqual(assertionFailed.Error(), err.Code, t)
-			test_utils.AssertEqual("Expected: 10, but got: 11", err.Description, t)
-			test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
-			return
-		}
-	}
+	test_utils.AssertEqual(assertionFailed.Error(), err.Code, t)
+	test_utils.AssertEqual("Expected: 10, but got: 11", err.Description, t)
+	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
 }
 
 func TestTransaction_ExecuteSuccessArrayValue(t *testing.T) {
@@ -64,18 +46,9 @@ func TestTransaction_ExecuteSuccessArrayValue(t *testing.T) {
 	})
 	transaction := New(&mockAssertion.MockDataArray)
 
-	go transaction.Execute(context)
+	err := transaction.Execute(context)
 
-	for {
-		select {
-		case <-context.GetProcessingChannels().Success:
-			return
-		case err := <-context.GetProcessingChannels().Error:
-			t.Log(err)
-			t.Fail()
-			return
-		}
-	}
+	test_utils.AssertEqual(errors.EmptyTransactionError, err, t)
 }
 
 func TestTransaction_ExecuteSuccessArrayWithMap(t *testing.T) {
@@ -88,18 +61,9 @@ func TestTransaction_ExecuteSuccessArrayWithMap(t *testing.T) {
 	})
 	transaction := New(&mockAssertion.MockDataArrayWithMap)
 
-	go transaction.Execute(context)
+	err := transaction.Execute(context)
 
-	for {
-		select {
-		case <-context.GetProcessingChannels().Success:
-			return
-		case err := <-context.GetProcessingChannels().Error:
-			t.Log(err)
-			t.Fail()
-			return
-		}
-	}
+	test_utils.AssertEqual(errors.EmptyTransactionError, err, t)
 }
 
 func TestTransaction_ExecuteCannotAccessValue(t *testing.T) {
@@ -110,21 +74,14 @@ func TestTransaction_ExecuteCannotAccessValue(t *testing.T) {
 	})
 	transaction := New(&mockAssertion.MockDataScore10)
 
-	go transaction.Execute(context)
-
-	for {
-		select {
-		case <-context.GetProcessingChannels().Success:
-			t.Log("Should not got success result")
-			t.Fail()
-			return
-		case err := <-context.GetProcessingChannels().Error:
-			test_utils.AssertEqual(cannotAccessValueByPath.Error(), err.Code, t)
-			test_utils.AssertEqual("Unable to get value by path: "+mockAssertion.MockDataScore10.GetDataPath(), err.Description, t)
-			test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
-			return
-		}
-	}
+	err := transaction.Execute(context)
+	test_utils.AssertEqual(cannotAccessValueByPath.Error(), err.Code, t)
+	test_utils.AssertEqual(
+		"Unable to get value by path: "+mockAssertion.MockDataScore10.GetDataPath(),
+		err.Description,
+		t,
+	)
+	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
 }
 
 func TestTransaction_ExecuteAssertionFailedByTypes(t *testing.T) {
@@ -137,41 +94,19 @@ func TestTransaction_ExecuteAssertionFailedByTypes(t *testing.T) {
 	})
 	transaction := New(&mockAssertion.MockDataArrayWithMap)
 
-	go transaction.Execute(context)
-
-	for {
-		select {
-		case <-context.GetProcessingChannels().Success:
-			t.Log("Should not got success result")
-			t.Fail()
-			return
-		case err := <-context.GetProcessingChannels().Error:
-			test_utils.AssertEqual(assertionFailed.Error(), err.Code, t)
-			test_utils.AssertEqual("Expected: 2, but got: [0 1]", err.Description, t)
-			test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
-			return
-		}
-	}
+	err := transaction.Execute(context)
+	test_utils.AssertEqual(assertionFailed.Error(), err.Code, t)
+	test_utils.AssertEqual("Expected: 2, but got: [0 1]", err.Description, t)
+	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
 }
 
 func TestTransaction_ExecuteVariableIsNotDefined(t *testing.T) {
 	transaction := New(&mockAssertion.MockDataScore10)
 
-	go transaction.Execute(context)
-
-	for {
-		select {
-		case <-context.GetProcessingChannels().Success:
-			t.Log("Should not got success result")
-			t.Fail()
-			return
-		case err := <-context.GetProcessingChannels().Error:
-			test_utils.AssertEqual(variableIsNotDefined.Error(), err.Code, t)
-			test_utils.AssertEqual("Unable to find variable: response", err.Description, t)
-			test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
-			return
-		}
-	}
+	err := transaction.Execute(context)
+	test_utils.AssertEqual(variableIsNotDefined.Error(), err.Code, t)
+	test_utils.AssertEqual("Unable to find variable: response", err.Description, t)
+	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
 }
 
 func TestTransaction_GetValueByPathSingleKey(t *testing.T) {

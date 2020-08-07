@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"interfaces"
 	"models"
+	"test_case/errors"
 )
 
 type Transaction struct {
@@ -16,14 +17,13 @@ func New(
 	return Transaction{data}
 }
 
-func (t Transaction) Execute(context interfaces.TestCaseContext) {
+func (t Transaction) Execute(context interfaces.TestCaseContext) models.TransactionError {
 	if !t.variableExists(context) {
-		context.GetProcessingChannels().Error <- models.TransactionError{
+		return models.TransactionError{
 			Code:            variableIsNotDefined.Error(),
 			Description:     t.variableIsNotDefinedDescription(),
 			TransactionText: t.data.GetTransactionText(),
 		}
-		return
 	}
 
 	currentValue, err := getValueByPath(
@@ -31,18 +31,17 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) {
 		t.data.GetDataPath(),
 	)
 	if err != nil {
-		context.GetProcessingChannels().Error <- models.TransactionError{
+		return models.TransactionError{
 			Code:            err.Error(),
 			Description:     t.unableToGetValueByPathDescription(),
 			TransactionText: t.data.GetTransactionText(),
 		}
-		return
 	}
 
 	if t.equals(currentValue, t.data.GetNewValue()) {
-		context.GetProcessingChannels().Success <- true
+		return errors.EmptyTransactionError
 	} else {
-		context.GetProcessingChannels().Error <- models.TransactionError{
+		return models.TransactionError{
 			Code:            assertionFailed.Error(),
 			Description:     t.assertionFailedDescription(currentValue),
 			TransactionText: t.data.GetTransactionText(),

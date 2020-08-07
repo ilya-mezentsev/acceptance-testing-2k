@@ -3,15 +3,16 @@ package test_case_runner
 import (
 	"interfaces"
 	"models"
+	"test_case/errors"
 )
 
 type baseMockTransaction struct {
 	previousCallContext interfaces.TestCaseContext
 }
 
-func (t *baseMockTransaction) Execute(context interfaces.TestCaseContext) {
+func (t *baseMockTransaction) Execute(context interfaces.TestCaseContext) models.TransactionError {
 	t.previousCallContext = context
-	context.GetProcessingChannels().Success <- true
+	return errors.EmptyTransactionError
 }
 
 func (t baseMockTransaction) CalledWith(context interfaces.TestCaseContext) bool {
@@ -26,7 +27,7 @@ type MockErroredTransaction struct {
 	baseMockTransaction
 }
 
-func (t *MockErroredTransaction) Execute(context interfaces.TestCaseContext) {
+func (t *MockErroredTransaction) Execute(context interfaces.TestCaseContext) models.TransactionError {
 	t.previousCallContext = context
-	context.GetProcessingChannels().Error <- models.TransactionError{Code: SomeTransactionError.Error()}
+	return models.TransactionError{Code: SomeTransactionError.Error()}
 }

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	context2 "context"
+	"context"
 	"interfaces"
 	"models"
 	"test_case_runner"
@@ -17,7 +17,7 @@ func New(testsRunnerClient interfaces.TestsRunnerClient) *Controller {
 }
 
 func (c *Controller) Run(
-	_ context2.Context,
+	_ context.Context,
 	request *test_case_runner.TestCasesRequest,
 ) (*test_case_runner.TestsReport, error) {
 	report, applicationError := c.testsRunnerClient.Run(request.AccountHash, request.TestCasesFilename)

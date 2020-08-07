@@ -3,6 +3,7 @@ package simple
 import (
 	"interfaces"
 	"models"
+	"test_case/errors"
 )
 
 const (
@@ -22,26 +23,24 @@ func New(
 	return Transaction{commandBuilder, data}
 }
 
-func (t Transaction) Execute(context interfaces.TestCaseContext) {
+func (t Transaction) Execute(context interfaces.TestCaseContext) models.TransactionError {
 	command, err := t.commandBuilder.Build(t.data.GetObject(), t.data.GetCommand())
 	if err != nil {
-		context.GetProcessingChannels().Error <- models.TransactionError{
+		return models.TransactionError{
 			Code:            err.Error(),
 			Description:     unableToBuildCommandError,
 			TransactionText: t.data.GetTransactionText(),
 		}
-		return
 	}
 
 	_, err = command.Run(t.data.GetArguments())
 	if err != nil {
-		context.GetProcessingChannels().Error <- models.TransactionError{
+		return models.TransactionError{
 			Code:            err.Error(),
 			Description:     unableToRunCommand,
 			TransactionText: t.data.GetTransactionText(),
 		}
-		return
 	}
 
-	context.GetProcessingChannels().Success <- true
+	return errors.EmptyTransactionError
 }

@@ -4,6 +4,7 @@ import (
 	mockConst "mock/transaction/constant"
 	mockContext "mock/transaction/context"
 	"mock/transaction/simple"
+	"test_case/errors"
 	"test_utils"
 	"testing"
 )
@@ -16,18 +17,9 @@ func TestTransaction_ExecuteSuccess(t *testing.T) {
 		&simple.MockData,
 	)
 
-	go transaction.Execute(context)
+	err := transaction.Execute(context)
 
-	for {
-		select {
-		case err := <-context.GetProcessingChannels().Error:
-			t.Log(err)
-			t.Fail()
-		case res := <-context.GetProcessingChannels().Success:
-			test_utils.AssertTrue(res, t)
-			return
-		}
-	}
+	test_utils.AssertEqual(errors.EmptyTransactionError, err, t)
 }
 
 func TestTransaction_ExecuteBuildCommandError(t *testing.T) {
@@ -36,20 +28,11 @@ func TestTransaction_ExecuteBuildCommandError(t *testing.T) {
 		&simple.MockData,
 	)
 
-	go transaction.Execute(context)
+	err := transaction.Execute(context)
 
-	for {
-		select {
-		case err := <-context.GetProcessingChannels().Error:
-			test_utils.AssertEqual(mockConst.BuildCommandError.Error(), err.Code, t)
-			test_utils.AssertEqual(unableToBuildCommandError, err.Description, t)
-			test_utils.AssertEqual(simple.MockData.GetTransactionText(), err.TransactionText, t)
-			return
-		case <-context.GetProcessingChannels().Success:
-			t.Log("Should not got success result")
-			t.Fail()
-		}
-	}
+	test_utils.AssertEqual(mockConst.BuildCommandError.Error(), err.Code, t)
+	test_utils.AssertEqual(unableToBuildCommandError, err.Description, t)
+	test_utils.AssertEqual(simple.MockData.GetTransactionText(), err.TransactionText, t)
 }
 
 func TestTransaction_ExecuteCommandRunError(t *testing.T) {
@@ -58,18 +41,9 @@ func TestTransaction_ExecuteCommandRunError(t *testing.T) {
 		&simple.MockData,
 	)
 
-	go transaction.Execute(context)
+	err := transaction.Execute(context)
 
-	for {
-		select {
-		case err := <-context.GetProcessingChannels().Error:
-			test_utils.AssertEqual(mockConst.RunCommandError.Error(), err.Code, t)
-			test_utils.AssertEqual(unableToRunCommand, err.Description, t)
-			test_utils.AssertEqual(simple.MockData.GetTransactionText(), err.TransactionText, t)
-			return
-		case <-context.GetProcessingChannels().Success:
-			t.Log("Should not got success result")
-			t.Fail()
-		}
-	}
+	test_utils.AssertEqual(mockConst.RunCommandError.Error(), err.Code, t)
+	test_utils.AssertEqual(unableToRunCommand, err.Description, t)
+	test_utils.AssertEqual(simple.MockData.GetTransactionText(), err.TransactionText, t)
 }

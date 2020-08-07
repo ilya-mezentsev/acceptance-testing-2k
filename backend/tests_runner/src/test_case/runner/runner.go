@@ -19,19 +19,10 @@ func (r *Runner) Run(processing models.TestsRun) {
 
 	r.initTestCaseContext()
 	for _, transaction := range r.transactions {
-		go transaction.Execute(r.context)
-
-		for {
-			select {
-			case <-r.context.GetProcessingChannels().Success:
-				goto FinishTransaction
-			case err := <-r.context.GetProcessingChannels().Error:
-				processing.Error <- err
-				return
-			}
-
-		FinishTransaction:
-			break
+		transactionError := transaction.Execute(r.context)
+		if transactionError != errors.EmptyTransactionError {
+			processing.Error <- transactionError
+			return
 		}
 	}
 
@@ -41,10 +32,6 @@ func (r *Runner) Run(processing models.TestsRun) {
 func (r *Runner) initTestCaseContext() {
 	r.context = &Context{
 		Scope: map[string]interface{}{},
-		ProcessingChannels: models.TestsRun{
-			Success: make(chan bool),
-			Error:   make(chan models.TransactionError),
-		},
 	}
 }
 
