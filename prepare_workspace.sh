@@ -23,8 +23,15 @@ END" >> "$1"/backend/tests_runner/test_data/some-hash/test_cases.txt
   touch "$1"/backend/tests_runner/test_data/some-hash/db.db
 }
 
-function prepareFiles() {
-  rm "$1"/.env 2>/dev/null
+function prepareBackendLibs() {
+  for lib in "${backendDeps[@]}"
+  do
+    GOPATH="$1"/backend/libs go get -v -u "$lib"
+  done
+}
+
+function recreateEnvFile() {
+  rm -f "$1"/.env 2>/dev/null
   touch "$1"/.env
 }
 
@@ -47,9 +54,17 @@ declare -A env=(
   ['TEST_RUNNER_PATH']="${rootFolder}"/backend/tests_runner
   ['BACKEND_LIBS_PATH']="${rootFolder}"/backend/libs
 )
+declare -a backendDeps=(
+  "github.com/jmoiron/sqlx"
+  "github.com/mattn/go-sqlite3"
+  "github.com/golang/protobuf/protoc-gen-go"
+  "google.golang.org/grpc"
+  "github.com/gorilla/mux"
+)
 
 prepareTestRunnerFiles "${rootFolder}"
-prepareFiles "${rootFolder}"
+prepareBackendLibs "${rootFolder}"
+recreateEnvFile "${rootFolder}"
 
 for envKey in "${!env[@]}"
 do
