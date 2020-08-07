@@ -20,8 +20,14 @@ message testCaseRunReport {
   repeated transactionError errors = 3;
 }
 
+message applicationError {
+  string code = 1;
+  string description = 2;
+}
+
 message testsReport {
-  repeated testCaseRunReport report = 1;
+  testCaseRunReport report = 1;
+  applicationError applicationError = 2;
 }
 
 service testRunnerService {
