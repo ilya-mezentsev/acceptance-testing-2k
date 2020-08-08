@@ -2,9 +2,9 @@ package assertion
 
 import (
 	"fmt"
-	"interfaces"
-	"models"
 	"test_case/errors"
+	"test_runner_meta/interfaces"
+	"test_runner_meta/models"
 )
 
 type Transaction struct {

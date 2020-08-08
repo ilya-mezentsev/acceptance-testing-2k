@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 	"plugins/logger"
-	"tests_runner_client/errors"
 )
 
 type Reader struct {
@@ -23,7 +22,7 @@ func (r Reader) Read(accountHash, testCasesFilename string) (string, error) {
 	case err == nil:
 		return string(data), nil
 	case os.IsNotExist(err):
-		return "", errors.TestsFileNotFound
+		return "", TestsFileNotFound
 	default:
 		logger.WithFields(logger.Fields{
 			MessageTemplate: "Unexpected error: %v",
@@ -37,6 +36,6 @@ func (r Reader) Read(accountHash, testCasesFilename string) (string, error) {
 			},
 		}, logger.Error)
 
-		return "", errors.UnknownError
+		return "", UnknownError
 	}
 }

@@ -7,10 +7,10 @@ import (
 	"command/http/types"
 	"encoding/json"
 	"fmt"
-	"interfaces"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"test_runner_meta/interfaces"
 )
 
 type Command struct {

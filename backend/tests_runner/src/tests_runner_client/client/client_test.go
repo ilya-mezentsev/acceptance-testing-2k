@@ -3,14 +3,15 @@ package client
 import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
-	mockCommand "mock/command"
-	testRunnerClientMock "mock/test_runner_client"
 	"net/http/httptest"
 	"os"
 	"path"
+	mockCommand "test_runner_meta/mock/command"
+	testRunnerClientMock "test_runner_meta/mock/test_runner_client"
 	"test_utils"
 	"testing"
 	"tests_runner_client/errors"
+	"utils"
 )
 
 var (
@@ -25,10 +26,10 @@ var (
 )
 
 func init() {
-	testDataPath = path.Dir(test_utils.MustGetEnv("TEST_RUNNER_DB_FILE"))
-	testCasesRootPath = test_utils.MustGetEnv("TEST_CASES_ROOT_PATH")
-	testCasesFilename = test_utils.MustGetEnv("TEST_CASES_FILENAME")
-	testHash = test_utils.MustGetEnv("TEST_ACCOUNT_HASH")
+	testDataPath = path.Dir(utils.MustGetEnv("TEST_RUNNER_DB_FILE"))
+	testCasesRootPath = utils.MustGetEnv("TEST_CASES_ROOT_PATH")
+	testCasesFilename = utils.MustGetEnv("TEST_CASES_FILENAME")
+	testHash = utils.MustGetEnv("TEST_ACCOUNT_HASH")
 
 	testCasesFilePath = path.Join(testCasesRootPath, testHash, testCasesFilename)
 	r = mux.NewRouter()
@@ -42,12 +43,12 @@ func init() {
 
 	mockCommand.Init(r)
 	testRunnerClientMock.FillTestCasesFile(testCasesFilePath)
-	mockCommand.ReplaceBaseURLAndInitTables(db, server.URL)
+	test_utils.ReplaceBaseURLAndInitTables(db, server.URL)
 }
 
 func TestMain(m *testing.M) {
 	defer server.Close()
-	defer mockCommand.DropTables(db)
+	defer test_utils.DropTables(db)
 
 	os.Exit(m.Run())
 }

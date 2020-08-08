@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"plugins/logger"
 	"strings"
-	"utils"
+	"type_utils"
 )
 
 func Parse(response http.Response) (map[string]interface{}, error) {
@@ -61,9 +61,9 @@ func processValue(value interface{}) interface{} {
 	}
 
 	switch {
-	case utils.IsGenericSlice(value):
+	case type_utils.IsGenericSlice(value):
 		return getValueFromSlice(value.([]interface{}))
-	case utils.IsGenericMap(value):
+	case type_utils.IsGenericMap(value):
 		return getValueFromMap(value.(map[string]interface{}))
 	}
 

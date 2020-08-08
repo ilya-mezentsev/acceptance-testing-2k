@@ -3,7 +3,7 @@ package builder
 import (
 	"command/http/command"
 	"github.com/jmoiron/sqlx"
-	"interfaces"
+	"test_runner_meta/interfaces"
 )
 
 const (

@@ -4,7 +4,7 @@ if [[ ${ENV_VARS_WERE_SET} != '1' ]]; then
   exit 1
 fi
 
-for appsDir in "${TEST_RUNNER_PATH}" "${BACKEND_LIBS_PATH}"
+for appsDir in "${TEST_RUNNER_PATH}" "${BACKEND_LIBS_PATH}" "${BACKEND_API_PATH}"
 do
   cd "${appsDir}"/src || exit
   for dir in $(ls)

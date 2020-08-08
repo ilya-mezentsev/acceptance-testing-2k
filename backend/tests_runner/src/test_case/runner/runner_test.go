@@ -1,9 +1,9 @@
 package runner
 
 import (
-	mockTestCaseRunner "mock/test_case_runner"
-	"models"
 	"test_case/errors"
+	mockTestCaseRunner "test_runner_meta/mock/test_case_runner"
+	"test_runner_meta/models"
 	"test_utils"
 	"testing"
 )

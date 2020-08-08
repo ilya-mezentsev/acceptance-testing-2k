@@ -1,10 +1,10 @@
 package simple
 
 import (
-	mockConst "mock/transaction/constant"
-	mockContext "mock/transaction/context"
-	"mock/transaction/simple"
 	"test_case/errors"
+	mockConst "test_runner_meta/mock/transaction/constant"
+	mockContext "test_runner_meta/mock/transaction/context"
+	"test_runner_meta/mock/transaction/simple"
 	"test_utils"
 	"testing"
 )

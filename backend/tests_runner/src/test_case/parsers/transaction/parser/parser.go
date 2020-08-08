@@ -1,9 +1,9 @@
 package parser
 
 import (
-	"interfaces"
 	"regexp"
 	"test_case/parsers/errors"
+	"test_runner_meta/interfaces"
 )
 
 func Parse(

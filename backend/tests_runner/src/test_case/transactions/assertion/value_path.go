@@ -3,16 +3,16 @@ package assertion
 import (
 	"strconv"
 	"strings"
-	"utils"
+	"type_utils"
 )
 
 func getValueByPath(value interface{}, path string) (interface{}, error) {
 	switch {
 	case path == "":
 		return nil, invalidPath
-	case utils.IsGenericMap(value):
+	case type_utils.IsGenericMap(value):
 		return getValueFromMap(value, path)
-	case utils.IsGenericSlice(value):
+	case type_utils.IsGenericSlice(value):
 		return getValueFromSlice(value, path)
 	default:
 		return nil, cannotAccessValueByPath

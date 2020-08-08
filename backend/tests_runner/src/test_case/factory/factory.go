@@ -1,7 +1,6 @@
 package factory
 
 import (
-	"interfaces"
 	"test_case/errors"
 	"test_case/parsers/test_case"
 	"test_case/parsers/transaction/data"
@@ -10,6 +9,7 @@ import (
 	"test_case/transactions/assertion"
 	"test_case/transactions/assignment"
 	"test_case/transactions/simple"
+	"test_runner_meta/interfaces"
 )
 
 type Factory struct {

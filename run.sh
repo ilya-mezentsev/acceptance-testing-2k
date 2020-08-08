@@ -5,6 +5,10 @@ declare -A scriptsDescriptions=(
   ['help']='show this help'
   ['calc_go_lines']='calculate lines of *.go files'
   ['test_runner_tests']='run tests of test runner'
+  ['api_tests']='run tests of API'
+  ['backend_libs_tests']='run tests for backend libs'
+  ['backend_tests']='run all backend tests'
+  ['install_api_dep']='install dependency for API project'
   ['push_all']='push all files to repository'
 )
 

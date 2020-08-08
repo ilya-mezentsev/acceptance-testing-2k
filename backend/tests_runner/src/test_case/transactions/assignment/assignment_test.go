@@ -1,10 +1,10 @@
 package assignment
 
 import (
-	"mock/transaction/assignment"
-	"mock/transaction/constant"
-	mockContext "mock/transaction/context"
 	"test_case/errors"
+	"test_runner_meta/mock/transaction/assignment"
+	"test_runner_meta/mock/transaction/constant"
+	mockContext "test_runner_meta/mock/transaction/context"
 	"test_utils"
 	"testing"
 )

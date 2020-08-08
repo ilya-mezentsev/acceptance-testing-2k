@@ -4,9 +4,9 @@ import (
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
-	mockCommand "mock/command"
 	"net/http"
 	"os"
+	mockCommand "test_runner_meta/mock/command"
 	"test_utils"
 	"testing"
 )

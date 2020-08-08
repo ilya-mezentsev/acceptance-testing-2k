@@ -2,11 +2,11 @@ package client
 
 import (
 	"command/http/builder"
+	"db_connector"
 	"github.com/jmoiron/sqlx"
-	"interfaces"
-	"models"
 	"test_case/factory"
-	"tests_runner_client/db_connector"
+	"test_runner_meta/interfaces"
+	"test_runner_meta/models"
 	"tests_runner_client/errors"
 	"tests_runner_client/tests_reader"
 )

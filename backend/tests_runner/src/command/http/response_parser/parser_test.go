@@ -4,10 +4,9 @@ import (
 	"command/http/errors"
 	"io/ioutil"
 	"log"
-	mockCommand "mock/command"
 	"net/http"
 	"os"
-	"strings"
+	mockCommand "test_runner_meta/mock/command"
 	"test_utils"
 	"testing"
 )
@@ -21,7 +20,7 @@ func TestParseSimpleFlatData(t *testing.T) {
 	data, err := Parse(http.Response{
 		Status:     "Ok",
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(strings.NewReader(`{"x": 1, "y": true, "z": "hey"}`)),
+		Body:       test_utils.GetReadCloser(`{"x": 1, "y": true, "z": "hey"}`),
 	})
 
 	test_utils.AssertNil(err, t)
@@ -34,7 +33,7 @@ func TestParseDataWithArray(t *testing.T) {
 	data, err := Parse(http.Response{
 		Status:     "Ok",
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(strings.NewReader(`{"x": [0, 1, 2, 3, 4.4, 5.05]}`)),
+		Body:       test_utils.GetReadCloser(`{"x": [0, 1, 2, 3, 4.4, 5.05]}`),
 	})
 	expectedSlice := []string{"0", "1", "2", "3", "4.4", "5.05"}
 	currentSlice, ok := data["x"].([]interface{})
@@ -50,7 +49,7 @@ func TestParseDataWithMap(t *testing.T) {
 	data, err := Parse(http.Response{
 		Status:     "Ok",
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(strings.NewReader(`{"x": {"y": 1}}`)),
+		Body:       test_utils.GetReadCloser(`{"x": {"y": 1}}`),
 	})
 	currentMap, ok := data["x"].(map[string]interface{})
 
@@ -63,7 +62,7 @@ func TestParseInvalidJSON(t *testing.T) {
 	_, err := Parse(http.Response{
 		Status:     "Ok",
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(strings.NewReader(``)),
+		Body:       test_utils.GetReadCloser(``),
 	})
 
 	test_utils.AssertErrorsEqual(errors.NoJSONInResponse, err, t)

@@ -1,0 +1,264 @@
+package test_object
+
+import (
+	"api_meta/mock/services"
+	"api_meta/models"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"services/errors"
+	"test_utils"
+	"testing"
+)
+
+var (
+	repository = services.TestObjectRepositoryMock{}
+	s          = New(&repository)
+)
+
+func init() {
+	repository.Reset()
+}
+
+func TestMain(m *testing.M) {
+	log.SetOutput(ioutil.Discard)
+	os.Exit(m.Run())
+}
+
+func TestService_CreateSuccess(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Create(test_utils.GetReadCloser(
+		`{"account_hash": "some-hash", "test_object": {"name": "TEST"}}`,
+	))
+
+	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertFalse(response.HasData(), t)
+	test_utils.AssertNil(response.GetData(), t)
+	test_utils.AssertNotNil(repository.Objects["some-hash"][0].Hash, t)
+	test_utils.AssertEqual("TEST", repository.Objects["some-hash"][0].Name, t)
+}
+
+func TestService_CreateDecodeBodyError(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Create(test_utils.GetReadCloser(`1`))
+
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		unableToCreateTestObjectCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
+	test_utils.AssertEqual(
+		decodingRequestError,
+		response.GetData().(errors.ServiceError).Description,
+		t,
+	)
+}
+
+func TestService_CreateRepositoryError(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Create(test_utils.GetReadCloser(
+		fmt.Sprintf(
+			`{"account_hash": "%s", "test_object": {"name": "TEST"}}`,
+			services.BadAccountHash,
+		),
+	))
+
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		unableToCreateTestObjectCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
+	test_utils.AssertEqual(
+		repositoryError,
+		response.GetData().(errors.ServiceError).Description,
+		t,
+	)
+}
+
+func TestService_GetAllSuccess(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.GetAll(services.PredefinedAccountHash)
+
+	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	for testObjectIndex, testObject := range response.GetData().([]models.TestObject) {
+		test_utils.AssertEqual(
+			repository.Objects[services.PredefinedAccountHash][testObjectIndex].Name,
+			testObject.Name,
+			t,
+		)
+		test_utils.AssertEqual(
+			repository.Objects[services.PredefinedAccountHash][testObjectIndex].Hash,
+			testObject.Hash,
+			t,
+		)
+	}
+}
+
+func TestService_GetAllRepositoryError(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.GetAll(services.BadAccountHash)
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		unableToFetchTestObjectsCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
+	test_utils.AssertEqual(
+		repositoryError,
+		response.GetData().(errors.ServiceError).Description,
+		t,
+	)
+}
+
+func TestService_GetSuccess(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Get(services.PredefinedAccountHash, services.PredefinedTestObject1.Hash)
+
+	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		services.PredefinedTestObject1.Name,
+		response.GetData().(models.TestObject).Name,
+		t,
+	)
+	test_utils.AssertEqual(
+		services.PredefinedTestObject1.Hash,
+		response.GetData().(models.TestObject).Hash,
+		t,
+	)
+}
+
+func TestService_GetRepositoryError(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Get(services.BadAccountHash, services.PredefinedTestObject1.Hash)
+
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		unableToFetchTestObjectCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
+	test_utils.AssertEqual(
+		repositoryError,
+		response.GetData().(errors.ServiceError).Description,
+		t,
+	)
+}
+
+func TestService_UpdateSuccess(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Update(test_utils.GetReadCloser(
+		fmt.Sprintf(
+			`
+			{"account_hash": "%s",
+			"update_payload": [{"hash": "%s", "field_name": "name", "new_value": "FOO"}]
+			}`,
+			services.PredefinedAccountHash,
+			services.PredefinedTestObject1.Hash,
+		),
+	))
+
+	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertFalse(response.HasData(), t)
+	test_utils.AssertNil(response.GetData(), t)
+	test_utils.AssertEqual("FOO", repository.Objects[services.PredefinedAccountHash][0].Name, t)
+}
+
+func TestService_UpdateDecodeBodyError(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Update(test_utils.GetReadCloser(`1`))
+
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		unableToUpdateTestObjectCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
+	test_utils.AssertEqual(
+		decodingRequestError,
+		response.GetData().(errors.ServiceError).Description,
+		t,
+	)
+}
+
+func TestService_UpdateRepositoryError(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Update(test_utils.GetReadCloser(
+		fmt.Sprintf(
+			`
+			{"account_hash": "%s",
+			"update_payload": [{"hash": "%s", "field_name": "name", "new_value": "FOO"}]
+			}`,
+			services.BadAccountHash,
+			services.PredefinedTestObject1.Hash,
+		),
+	))
+
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		unableToUpdateTestObjectCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
+	test_utils.AssertEqual(
+		repositoryError,
+		response.GetData().(errors.ServiceError).Description,
+		t,
+	)
+}
+
+func TestService_DeleteSuccess(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Delete(services.PredefinedAccountHash, services.PredefinedTestObject1.Hash)
+
+	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertFalse(response.HasData(), t)
+	test_utils.AssertNil(response.GetData(), t)
+	for _, object := range repository.Objects[services.PredefinedAccountHash] {
+		test_utils.AssertNotEqual(
+			services.PredefinedTestObject1.Hash,
+			object.Hash,
+			t,
+		)
+	}
+}
+
+func TestService_DeleteRepositoryError(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Delete(services.BadAccountHash, services.PredefinedTestObject1.Hash)
+
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		unableToDeleteTestObjectCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
+	test_utils.AssertEqual(
+		repositoryError,
+		response.GetData().(errors.ServiceError).Description,
+		t,
+	)
+}

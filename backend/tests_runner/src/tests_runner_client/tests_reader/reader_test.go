@@ -7,7 +7,7 @@ import (
 	"path"
 	"test_utils"
 	"testing"
-	"tests_runner_client/errors"
+	"utils"
 )
 
 var (
@@ -16,9 +16,9 @@ var (
 )
 
 func init() {
-	testCasesRootPath = test_utils.MustGetEnv("TEST_CASES_ROOT_PATH")
-	testCasesFilename = test_utils.MustGetEnv("TEST_CASES_FILENAME")
-	testHash = test_utils.MustGetEnv("TEST_ACCOUNT_HASH")
+	testCasesRootPath = utils.MustGetEnv("TEST_CASES_ROOT_PATH")
+	testCasesFilename = utils.MustGetEnv("TEST_CASES_FILENAME")
+	testHash = utils.MustGetEnv("TEST_ACCOUNT_HASH")
 
 	data, err := ioutil.ReadFile(path.Join(testCasesRootPath, testHash, testCasesFilename))
 	if err != nil {
@@ -46,7 +46,7 @@ func TestReader_ReadFileNotFound(t *testing.T) {
 
 	_, err := reader.Read(testHash, "not_exists.txt")
 
-	test_utils.AssertErrorsEqual(errors.TestsFileNotFound, err, t)
+	test_utils.AssertErrorsEqual(TestsFileNotFound, err, t)
 }
 
 func TestReader_ReadUnknownError(t *testing.T) {
@@ -54,5 +54,5 @@ func TestReader_ReadUnknownError(t *testing.T) {
 
 	_, err := reader.Read(testHash, testCasesFilename)
 
-	test_utils.AssertErrorsEqual(errors.UnknownError, err, t)
+	test_utils.AssertErrorsEqual(UnknownError, err, t)
 }

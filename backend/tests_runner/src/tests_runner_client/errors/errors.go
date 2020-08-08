@@ -1,14 +1,5 @@
 package errors
 
-import (
-	"errors"
-	"models"
-)
-
-var (
-	DBFileNotFound    = errors.New("db-file-not-found")
-	TestsFileNotFound = errors.New("tests-file-not-found")
-	UnknownError      = errors.New("unknown-error")
-)
+import "test_runner_meta/models"
 
 var EmptyApplicationError models.ApplicationError

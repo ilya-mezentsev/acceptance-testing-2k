@@ -1,9 +1,9 @@
 package assertion
 
 import (
-	mockAssertion "mock/transaction/assertion"
-	mockContext "mock/transaction/context"
 	"test_case/errors"
+	mockAssertion "test_runner_meta/mock/transaction/assertion"
+	mockContext "test_runner_meta/mock/transaction/context"
 	"test_utils"
 	"testing"
 )

@@ -2,7 +2,7 @@ package errors
 
 import (
 	"errors"
-	"models"
+	"test_runner_meta/models"
 )
 
 var (

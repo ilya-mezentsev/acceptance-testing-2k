@@ -2,9 +2,9 @@ package controller
 
 import (
 	"context"
-	"interfaces"
-	"models"
 	"test_case_runner"
+	"test_runner_meta/interfaces"
+	"test_runner_meta/models"
 	"tests_runner_client/errors"
 )
 

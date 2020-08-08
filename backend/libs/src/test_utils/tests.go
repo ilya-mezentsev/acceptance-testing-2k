@@ -3,8 +3,10 @@ package test_utils
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"io"
+	"io/ioutil"
 	"net/http/httptest"
-	"os"
+	"strings"
 	"testing"
 )
 
@@ -69,11 +71,6 @@ func GetTestServer(r *mux.Router) *httptest.Server {
 	return httptest.NewServer(r)
 }
 
-func MustGetEnv(key string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		panic(fmt.Sprintf("%s is not provided", key))
-	}
-
-	return value
+func GetReadCloser(s string) io.ReadCloser {
+	return ioutil.NopCloser(strings.NewReader(s))
 }
