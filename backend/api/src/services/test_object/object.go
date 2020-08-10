@@ -8,6 +8,7 @@ import (
 	"services/plugins/hash"
 	"services/plugins/request_decoder"
 	"services/plugins/response_factory"
+	"services/plugins/validation"
 )
 
 type service struct {
@@ -30,9 +31,19 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
+	createTestObjectRequest.TestObject.Hash = hash.GetHashWithTimeAsKey(
+		createTestObjectRequest.TestObject.Name,
+	)
+	if !validation.IsValid(&createTestObjectRequest) {
+		return response_factory.ErrorResponse(errors.ServiceError{
+			Code:        unableToCreateTestObjectCode,
+			Description: invalidRequestError,
+		})
+	}
+
 	err = s.repository.Create(createTestObjectRequest.AccountHash, map[string]interface{}{
 		"name": createTestObjectRequest.TestObject.Name,
-		"hash": hash.GetHashWithTimeAsKey(createTestObjectRequest.TestObject.Name),
+		"hash": createTestObjectRequest.TestObject.Hash,
 	})
 	if err != nil {
 		logCreateTestObjectRepositoryError(err, map[string]interface{}{
@@ -49,6 +60,13 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 }
 
 func (s service) GetAll(accountHash string) interfaces.Response {
+	if !validation.IsMd5Hash(accountHash) {
+		return response_factory.ErrorResponse(errors.ServiceError{
+			Code:        unableToFetchTestObjectsCode,
+			Description: invalidRequestError,
+		})
+	}
+
 	var testObjects []models.TestObject
 	err := s.repository.GetAll(accountHash, &testObjects)
 	if err != nil {
@@ -66,6 +84,13 @@ func (s service) GetAll(accountHash string) interfaces.Response {
 }
 
 func (s service) Get(accountHash, testObjectHash string) interfaces.Response {
+	if !validation.IsMd5Hash(accountHash) || !validation.IsMd5Hash(testObjectHash) {
+		return response_factory.ErrorResponse(errors.ServiceError{
+			Code:        unableToFetchTestObjectCode,
+			Description: invalidRequestError,
+		})
+	}
+
 	var testObject models.TestObject
 	err := s.repository.Get(accountHash, testObjectHash, &testObject)
 	if err != nil {
@@ -95,6 +120,13 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
+	if !validation.IsValid(&updateTestObjectRequest) {
+		return response_factory.ErrorResponse(errors.ServiceError{
+			Code:        unableToUpdateTestObjectCode,
+			Description: invalidRequestError,
+		})
+	}
+
 	err = s.repository.Update(updateTestObjectRequest.AccountHash, updateTestObjectRequest.UpdatePayload)
 	if err != nil {
 		logUpdateTestObjectRepositoryError(err, map[string]interface{}{
@@ -112,6 +144,13 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 }
 
 func (s service) Delete(accountHash, testObjectHash string) interfaces.Response {
+	if !validation.IsMd5Hash(accountHash) || !validation.IsMd5Hash(testObjectHash) {
+		return response_factory.ErrorResponse(errors.ServiceError{
+			Code:        unableToDeleteTestObjectCode,
+			Description: invalidRequestError,
+		})
+	}
+
 	err := s.repository.Delete(accountHash, testObjectHash)
 	if err != nil {
 		logDeleteTestObjectRepositoryError(err, map[string]interface{}{

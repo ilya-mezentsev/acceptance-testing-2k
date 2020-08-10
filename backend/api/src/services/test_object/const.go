@@ -10,5 +10,6 @@ const (
 
 const (
 	decodingRequestError = "Json decoding error"
+	invalidRequestError  = "Invalid request data"
 	repositoryError      = "DB error"
 )
