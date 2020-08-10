@@ -26,7 +26,7 @@ var (
 )
 
 func init() {
-	testDataPath = path.Dir(utils.MustGetEnv("TEST_RUNNER_DB_FILE"))
+	testDataPath = path.Dir(utils.MustGetEnv("TEST_DB_FILE"))
 	testCasesRootPath = utils.MustGetEnv("TEST_CASES_ROOT_PATH")
 	testCasesFilename = utils.MustGetEnv("TEST_CASES_FILENAME")
 	testHash = utils.MustGetEnv("TEST_ACCOUNT_HASH")

@@ -58,6 +58,16 @@ func TestIsValidStruct(t *testing.T) {
 				},
 			},
 		}), t)
+
+		test_utils.AssertTrue(IsValid(&models.UpdateTestObjectRequest{
+			AccountHash: hash.GetHashWithTimeAsKey("hash"),
+			UpdatePayload: []models.UpdateModel{
+				{
+					Hash:      hash.GetHashWithTimeAsKey("hash"),
+					FieldName: "update_target:field_name",
+				},
+			},
+		}), t)
 	})
 
 	t.Run("invalid field name", func(t *testing.T) {

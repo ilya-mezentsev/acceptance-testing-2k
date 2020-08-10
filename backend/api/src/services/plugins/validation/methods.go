@@ -13,7 +13,7 @@ var validationRuleToMethod = map[string]func(string) bool{
 
 var (
 	regularNamePattern = regexp.MustCompile(`^[-a-zA-Z0-9_]{1,64}$`)
-	fieldNamePattern   = regexp.MustCompile(`^[a-zA-Z0-9_]{1,64}$`)
+	fieldNamePattern   = regexp.MustCompile(`^(?P<updateTarget>[a-zA-Z_]+?:)?[a-zA-Z0-9_]{1,64}$`)
 	md5Pattern         = regexp.MustCompile(`^[a-f0-9]{32}$`)
 )
 

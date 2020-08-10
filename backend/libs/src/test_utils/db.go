@@ -3,15 +3,21 @@ package test_utils
 import "github.com/jmoiron/sqlx"
 
 const (
+	dropObjectsQuery          = `DROP TABLE IF EXISTS objects;`
 	dropCommandsQuery         = `DROP TABLE IF EXISTS commands;`
 	dropCommandsSettingsQuery = `DROP TABLE IF EXISTS commands_settings;`
 	dropCommandsHeadersQuery  = `DROP TABLE IF EXISTS commands_headers;`
 	dropCommandsCookiesQuery  = `DROP TABLE IF EXISTS commands_cookies;`
 
 	createTablesQuery = `
+	CREATE TABLE IF NOT EXISTS objects(
+		id INTEGER PRIMARY KEY,
+		name TEXT NOT NULL UNIQUE,
+		hash VARCHAR(32) NOT NULL UNIQUE
+	);
 	CREATE TABLE IF NOT EXISTS commands(
 		id INTEGER PRIMARY KEY,
-		object_name TEXT NOT NULL,
+		object_name TEXT REFERENCES objects(name),
 		name TEXT NOT NULL UNIQUE,
 		hash VARCHAR(32) NOT NULL UNIQUE
 	);
@@ -36,6 +42,9 @@ const (
 		command_hash VARCHAR(32) REFERENCES commands(hash)
 	);`
 
+	addObjectQuery = `
+	INSERT INTO objects(name, hash)
+	VALUES(:name, :hash)`
 	addCommandQuery = `
 	INSERT INTO commands(name, hash, object_name)
 	VALUES(:name, :hash, :object_name)`
@@ -50,6 +59,7 @@ const (
 	VALUES(:key, :value, :command_hash)`
 
 	ObjectName        = "USER"
+	ObjectHash        = "hash-1"
 	CreateCommandName = "CREATE"
 	GetCommandName    = "GET"
 	PatchCommandName  = "PATCH"
@@ -58,9 +68,18 @@ const (
 	GetCommandHash    = "hash-2"
 	PatchCommandHash  = "hash-3"
 	DeleteCommandHash = "hash-4"
+
+	NotExistsAccountHash = "not-exists-account-hash"
+	NotExistsObjectHash  = "not-exists-object-hash"
 )
 
 var (
+	objects = []map[string]interface{}{
+		{
+			"name": ObjectName,
+			"hash": ObjectHash,
+		},
+	}
 	commands = []map[string]interface{}{
 		{
 			"name":        CreateCommandName,
@@ -139,6 +158,7 @@ var (
 	}
 
 	queryToData = map[string][]map[string]interface{}{
+		addObjectQuery:          objects,
 		addCommandQuery:         commands,
 		addCommandSettingsQuery: Settings,
 		addCommandHeadersQuery:  Headers,
@@ -150,9 +170,14 @@ func DropTables(db *sqlx.DB) {
 	for _, query := range []string{
 		dropCommandsQuery, dropCommandsSettingsQuery,
 		dropCommandsHeadersQuery, dropCommandsCookiesQuery,
+		dropObjectsQuery,
 	} {
 		exec(db, query)
 	}
+}
+
+func DropObjects(db *sqlx.DB) {
+	exec(db, dropObjectsQuery)
 }
 
 func DropCommandsSettings(db *sqlx.DB) {

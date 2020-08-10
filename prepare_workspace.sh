@@ -4,12 +4,11 @@ function prepareTestRunnerFiles() {
   mkdir -p "$1"/backend/tests_runner/test_report
   mkdir -p "$1"/backend/api/test_report
   mkdir -p "$1"/backend/libs/test_report
-  mkdir -p "$1"/backend/tests_runner/test_data
-  mkdir -p "$1"/backend/api/test_data
-  mkdir -p "$1"/backend/libs/test_data
-  mkdir -p "$1"/backend/tests_runner/test_data/some-hash
 
-  rm -f "$1"/backend/tests_runner/test_data/some-hash/test_cases.txt
+  mkdir -p "$1"/backend/test_data
+  mkdir -p "$1"/backend/test_data/some-hash
+
+  rm -f "$1"/backend/test_data/some-hash/test_cases.txt
   echo "BEGIN
   // some comment (will be ignored)
   CREATE USER {\"hash\": \"some-hash\", \"userName\": \"Piter\"}
@@ -18,13 +17,13 @@ function prepareTestRunnerFiles() {
 
   ASSERT user.hash EQUALS 'some-hash'
   ASSERT user.userName EQUALS 'Piter'
-END" >> "$1"/backend/tests_runner/test_data/some-hash/test_cases.txt
+END" >> "$1"/backend/test_data/some-hash/test_cases.txt
 
-  rm -f "$1"/backend/tests_runner/test_data/test.db
-  touch "$1"/backend/tests_runner/test_data/test.db
+  rm -f "$1"/backend/test_data/test.db
+  touch "$1"/backend/test_data/test.db
 
-  rm -f "$1"/backend/tests_runner/test_data/some-hash/db.db
-  touch "$1"/backend/tests_runner/test_data/some-hash/db.db
+  rm -f "$1"/backend/test_data/some-hash/db.db
+  touch "$1"/backend/test_data/some-hash/db.db
 }
 
 function prepareBackendLibs() {
@@ -53,9 +52,9 @@ declare -A env=(
   ['TEST_RUNNER_REPORT_FOLDER']="${rootFolder}/backend/tests_runner/test_report"
   ['API_REPORT_FOLDER']="${rootFolder}/backend/api/test_report"
   ['BACKEND_LIBS_REPORT_FOLDER']="${rootFolder}/backend/libs/test_report"
-  ['TEST_CASES_ROOT_PATH']="${rootFolder}/backend/tests_runner/test_data/"
+  ['TEST_CASES_ROOT_PATH']="${rootFolder}/backend/test_data/"
   ['TEST_CASES_FILENAME']="test_cases.txt"
-  ['TEST_RUNNER_DB_FILE']="${rootFolder}/backend/tests_runner/test_data/test.db"
+  ['TEST_DB_FILE']="${rootFolder}/backend/test_data/test.db"
   ['TEST_ACCOUNT_HASH']="some-hash"
   ['TEST_RUNNER_PATH']="${rootFolder}"/backend/tests_runner
   ['BACKEND_LIBS_PATH']="${rootFolder}"/backend/libs

@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	dbFile := utils.MustGetEnv("TEST_RUNNER_DB_FILE")
+	dbFile := utils.MustGetEnv("TEST_DB_FILE")
 
 	var err error
 	db, err = sqlx.Open("sqlite3", dbFile)
