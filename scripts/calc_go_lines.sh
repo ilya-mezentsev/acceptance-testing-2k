@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-if [[ ${ENV_VARS_WERE_SET} != '1' ]]; then
-  echo 'env variables are not set'
+rootFolder="$1"
+if [[ ${rootFolder} = '' ]]; then
+  echo 'root folder was not provided'
   exit 1
 fi
+set -o allexport; source ${rootFolder}/.env; set +o allexport
 
 for appsDir in "${TEST_RUNNER_PATH}" "${BACKEND_LIBS_PATH}" "${BACKEND_API_PATH}"
 do
