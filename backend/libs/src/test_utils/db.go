@@ -11,18 +11,18 @@ const (
 
 	createTablesQuery = `
 	CREATE TABLE IF NOT EXISTS objects(
-		id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT NOT NULL UNIQUE,
 		hash VARCHAR(32) NOT NULL UNIQUE
 	);
 	CREATE TABLE IF NOT EXISTS commands(
-		id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		object_name TEXT REFERENCES objects(name),
 		name TEXT NOT NULL UNIQUE,
 		hash VARCHAR(32) NOT NULL UNIQUE
 	);
 	CREATE TABLE IF NOT EXISTS commands_settings(
-		id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		method TEXT NOT NULL,
 		base_url TEXT NOT NULL,
 		endpoint TEXT DEFAULT '',
@@ -30,13 +30,13 @@ const (
 		command_hash VARCHAR(32) REFERENCES commands(hash)
 	);
 	CREATE TABLE IF NOT EXISTS commands_headers(
-		id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		key TEXT NOT NULL,
 		value TEXT NOT NULL,
 		command_hash VARCHAR(32) REFERENCES commands(hash)
 	);
 	CREATE TABLE IF NOT EXISTS commands_cookies(
-		id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		key TEXT NOT NULL,
 		value TEXT NOT NULL,
 		command_hash VARCHAR(32) REFERENCES commands(hash)
@@ -174,10 +174,6 @@ func DropTables(db *sqlx.DB) {
 	} {
 		exec(db, query)
 	}
-}
-
-func DropObjects(db *sqlx.DB) {
-	exec(db, dropObjectsQuery)
 }
 
 func DropCommandsSettings(db *sqlx.DB) {
