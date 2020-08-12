@@ -3,13 +3,21 @@ package test_utils
 import "github.com/jmoiron/sqlx"
 
 const (
-	dropObjectsQuery          = `DROP TABLE IF EXISTS objects;`
-	dropCommandsQuery         = `DROP TABLE IF EXISTS commands;`
-	dropCommandsSettingsQuery = `DROP TABLE IF EXISTS commands_settings;`
-	dropCommandsHeadersQuery  = `DROP TABLE IF EXISTS commands_headers;`
-	dropCommandsCookiesQuery  = `DROP TABLE IF EXISTS commands_cookies;`
+	dropAccountCredentialsQuery = `DROP TABLE IF EXISTS account_credentials;`
+	dropObjectsQuery            = `DROP TABLE IF EXISTS objects;`
+	dropCommandsQuery           = `DROP TABLE IF EXISTS commands;`
+	dropCommandsSettingsQuery   = `DROP TABLE IF EXISTS commands_settings;`
+	dropCommandsHeadersQuery    = `DROP TABLE IF EXISTS commands_headers;`
+	dropCommandsCookiesQuery    = `DROP TABLE IF EXISTS commands_cookies;`
 
 	createTablesQuery = `
+	CREATE TABLE IF NOT EXISTS account_credentials(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		login VARCHAR(64) NOT NULL UNIQUE,
+		password VARCHAR(32) NOT NULL,
+		verified BOOLEAN NOT NULL DEFAULT 0 CHECK (verified IN (0,1)),
+		hash VARCHAR(32) NOT NULL UNIQUE
+	);
 	CREATE TABLE IF NOT EXISTS objects(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT NOT NULL UNIQUE,
@@ -42,6 +50,9 @@ const (
 		command_hash VARCHAR(32) REFERENCES commands(hash)
 	);`
 
+	addAccountCredentialsQuery = `
+	INSERT INTO account_credentials(login, password, hash)
+	VALUES(:login, :password, :hash)`
 	addObjectQuery = `
 	INSERT INTO objects(name, hash)
 	VALUES(:name, :hash)`
@@ -58,6 +69,8 @@ const (
 	INSERT INTO commands_cookies(key, value, command_hash)
 	VALUES(:key, :value, :command_hash)`
 
+	CredentialsLogin  = "some_login"
+	CredentialsHash   = "some_hash"
 	ObjectName        = "USER"
 	ObjectHash        = "hash-1"
 	CreateCommandName = "CREATE"
@@ -74,6 +87,13 @@ const (
 )
 
 var (
+	credentials = []map[string]interface{}{
+		{
+			"login":    CredentialsLogin,
+			"password": "some_password",
+			"hash":     CredentialsHash,
+		},
+	}
 	objects = []map[string]interface{}{
 		{
 			"name": ObjectName,
@@ -158,11 +178,12 @@ var (
 	}
 
 	queryToData = map[string][]map[string]interface{}{
-		addObjectQuery:          objects,
-		addCommandQuery:         commands,
-		addCommandSettingsQuery: Settings,
-		addCommandHeadersQuery:  Headers,
-		addCommandCookiesQuery:  Cookies,
+		addAccountCredentialsQuery: credentials,
+		addObjectQuery:             objects,
+		addCommandQuery:            commands,
+		addCommandSettingsQuery:    Settings,
+		addCommandHeadersQuery:     Headers,
+		addCommandCookiesQuery:     Cookies,
 	}
 )
 
@@ -170,7 +191,7 @@ func DropTables(db *sqlx.DB) {
 	for _, query := range []string{
 		dropCommandsQuery, dropCommandsSettingsQuery,
 		dropCommandsHeadersQuery, dropCommandsCookiesQuery,
-		dropObjectsQuery,
+		dropObjectsQuery, dropAccountCredentialsQuery,
 	} {
 		exec(db, query)
 	}
