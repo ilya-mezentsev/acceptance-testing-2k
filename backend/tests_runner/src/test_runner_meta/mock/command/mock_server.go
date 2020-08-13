@@ -5,8 +5,8 @@ import (
 	"errors"
 	"github.com/gorilla/mux"
 	"io/ioutil"
+	"logger"
 	"net/http"
-	"plugins/logger"
 )
 
 type (

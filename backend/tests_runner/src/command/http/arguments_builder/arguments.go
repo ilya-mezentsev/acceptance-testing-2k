@@ -4,7 +4,7 @@ import (
 	"command/http/errors"
 	"encoding/json"
 	"fmt"
-	"plugins/logger"
+	"logger"
 	"regexp"
 	"strings"
 )

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"logger"
 	"net/http"
-	"plugins/logger"
 	"strings"
 	"type_utils"
 )

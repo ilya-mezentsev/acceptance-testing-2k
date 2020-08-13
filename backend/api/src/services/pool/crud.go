@@ -3,7 +3,7 @@ package pool
 import (
 	"api_meta/interfaces"
 	"fmt"
-	"plugins/logger"
+	"logger"
 	"services/errors"
 	"services/plugins/response_factory"
 )

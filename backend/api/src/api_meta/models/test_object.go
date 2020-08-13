@@ -10,9 +10,4 @@ type (
 		AccountHash string     `json:"account_hash" validation:"md5-hash"`
 		TestObject  TestObject `json:"test_object"`
 	}
-
-	UpdateTestObjectRequest struct {
-		AccountHash   string        `json:"account_hash" validation:"md5-hash"`
-		UpdatePayload []UpdateModel `json:"update_payload"`
-	}
 )

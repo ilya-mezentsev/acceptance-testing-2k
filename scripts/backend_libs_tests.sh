@@ -12,3 +12,7 @@ export GOPATH=${BACKEND_LIBS_PATH}
 export GO_SRC=${BACKEND_LIBS_PATH}
 export REPORT_FOLDER=${BACKEND_LIBS_REPORT_FOLDER}
 cd "${PROJECT_ROOT}" && source scripts/go_tests.sh
+
+echo
+echo '=============================='
+echo

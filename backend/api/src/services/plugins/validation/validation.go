@@ -3,6 +3,7 @@ package validation
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 func IsValid(data interface{}) bool {
@@ -67,6 +68,13 @@ func validateField(field reflect.StructField, value string) bool {
 		return true
 	}
 
-	validationMethod, hasValidationRule := validationRuleToMethod[validationRule]
+	// append is needed to avoid panic on parsedValidationRule[1]
+	parsedValidationRule := append(strings.Split(validationRule, ";"), "")
+	validationRuleName, additionalFlag := parsedValidationRule[0], parsedValidationRule[1]
+	if strings.TrimSpace(additionalFlag) == noValidateEmptyStringFlag && value == "" {
+		return true
+	}
+
+	validationMethod, hasValidationRule := validationRuleToMethod[validationRuleName]
 	return hasValidationRule && validationMethod(value)
 }

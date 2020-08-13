@@ -48,8 +48,8 @@ func TestIsValidStruct(t *testing.T) {
 		}), t)
 	})
 
-	t.Run("valid struct UpdateTestObjectRequest", func(t *testing.T) {
-		test_utils.AssertTrue(IsValid(&models.UpdateTestObjectRequest{
+	t.Run("valid struct UpdateRequest", func(t *testing.T) {
+		test_utils.AssertTrue(IsValid(&models.UpdateRequest{
 			AccountHash: hash.GetHashWithTimeAsKey("hash"),
 			UpdatePayload: []models.UpdateModel{
 				{
@@ -59,7 +59,7 @@ func TestIsValidStruct(t *testing.T) {
 			},
 		}), t)
 
-		test_utils.AssertTrue(IsValid(&models.UpdateTestObjectRequest{
+		test_utils.AssertTrue(IsValid(&models.UpdateRequest{
 			AccountHash: hash.GetHashWithTimeAsKey("hash"),
 			UpdatePayload: []models.UpdateModel{
 				{
@@ -71,7 +71,7 @@ func TestIsValidStruct(t *testing.T) {
 	})
 
 	t.Run("invalid field name", func(t *testing.T) {
-		test_utils.AssertFalse(IsValid(&models.UpdateTestObjectRequest{
+		test_utils.AssertFalse(IsValid(&models.UpdateRequest{
 			AccountHash: hash.GetHashWithTimeAsKey("hash"),
 			UpdatePayload: []models.UpdateModel{
 				{
@@ -79,6 +79,37 @@ func TestIsValidStruct(t *testing.T) {
 					FieldName: "field-name",
 				},
 			},
+		}), t)
+	})
+
+	t.Run("valid struct TestCommandRecord", func(t *testing.T) {
+		test_utils.AssertTrue(IsValid(&models.TestCommandRecord{
+			CommandSettings: models.CommandSettings{
+				Name:               "GET",
+				Hash:               hash.GetHashWithTimeAsKey("hash"),
+				ObjectName:         "SETTINGS",
+				Method:             "GET",
+				BaseURL:            "https://link.com/api/v2",
+				Endpoint:           "user/settings",
+				PassArgumentsInURL: false,
+			},
+			Headers: "X-Header-1=x_value1;X-Header-2=x_value2",
+		}), t)
+	})
+
+	t.Run("invalid struct TestCommandRecord", func(t *testing.T) {
+		test_utils.AssertFalse(IsValid(&models.TestCommandRecord{
+			CommandSettings: models.CommandSettings{
+				Name:               "GET",
+				Hash:               "some-hash",
+				ObjectName:         "",
+				Method:             "HEAD",
+				BaseURL:            "127.0.0.1",
+				Endpoint:           "@#$#@%",
+				PassArgumentsInURL: false,
+			},
+			Headers: "Test",
+			Cookies: "FOO",
 		}), t)
 	})
 

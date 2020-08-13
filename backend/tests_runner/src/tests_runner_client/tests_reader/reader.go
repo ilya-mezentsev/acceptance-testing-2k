@@ -2,9 +2,9 @@ package tests_reader
 
 import (
 	"io/ioutil"
+	"logger"
 	"os"
 	"path"
-	"plugins/logger"
 )
 
 type Reader struct {

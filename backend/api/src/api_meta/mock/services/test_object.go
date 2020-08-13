@@ -2,16 +2,14 @@ package services
 
 import "api_meta/models"
 
-var Objects = map[string][]models.TestObject{
-	PredefinedAccountHash: {PredefinedTestObject1, PredefinedTestObject2},
-}
-
 type TestObjectRepositoryMock struct {
 	Objects map[string][]models.TestObject
 }
 
 func (m *TestObjectRepositoryMock) Reset() {
-	m.Objects = Objects
+	m.Objects = map[string][]models.TestObject{
+		PredefinedAccountHash: {PredefinedTestObject1, PredefinedTestObject2},
+	}
 }
 
 func (m *TestObjectRepositoryMock) Create(accountHash string, entity map[string]interface{}) error {
@@ -32,7 +30,8 @@ func (m *TestObjectRepositoryMock) GetAll(accountHash string, dest interface{}) 
 		return someError
 	}
 
-	dest = testObjectsToInterfaceSlice(m.Objects[accountHash])
+	destPtr := dest.(*[]models.TestObject)
+	*destPtr = append(*destPtr, m.Objects[accountHash]...)
 	return nil
 }
 

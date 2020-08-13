@@ -2,7 +2,7 @@ package errors
 
 type (
 	ServiceError struct {
-		Code        string
-		Description string
+		Code        string `json:"code"`
+		Description string `json:"description"`
 	}
 )

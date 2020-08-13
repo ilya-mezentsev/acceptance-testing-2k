@@ -3,9 +3,9 @@ package db_connector
 import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
+	"logger"
 	"os"
 	"path"
-	"plugins/logger"
 )
 
 const dbFilename = "db.db"
