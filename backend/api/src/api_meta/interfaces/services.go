@@ -2,7 +2,6 @@ package interfaces
 
 import (
 	"io"
-	"net/http"
 )
 
 type (
@@ -20,16 +19,7 @@ type (
 		Delete(accountHash, entityHash string) Response
 	}
 
-	// Should be used for cookies and headers
-	HTTPMetaService interface {
-		PostProcess(r *http.Request, serviceResponse Response) error
-	}
-
 	CRUDServicesPool interface {
-		Get(serviceType string) (CRUDService, Response)
-	}
-
-	MetaServicesPool interface {
-		Get(serviceType string) HTTPMetaService
+		Get(serviceType string) CRUDService
 	}
 )

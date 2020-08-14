@@ -16,21 +16,27 @@ func TestMain(m *testing.M) {
 }
 
 func TestCRUDServicesPool_GetSuccess(t *testing.T) {
-	pool := NewCRUD()
+	pool := New()
 	pool.AddService("test", services.CRUDServiceMock{})
 
-	service, response := pool.Get("test")
+	service := pool.Get("test")
 
-	test_utils.AssertNil(response, t)
 	test_utils.AssertNotNil(service, t)
 }
 
-func TestCRUDServicesPool_GetError(t *testing.T) {
-	pool := NewCRUD()
+func TestCRUDServicesPool_GetNotExistsService(t *testing.T) {
+	pool := New()
 
-	service, response := pool.Get("test")
+	service := pool.Get("test")
 
-	responseData := response.GetData().(errors.ServiceError)
+	_, ok := service.(defaultCRUDService)
+	test_utils.AssertTrue(ok, t)
+
+	var (
+		response     = service.Create(nil)
+		responseData errors.ServiceError
+	)
+	responseData = response.GetData().(errors.ServiceError)
 	test_utils.AssertEqual("error", response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(noServiceErrorCode, responseData.Code, t)
@@ -39,5 +45,48 @@ func TestCRUDServicesPool_GetError(t *testing.T) {
 		responseData.Description,
 		t,
 	)
-	test_utils.AssertNil(service, t)
+
+	response = service.GetAll("")
+	responseData = response.GetData().(errors.ServiceError)
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(noServiceErrorCode, responseData.Code, t)
+	test_utils.AssertEqual(
+		pool.getNoServiceErrorDescription("test"),
+		responseData.Description,
+		t,
+	)
+
+	response = service.Get("", "")
+	responseData = response.GetData().(errors.ServiceError)
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(noServiceErrorCode, responseData.Code, t)
+	test_utils.AssertEqual(
+		pool.getNoServiceErrorDescription("test"),
+		responseData.Description,
+		t,
+	)
+
+	response = service.Update(nil)
+	responseData = response.GetData().(errors.ServiceError)
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(noServiceErrorCode, responseData.Code, t)
+	test_utils.AssertEqual(
+		pool.getNoServiceErrorDescription("test"),
+		responseData.Description,
+		t,
+	)
+
+	response = service.Delete("", "")
+	responseData = response.GetData().(errors.ServiceError)
+	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(noServiceErrorCode, responseData.Code, t)
+	test_utils.AssertEqual(
+		pool.getNoServiceErrorDescription("test"),
+		responseData.Description,
+		t,
+	)
 }

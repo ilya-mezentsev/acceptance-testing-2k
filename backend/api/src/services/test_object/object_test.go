@@ -8,13 +8,16 @@ import (
 	"log"
 	"os"
 	"services/errors"
+	"services/plugins/response_factory"
 	"test_utils"
 	"testing"
 )
 
 var (
-	repository = services.TestObjectRepositoryMock{}
-	s          = New(&repository)
+	repository            = services.TestObjectRepositoryMock{}
+	s                     = New(&repository)
+	expectedSuccessStatus = response_factory.DefaultResponse().GetStatus()
+	expectedErrorStatus   = response_factory.ErrorResponse(nil).GetStatus()
 )
 
 func init() {
@@ -33,7 +36,7 @@ func TestService_CreateSuccess(t *testing.T) {
 		fmt.Sprintf(`{"account_hash": "%s", "test_object": {"name": "TEST"}}`, services.SomeHash),
 	))
 
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertFalse(response.HasData(), t)
 	test_utils.AssertNil(response.GetData(), t)
 	test_utils.AssertNotNil(repository.Objects[services.SomeHash][0].Hash, t)
@@ -45,7 +48,7 @@ func TestService_CreateDecodeBodyError(t *testing.T) {
 
 	response := s.Create(test_utils.GetReadCloser(`1`))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToCreateTestObjectCode,
@@ -66,7 +69,7 @@ func TestService_CreateInvalidRequestError(t *testing.T) {
 		`{"account_hash": "some-hash", "test_object": {"name": "TEST"}}`,
 	))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToCreateTestObjectCode,
@@ -90,7 +93,7 @@ func TestService_CreateRepositoryError(t *testing.T) {
 		),
 	))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToCreateTestObjectCode,
@@ -109,7 +112,7 @@ func TestService_GetAllSuccess(t *testing.T) {
 
 	response := s.GetAll(services.PredefinedAccountHash)
 
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	for expectedObjectIndex, expectedObject := range repository.Objects[services.PredefinedAccountHash] {
 		test_utils.AssertEqual(
@@ -124,7 +127,7 @@ func TestService_GetAllInvalidHashError(t *testing.T) {
 	defer repository.Reset()
 
 	response := s.GetAll("some-hash")
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToFetchTestObjectsCode,
@@ -142,7 +145,7 @@ func TestService_GetAllRepositoryError(t *testing.T) {
 	defer repository.Reset()
 
 	response := s.GetAll(services.BadAccountHash)
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToFetchTestObjectsCode,
@@ -161,7 +164,7 @@ func TestService_GetSuccess(t *testing.T) {
 
 	response := s.Get(services.PredefinedAccountHash, services.PredefinedTestObject1.Hash)
 
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		services.PredefinedTestObject1.Name,
@@ -180,7 +183,7 @@ func TestService_GetInvalidHashError(t *testing.T) {
 
 	response := s.Get("hash-1", "hash-2")
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToFetchTestObjectCode,
@@ -199,7 +202,7 @@ func TestService_GetRepositoryError(t *testing.T) {
 
 	response := s.Get(services.BadAccountHash, services.PredefinedTestObject1.Hash)
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToFetchTestObjectCode,
@@ -227,7 +230,7 @@ func TestService_UpdateSuccess(t *testing.T) {
 		),
 	))
 
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertFalse(response.HasData(), t)
 	test_utils.AssertNil(response.GetData(), t)
 	test_utils.AssertEqual("FOO", repository.Objects[services.PredefinedAccountHash][0].Name, t)
@@ -238,7 +241,7 @@ func TestService_UpdateDecodeBodyError(t *testing.T) {
 
 	response := s.Update(test_utils.GetReadCloser(`1`))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToUpdateTestObjectCode,
@@ -262,7 +265,7 @@ func TestService_UpdateInvalidRequestError(t *testing.T) {
 		}`,
 	))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToUpdateTestObjectCode,
@@ -290,7 +293,7 @@ func TestService_UpdateRepositoryError(t *testing.T) {
 		),
 	))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToUpdateTestObjectCode,
@@ -309,7 +312,7 @@ func TestService_DeleteSuccess(t *testing.T) {
 
 	response := s.Delete(services.PredefinedAccountHash, services.PredefinedTestObject1.Hash)
 
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertFalse(response.HasData(), t)
 	test_utils.AssertNil(response.GetData(), t)
 	for _, object := range repository.Objects[services.PredefinedAccountHash] {
@@ -326,7 +329,7 @@ func TestService_DeleteInvalidHashError(t *testing.T) {
 
 	response := s.Delete("hash-1", "hash-2")
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToDeleteTestObjectCode,
@@ -345,7 +348,7 @@ func TestService_DeleteRepositoryError(t *testing.T) {
 
 	response := s.Delete(services.BadAccountHash, services.PredefinedTestObject1.Hash)
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToDeleteTestObjectCode,

@@ -8,14 +8,17 @@ import (
 	"log"
 	"os"
 	"services/errors"
+	"services/plugins/response_factory"
 	"strings"
 	"test_utils"
 	"testing"
 )
 
 var (
-	repository = services.TestCommandsRepositoryMock{}
-	s          = New(&repository)
+	repository            = services.TestCommandsRepositoryMock{}
+	s                     = New(&repository)
+	expectedSuccessStatus = response_factory.DefaultResponse().GetStatus()
+	expectedErrorStatus   = response_factory.ErrorResponse(nil).GetStatus()
 )
 
 func init() {
@@ -44,7 +47,7 @@ func TestService_CreateSuccess(t *testing.T) {
 		}}`, services.SomeHash),
 	))
 
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertFalse(response.HasData(), t)
 	test_utils.AssertNil(response.GetData(), t)
 	test_utils.AssertEqual("CREATE", repository.Commands[services.SomeHash][0].Name, t)
@@ -78,7 +81,7 @@ func TestService_CreateDecodeBodyError(t *testing.T) {
 
 	response := s.Create(test_utils.GetReadCloser(`1`))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToCreateTestCommandCode,
@@ -105,7 +108,7 @@ func TestService_CreateInvalidRequestError(t *testing.T) {
 		}}`, services.SomeHash),
 	))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToCreateTestCommandCode,
@@ -136,7 +139,7 @@ func TestService_CreateRepositoryError(t *testing.T) {
 		}}`, services.BadAccountHash),
 	))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToCreateTestCommandCode,
@@ -155,7 +158,7 @@ func TestService_GetAllSuccess(t *testing.T) {
 
 	response := s.GetAll(services.PredefinedAccountHash)
 
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	for expectedCommandIndex, expectedCommand := range repository.Commands[services.PredefinedAccountHash] {
 		currentCommand := response.GetData().([]models.TestCommandRequest)[expectedCommandIndex]
@@ -186,7 +189,7 @@ func TestService_GetAllInvalidRequestError(t *testing.T) {
 
 	response := s.GetAll("some-hash")
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertEqual(
 		unableToFetchTestCommandsCode,
 		response.GetData().(errors.ServiceError).Code,
@@ -220,7 +223,7 @@ func TestService_GetSuccess(t *testing.T) {
 
 	response := s.Get(services.PredefinedAccountHash, services.PredefinedTestCommand1.Hash)
 
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	expectedCommand, currentCommand :=
 		services.PredefinedTestCommand1, response.GetData().(models.TestCommandRequest)
@@ -249,7 +252,7 @@ func TestService_GetInvalidRequestError(t *testing.T) {
 
 	response := s.Get("some-hash", "some-hash")
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertEqual(
 		unableToFetchTestCommandCode,
 		response.GetData().(errors.ServiceError).Code,
@@ -267,7 +270,7 @@ func TestService_GetRepositoryError(t *testing.T) {
 
 	response := s.Get(services.BadAccountHash, services.PredefinedTestCommand1.Hash)
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertEqual(
 		unableToFetchTestCommandCode,
 		response.GetData().(errors.ServiceError).Code,
@@ -302,7 +305,7 @@ func TestService_UpdateSuccess(t *testing.T) {
 		services.PredefinedTestCommand1.Hash,
 		&updatedCommand,
 	)
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertFalse(response.HasData(), t)
 	test_utils.AssertNil(response.GetData(), t)
 	test_utils.AssertEqual("FOO", updatedCommand.Name, t)
@@ -314,7 +317,7 @@ func TestService_UpdateDecodeBodyError(t *testing.T) {
 
 	response := s.Update(test_utils.GetReadCloser(`1`))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
 		unableToUpdateTestCommandCode,
@@ -343,7 +346,7 @@ func TestService_UpdateInvalidRequestError(t *testing.T) {
 			services.PredefinedTestCommand1.Hash),
 	))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertEqual(
 		unableToUpdateTestCommandCode,
 		response.GetData().(errors.ServiceError).Code,
@@ -372,7 +375,7 @@ func TestService_UpdateRepositoryError(t *testing.T) {
 			services.PredefinedTestCommand1.Hash),
 	))
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertEqual(
 		unableToUpdateTestCommandCode,
 		response.GetData().(errors.ServiceError).Code,
@@ -390,7 +393,7 @@ func TestService_DeleteSuccess(t *testing.T) {
 
 	response := s.Delete(services.PredefinedAccountHash, services.PredefinedTestCommand1.Hash)
 
-	test_utils.AssertEqual("ok", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertFalse(response.HasData(), t)
 	test_utils.AssertNil(response.GetData(), t)
 	for _, command := range repository.Commands[services.PredefinedAccountHash] {
@@ -403,7 +406,7 @@ func TestService_DeleteInvalidRequestError(t *testing.T) {
 
 	response := s.Delete("some-hash", "some-hash")
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertEqual(
 		unableToDeleteTestCommandCode,
 		response.GetData().(errors.ServiceError).Code,
@@ -421,7 +424,7 @@ func TestService_DeleteRepositoryError(t *testing.T) {
 
 	response := s.Delete(services.BadAccountHash, services.PredefinedTestCommand1.Hash)
 
-	test_utils.AssertEqual("error", response.GetStatus(), t)
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertEqual(
 		unableToDeleteTestCommandCode,
 		response.GetData().(errors.ServiceError).Code,

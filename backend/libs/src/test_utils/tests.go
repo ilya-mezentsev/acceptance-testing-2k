@@ -1,10 +1,12 @@
 package test_utils
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -69,6 +71,36 @@ func GetExpectationString(e Expectation) string {
 
 func GetTestServer(r *mux.Router) *httptest.Server {
 	return httptest.NewServer(r)
+}
+
+func RequestGet(url string) io.ReadCloser {
+	return request(http.MethodGet, url, "")
+}
+
+func RequestPost(url, data string) io.ReadCloser {
+	return request(http.MethodPost, url, data)
+}
+
+func RequestPatch(url, data string) io.ReadCloser {
+	return request(http.MethodPatch, url, data)
+}
+
+func RequestDelete(url string) io.ReadCloser {
+	return request(http.MethodDelete, url, "")
+}
+
+func request(method, url, data string) io.ReadCloser {
+	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := (&http.Client{}).Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+	return res.Body
 }
 
 func GetReadCloser(s string) io.ReadCloser {

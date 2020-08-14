@@ -4,19 +4,13 @@ import (
 	"api_meta/interfaces"
 	"fmt"
 	"logger"
-	"services/errors"
-	"services/plugins/response_factory"
-)
-
-const (
-	noServiceErrorCode = "no-service-for-operation-type"
 )
 
 type CRUDServicesPool struct {
 	serviceTypeToImplementation map[string]interfaces.CRUDService
 }
 
-func NewCRUD() CRUDServicesPool {
+func New() CRUDServicesPool {
 	return CRUDServicesPool{map[string]interfaces.CRUDService{}}
 }
 
@@ -24,19 +18,16 @@ func (p CRUDServicesPool) AddService(serviceType string, implementation interfac
 	p.serviceTypeToImplementation[serviceType] = implementation
 }
 
-func (p CRUDServicesPool) Get(serviceType string) (interfaces.CRUDService, interfaces.Response) {
+func (p CRUDServicesPool) Get(serviceType string) interfaces.CRUDService {
 	service, found := p.serviceTypeToImplementation[serviceType]
 	if !found {
 		desc := p.getNoServiceErrorDescription(serviceType)
 		logger.Warning(desc)
 
-		return nil, response_factory.ErrorResponse(errors.ServiceError{
-			Code:        noServiceErrorCode,
-			Description: desc,
-		})
+		return defaultCRUDService{desc}
 	}
 
-	return service, nil
+	return service
 }
 
 func (p CRUDServicesPool) getNoServiceErrorDescription(serviceType string) string {
