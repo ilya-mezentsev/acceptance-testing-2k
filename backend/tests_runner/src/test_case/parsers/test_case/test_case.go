@@ -20,7 +20,10 @@ func Parse(testCases string) ([]TestCaseTransactionsIterator, error) {
 	for _, match := range matches {
 		testCasesIterators = append(
 			testCasesIterators,
-			TestCaseTransactionsIterator{transactions: getMeaningRows(match[1])},
+			TestCaseTransactionsIterator{
+				testCase:     match[1],
+				transactions: getMeaningRows(match[1]),
+			},
 		)
 	}
 

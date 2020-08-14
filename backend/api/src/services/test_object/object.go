@@ -36,7 +36,7 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	createTestObjectRequest.TestObject.Hash = hash.GetHashWithTimeAsKey(
+	createTestObjectRequest.TestObject.Hash = hash.Md5WithTimeAsKey(
 		createTestObjectRequest.TestObject.Name,
 	)
 	if !validation.IsValid(&createTestObjectRequest) {

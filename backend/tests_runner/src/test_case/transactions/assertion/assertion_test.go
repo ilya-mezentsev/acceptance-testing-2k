@@ -36,6 +36,7 @@ func TestTransaction_ExecuteSuccessAssertionFailed(t *testing.T) {
 	test_utils.AssertEqual(assertionFailed.Error(), err.Code, t)
 	test_utils.AssertEqual("Expected: 10, but got: 11", err.Description, t)
 	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
+	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTestCaseText(), err.TestCaseText, t)
 }
 
 func TestTransaction_ExecuteSuccessArrayValue(t *testing.T) {
@@ -82,6 +83,7 @@ func TestTransaction_ExecuteCannotAccessValue(t *testing.T) {
 		t,
 	)
 	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
+	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTestCaseText(), err.TestCaseText, t)
 }
 
 func TestTransaction_ExecuteAssertionFailedByTypes(t *testing.T) {
@@ -98,6 +100,7 @@ func TestTransaction_ExecuteAssertionFailedByTypes(t *testing.T) {
 	test_utils.AssertEqual(assertionFailed.Error(), err.Code, t)
 	test_utils.AssertEqual("Expected: 2, but got: [0 1]", err.Description, t)
 	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
+	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTestCaseText(), err.TestCaseText, t)
 }
 
 func TestTransaction_ExecuteVariableIsNotDefined(t *testing.T) {
@@ -107,6 +110,7 @@ func TestTransaction_ExecuteVariableIsNotDefined(t *testing.T) {
 	test_utils.AssertEqual(variableIsNotDefined.Error(), err.Code, t)
 	test_utils.AssertEqual("Unable to find variable: response", err.Description, t)
 	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTransactionText(), err.TransactionText, t)
+	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTestCaseText(), err.TestCaseText, t)
 }
 
 func TestTransaction_GetValueByPathSingleKey(t *testing.T) {

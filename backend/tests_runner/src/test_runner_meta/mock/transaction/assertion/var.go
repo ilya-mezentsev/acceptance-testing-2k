@@ -12,12 +12,15 @@ func init() {
 	MockDataScore10.SetField("variableName", "response")
 	MockDataScore10.SetField("dataPath", "data.score")
 	MockDataScore10.SetField("newValue", "10")
+	MockDataScore10.SetTestCaseText(`some test case text`)
 
 	MockDataArray.SetField("variableName", "response")
 	MockDataArray.SetField("dataPath", "data.1")
 	MockDataArray.SetField("newValue", "2")
+	MockDataArray.SetTestCaseText(`some test case text`)
 
 	MockDataArrayWithMap.SetField("variableName", "response")
 	MockDataArrayWithMap.SetField("dataPath", "data.0.y")
 	MockDataArrayWithMap.SetField("newValue", "2")
+	MockDataArrayWithMap.SetTestCaseText(`some test case text`)
 }

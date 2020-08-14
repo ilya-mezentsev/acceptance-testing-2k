@@ -3,7 +3,6 @@ package crud
 import (
 	"api_meta/interfaces"
 	"api_meta/models"
-	"database/sql"
 	"db_connector"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -21,7 +20,6 @@ var (
 	connector             db_connector.Connector
 	testObjectRepository  interfaces.CRUDRepository
 	testCommandRepository interfaces.CRUDRepository
-	credentialsRepository interfaces.CRUDRepository
 )
 
 func init() {
@@ -31,7 +29,6 @@ func init() {
 
 	testObjectRepository = New(connector, query_providers.TestObjectQueryProvider{})
 	testCommandRepository = New(connector, query_providers.TestCommandQueryProvider{})
-	credentialsRepository = New(connector, query_providers.AccountCredentialsQueryProvider{})
 }
 
 func TestRepository(t *testing.T) {
@@ -41,22 +38,16 @@ func TestRepository(t *testing.T) {
 
 		"Create TestCommand Success": createTestCommandSuccess,
 
-		"Create AccountCredentials Success": createAccountCredentialsSuccess,
-
 		"GetAll TestObjects Success":        getAllTestObjectsSuccess,
 		"GetAll TestObjects BadAccountHash": getAllTestObjectsBadAccountHash,
 
 		"GetAll TestCommands Success": getAllTestCommandsSuccess,
-
-		"GetAll AccountCredentials Error": getAllAccountCredentialsError,
 
 		"Get TestObject Success":        getTestObjectSuccess,
 		"Get TestObject NotFound":       getTestObjectNotFound,
 		"Get TestObject BadAccountHash": getTestObjectBadAccountHash,
 
 		"Get TestCommand Success": getTestCommandSuccess,
-
-		"Get AccountCredentials Success": getAccountCredentialsSuccess,
 
 		"Update TestObject Success":        updateTestObjectSuccess,
 		"Update TestObject BadFieldName":   updateTestObjectBadFieldName,
@@ -65,14 +56,10 @@ func TestRepository(t *testing.T) {
 		"Update TestCommand Success":         updateTestCommandSuccess,
 		"Update TestCommand BadUpdateTarget": updateTestObjectBadUpdateTarget,
 
-		"Update AccountCredentials Success": updateAccountCredentialsSuccess,
-
 		"Delete TestObject Success":        deleteTestObjectSuccess,
 		"Delete TestObject BadAccountHash": deleteTestObjectBadAccountHash,
 
 		"Delete TestCommand Success": deleteTestCommandSuccess,
-
-		"Delete AccountCredentials Success": deleteAccountCredentialsSuccess,
 	} {
 		t.Run(name, func(t *testing.T) {
 			test_utils.InitTables(db)
@@ -360,85 +347,4 @@ func deleteTestCommandSuccess(t *testing.T) {
 	for _, command := range commands {
 		test_utils.AssertNotEqual(test_utils.CreateCommandHash, command.Hash, t)
 	}
-}
-
-func createAccountCredentialsSuccess(t *testing.T) {
-	err := credentialsRepository.Create(testHash, map[string]interface{}{
-		"login":    "login",
-		"password": "some_password",
-		"hash":     "hash-1",
-	})
-
-	var createdAccountCredentials models.AccountCredentials
-	_ = credentialsRepository.Get(testHash, "hash-1", &createdAccountCredentials)
-	test_utils.AssertNil(err, t)
-	test_utils.AssertEqual("login", createdAccountCredentials.Login, t)
-	test_utils.AssertEqual("hash-1", createdAccountCredentials.Hash, t)
-	test_utils.AssertFalse(createdAccountCredentials.Verified, t)
-}
-
-func getAllAccountCredentialsError(t *testing.T) {
-	defer func() {
-		test_utils.AssertEqual("should not used here", recover(), t)
-	}()
-
-	var i interface{}
-	_ = credentialsRepository.GetAll(testHash, &i)
-	test_utils.AssertTrue(false, t)
-}
-
-func getAccountCredentialsSuccess(t *testing.T) {
-	var accountCredentials models.AccountCredentials
-	err := credentialsRepository.Get(testHash, test_utils.CredentialsHash, &accountCredentials)
-
-	test_utils.AssertNil(err, t)
-	test_utils.AssertEqual(test_utils.CredentialsHash, accountCredentials.Hash, t)
-	test_utils.AssertEqual(test_utils.CredentialsLogin, accountCredentials.Login, t)
-	test_utils.AssertFalse(accountCredentials.Verified, t)
-}
-
-func updateAccountCredentialsSuccess(t *testing.T) {
-	// can update only verified credentials
-	_, _ = db.Exec(
-		`UPDATE account_credentials SET verified = 1 WHERE hash = ?`,
-		test_utils.CredentialsHash,
-	)
-
-	err := credentialsRepository.Update(testHash, []models.UpdateModel{
-		{
-			Hash:      test_utils.CredentialsHash,
-			FieldName: "login",
-			NewValue:  "foo",
-		},
-		{
-			Hash:      test_utils.CredentialsHash,
-			FieldName: "verified",
-			NewValue:  true,
-		},
-	})
-
-	var updatedAccountCredentials models.AccountCredentials
-	_ = credentialsRepository.Get(testHash, test_utils.CredentialsHash, &updatedAccountCredentials)
-	test_utils.AssertNil(err, t)
-	test_utils.AssertEqual("foo", updatedAccountCredentials.Login, t)
-	test_utils.AssertTrue(updatedAccountCredentials.Verified, t)
-}
-
-func deleteAccountCredentialsSuccess(t *testing.T) {
-	_ = credentialsRepository.Create(testHash, map[string]interface{}{
-		"login":    "login",
-		"password": "some_password",
-		"hash":     "hash-1",
-	})
-
-	err := credentialsRepository.Delete(testHash, "hash-1")
-
-	test_utils.AssertNil(err, t)
-	var c models.AccountCredentials
-	err = db.Get(
-		&c,
-		`SELECT hash, login, verified FROM account_credentials WHERE hash = ?`,
-		"hash-1",
-	)
-	test_utils.AssertErrorsEqual(sql.ErrNoRows, err, t)
 }

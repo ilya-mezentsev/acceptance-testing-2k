@@ -2,6 +2,7 @@ package test_case
 
 type TestCaseTransactionsIterator struct {
 	currentTransactionIndex int
+	testCase                string
 	transactions            []string
 }
 
@@ -14,4 +15,8 @@ func (t *TestCaseTransactionsIterator) GetTestCaseTransaction() string {
 	t.currentTransactionIndex++
 
 	return transactions
+}
+
+func (t TestCaseTransactionsIterator) GetTestCaseText() string {
+	return t.testCase
 }

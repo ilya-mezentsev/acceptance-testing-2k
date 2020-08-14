@@ -11,7 +11,7 @@ type (
 	}
 
 	TransactionError struct {
-		Code, Description, TransactionText string
+		Code, Description, TestCaseText, TransactionText string
 	}
 
 	TestsReport struct {

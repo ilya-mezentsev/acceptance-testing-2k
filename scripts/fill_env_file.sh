@@ -12,6 +12,7 @@ declare -A env=(
   ['API_REPORT_FOLDER']="${rootFolder}/backend/api/test_report"
   ['BACKEND_LIBS_REPORT_FOLDER']="${rootFolder}/backend/libs/test_report"
   ['TEST_CASES_ROOT_PATH']="${rootFolder}/backend/test_data/"
+  ['REGISTRATION_ROOT_PATH']="${rootFolder}/backend/test_data/registration"
   ['TEST_CASES_FILENAME']="test_cases.txt"
   ['TEST_DB_FILE']="${rootFolder}/backend/test_data/test.db"
   ['TEST_ACCOUNT_HASH']="some-hash"

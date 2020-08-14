@@ -1,6 +1,7 @@
 package test_case
 
 import (
+	"strings"
 	"test_case/parsers/errors"
 	"test_utils"
 	"testing"
@@ -109,6 +110,38 @@ func TestTestCaseIterator_GetTestCaseTransactions(t *testing.T) {
 		test_utils.AssertEqual(
 			expectedTransactions[iterator.currentTransactionIndex-1],
 			iterator.GetTestCaseTransaction(),
+			t,
+		)
+	}
+}
+
+func TestTestCaseTransactionsIterator_GetTestCaseText(t *testing.T) {
+	testCases := `
+		BEGIN
+			// some comment (will be ignored)
+			CREATE USER {"hash": "some-hash", "userName": "Piter"}
+			user = GET USER {"hash": "some-hash"}
+			ASSERT user.hash EQUALS 'some-hash'
+			ASSERT user.userName EQUALS 'Piter'
+		END
+	`
+	expectedTestCaseText := []string{
+		`// some comment (will be ignored)`,
+		`CREATE USER {"hash": "some-hash", "userName": "Piter"}`,
+		`user = GET USER {"hash": "some-hash"}`,
+		`ASSERT user.hash EQUALS 'some-hash'`,
+		`ASSERT user.userName EQUALS 'Piter'`,
+	}
+
+	iterators, _ := Parse(testCases)
+	iterator := iterators[0]
+
+	for testCaseLineIndex, testCaseLine := range strings.Split(
+		strings.TrimSpace(iterator.GetTestCaseText()), "\n",
+	) {
+		test_utils.AssertEqual(
+			strings.TrimSpace(testCaseLine),
+			expectedTestCaseText[testCaseLineIndex],
 			t,
 		)
 	}

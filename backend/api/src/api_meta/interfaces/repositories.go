@@ -3,6 +3,11 @@ package interfaces
 import "api_meta/models"
 
 type (
+	RegistrationRepository interface {
+		CreateAccount(accountHash string) error
+		CreateAccountCredentials(record models.AccountCredentialsRecord) error
+	}
+
 	CRUDRepository interface {
 		Create(accountHash string, entity map[string]interface{}) error
 		GetAll(accountHash string, dest interface{}) error

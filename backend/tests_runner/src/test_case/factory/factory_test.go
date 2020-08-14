@@ -52,19 +52,19 @@ func TestFactory_GetAllUnknownTransactionType(t *testing.T) {
 }
 
 func TestFactory_GetAssertionTransactionError(t *testing.T) {
-	_, err := factory.(Factory).getAssertionTransaction(``)
+	_, err := factory.(Factory).getAssertionTransaction(``, ``)
 
 	test_utils.AssertErrorsEqual(parseErrors.InvalidTransactionFormat, err, t)
 }
 
 func TestFactory_GetAssignmentTransactionError(t *testing.T) {
-	_, err := factory.(Factory).getAssignmentTransaction(``)
+	_, err := factory.(Factory).getAssignmentTransaction(``, ``)
 
 	test_utils.AssertErrorsEqual(parseErrors.InvalidTransactionFormat, err, t)
 }
 
 func TestFactory_GetSimpleTransactionError(t *testing.T) {
-	_, err := factory.(Factory).getSimpleTransaction(``)
+	_, err := factory.(Factory).getSimpleTransaction(``, ``)
 
 	test_utils.AssertErrorsEqual(parseErrors.InvalidTransactionFormat, err, t)
 }

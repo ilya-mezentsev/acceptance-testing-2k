@@ -23,13 +23,14 @@ func New(
 	return Transaction{commandBuilder, data}
 }
 
-func (t Transaction) Execute(context interfaces.TestCaseContext) models.TransactionError {
+func (t Transaction) Execute(interfaces.TestCaseContext) models.TransactionError {
 	command, err := t.commandBuilder.Build(t.data.GetObject(), t.data.GetCommand())
 	if err != nil {
 		return models.TransactionError{
 			Code:            err.Error(),
 			Description:     unableToBuildCommandError,
 			TransactionText: t.data.GetTransactionText(),
+			TestCaseText:    t.data.GetTestCaseText(),
 		}
 	}
 
@@ -39,6 +40,7 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) models.Transact
 			Code:            err.Error(),
 			Description:     unableToRunCommand,
 			TransactionText: t.data.GetTransactionText(),
+			TestCaseText:    t.data.GetTestCaseText(),
 		}
 	}
 

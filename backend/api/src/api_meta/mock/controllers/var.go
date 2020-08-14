@@ -3,6 +3,6 @@ package controllers
 import "services/plugins/hash"
 
 var (
-	BadAccountHash = hash.GetHashWithTimeAsKey("bad-account-hash")
-	BadEntityHash  = hash.GetHashWithTimeAsKey("bad-entity-hash")
+	BadAccountHash = hash.Md5WithTimeAsKey("bad-account-hash")
+	BadEntityHash  = hash.Md5WithTimeAsKey("bad-entity-hash")
 )

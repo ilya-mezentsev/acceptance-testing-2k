@@ -7,8 +7,12 @@ import (
 	"time"
 )
 
-func GetHashWithTimeAsKey(s string) string {
+func Md5(s string) string {
 	h := md5.New()
-	h.Write([]byte(fmt.Sprintf("%s%d", s, time.Now().UnixNano())))
+	h.Write([]byte(s))
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+func Md5WithTimeAsKey(s string) string {
+	return Md5(fmt.Sprintf("%s%d", s, time.Now().UnixNano()))
 }

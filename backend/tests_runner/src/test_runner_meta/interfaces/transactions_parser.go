@@ -3,6 +3,7 @@ package interfaces
 type (
 	transactionTextGetter interface {
 		GetTransactionText() string
+		GetTestCaseText() string
 	}
 
 	variableContainer interface {

@@ -11,6 +11,7 @@ mkdir -p "$1"/backend/libs/test_report
 
 mkdir -p "$1"/backend/test_data
 mkdir -p "$1"/backend/test_data/some-hash
+mkdir -p "$1"/backend/test_data/registration
 
 rm -f "$1"/backend/test_data/some-hash/test_cases.txt
 echo "BEGIN

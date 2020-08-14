@@ -20,7 +20,7 @@ func TestIsValidStruct(t *testing.T) {
 	t.Run("valid struct TestObject", func(t *testing.T) {
 		test_utils.AssertTrue(IsValid(&models.TestObject{
 			Name: "some-name",
-			Hash: hash.GetHashWithTimeAsKey("hash"),
+			Hash: hash.Md5WithTimeAsKey("hash"),
 		}), t)
 	})
 
@@ -32,38 +32,38 @@ func TestIsValidStruct(t *testing.T) {
 
 		test_utils.AssertFalse(IsValid(&models.TestObject{
 			Name: "some-name",
-			Hash: strings.Repeat(hash.GetHashWithTimeAsKey("hash"), 1000),
+			Hash: strings.Repeat(hash.Md5WithTimeAsKey("hash"), 1000),
 		}), t)
 	})
 
 	t.Run("invalid test object name", func(t *testing.T) {
 		test_utils.AssertFalse(IsValid(&models.TestObject{
 			Name: "",
-			Hash: hash.GetHashWithTimeAsKey("hash"),
+			Hash: hash.Md5WithTimeAsKey("hash"),
 		}), t)
 
 		test_utils.AssertFalse(IsValid(&models.TestObject{
 			Name: strings.Repeat("1", 1000),
-			Hash: hash.GetHashWithTimeAsKey("hash"),
+			Hash: hash.Md5WithTimeAsKey("hash"),
 		}), t)
 	})
 
 	t.Run("valid struct UpdateRequest", func(t *testing.T) {
 		test_utils.AssertTrue(IsValid(&models.UpdateRequest{
-			AccountHash: hash.GetHashWithTimeAsKey("hash"),
+			AccountHash: hash.Md5WithTimeAsKey("hash"),
 			UpdatePayload: []models.UpdateModel{
 				{
-					Hash:      hash.GetHashWithTimeAsKey("hash"),
+					Hash:      hash.Md5WithTimeAsKey("hash"),
 					FieldName: "field_name",
 				},
 			},
 		}), t)
 
 		test_utils.AssertTrue(IsValid(&models.UpdateRequest{
-			AccountHash: hash.GetHashWithTimeAsKey("hash"),
+			AccountHash: hash.Md5WithTimeAsKey("hash"),
 			UpdatePayload: []models.UpdateModel{
 				{
-					Hash:      hash.GetHashWithTimeAsKey("hash"),
+					Hash:      hash.Md5WithTimeAsKey("hash"),
 					FieldName: "update_target:field_name",
 				},
 			},
@@ -72,10 +72,10 @@ func TestIsValidStruct(t *testing.T) {
 
 	t.Run("invalid field name", func(t *testing.T) {
 		test_utils.AssertFalse(IsValid(&models.UpdateRequest{
-			AccountHash: hash.GetHashWithTimeAsKey("hash"),
+			AccountHash: hash.Md5WithTimeAsKey("hash"),
 			UpdatePayload: []models.UpdateModel{
 				{
-					Hash:      hash.GetHashWithTimeAsKey("hash"),
+					Hash:      hash.Md5WithTimeAsKey("hash"),
 					FieldName: "field-name",
 				},
 			},
@@ -86,7 +86,7 @@ func TestIsValidStruct(t *testing.T) {
 		test_utils.AssertTrue(IsValid(&models.TestCommandRecord{
 			CommandSettings: models.CommandSettings{
 				Name:               "GET",
-				Hash:               hash.GetHashWithTimeAsKey("hash"),
+				Hash:               hash.Md5WithTimeAsKey("hash"),
 				ObjectName:         "SETTINGS",
 				Method:             "GET",
 				BaseURL:            "https://link.com/api/v2",
@@ -132,7 +132,7 @@ func TestIsValidStruct(t *testing.T) {
 
 		test_utils.AssertTrue(IsValid(&x{y: models.TestObject{
 			Name: "some-name",
-			Hash: hash.GetHashWithTimeAsKey("hash"),
+			Hash: hash.Md5WithTimeAsKey("hash"),
 		}}), t)
 	})
 
@@ -143,7 +143,7 @@ func TestIsValidStruct(t *testing.T) {
 
 		test_utils.AssertFalse(IsValid(&x{y: models.TestObject{
 			Name: "",
-			Hash: hash.GetHashWithTimeAsKey("hash"),
+			Hash: hash.Md5WithTimeAsKey("hash"),
 		}}), t)
 	})
 
@@ -163,7 +163,7 @@ func TestIsValidPanicNotPointer(t *testing.T) {
 
 	IsValid(models.TestObject{
 		Name: strings.Repeat("1", 1000),
-		Hash: hash.GetHashWithTimeAsKey("hash"),
+		Hash: hash.Md5WithTimeAsKey("hash"),
 	})
 	test_utils.AssertTrue(false, t)
 }

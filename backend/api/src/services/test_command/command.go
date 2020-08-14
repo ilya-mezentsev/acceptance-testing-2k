@@ -43,7 +43,7 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 		Headers:         createTestCommandRequest.TestCommand.Headers.ReduceToRecordable(),
 		Cookies:         createTestCommandRequest.TestCommand.Cookies.ReduceToRecordable(),
 	}
-	testCommandRecord.Hash = hash.GetHashWithTimeAsKey(testCommandRecord.Name)
+	testCommandRecord.Hash = hash.Md5WithTimeAsKey(testCommandRecord.Name)
 
 	if !validation.IsValid(&testCommandRecord) {
 		return response_factory.ErrorResponse(errors.ServiceError{

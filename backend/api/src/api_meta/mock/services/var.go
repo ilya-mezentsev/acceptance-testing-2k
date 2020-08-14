@@ -2,25 +2,31 @@ package services
 
 import (
 	"api_meta/models"
+	"services/plugins/account_credentials"
 	"services/plugins/hash"
 )
 
 var (
-	SomeHash              = hash.GetHashWithTimeAsKey("some-hash")
-	BadAccountHash        = hash.GetHashWithTimeAsKey("bad-hash")
-	PredefinedAccountHash = hash.GetHashWithTimeAsKey("account-hash-1")
+	ExistsLogin           = "exists-login"
+	ExistsPassword        = "exists-password"
+	BadLogin              = "bad-login"
+	BadPassword           = "bad-password"
+	SomeHash              = hash.Md5WithTimeAsKey("some-hash")
+	BadAccountHash        = account_credentials.GenerateAccountHash(BadLogin, BadPassword)
+	ExistsAccountHash     = account_credentials.GenerateAccountHash(ExistsLogin, ExistsPassword)
+	PredefinedAccountHash = hash.Md5WithTimeAsKey("account-hash-1")
 	PredefinedTestObject1 = models.TestObject{
 		Name: "USER",
-		Hash: hash.GetHashWithTimeAsKey("object-hash-1"),
+		Hash: hash.Md5WithTimeAsKey("object-hash-1"),
 	}
 	PredefinedTestObject2 = models.TestObject{
 		Name: "ACTION",
-		Hash: hash.GetHashWithTimeAsKey("object-hash-2"),
+		Hash: hash.Md5WithTimeAsKey("object-hash-2"),
 	}
 	PredefinedTestCommand1 = models.TestCommandRecord{
 		CommandSettings: models.CommandSettings{
 			Name:               "GET",
-			Hash:               hash.GetHashWithTimeAsKey("command-hash-1"),
+			Hash:               hash.Md5WithTimeAsKey("command-hash-1"),
 			ObjectName:         "SETTINGS",
 			Method:             "GET",
 			BaseURL:            "https://link.com/api/v2",
@@ -33,7 +39,7 @@ var (
 	PredefinedTestCommand2 = models.TestCommandRecord{
 		CommandSettings: models.CommandSettings{
 			Name:               "CREATE",
-			Hash:               hash.GetHashWithTimeAsKey("command-hash-1"),
+			Hash:               hash.Md5WithTimeAsKey("command-hash-1"),
 			ObjectName:         "SETTINGS",
 			Method:             "POST",
 			BaseURL:            "https://link.com/api/v2",

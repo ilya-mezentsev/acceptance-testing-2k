@@ -30,6 +30,7 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) models.Transact
 			Code:            err.Error(),
 			Description:     unableToBuildCommand,
 			TransactionText: t.data.GetTransactionText(),
+			TestCaseText:    t.data.GetTestCaseText(),
 		}
 	}
 
@@ -39,6 +40,7 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) models.Transact
 			Code:            err.Error(),
 			Description:     unableToRunCommand,
 			TransactionText: t.data.GetTransactionText(),
+			TestCaseText:    t.data.GetTestCaseText(),
 		}
 	}
 

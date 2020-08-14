@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 )
@@ -105,4 +106,14 @@ func request(method, url, data string) io.ReadCloser {
 
 func GetReadCloser(s string) io.ReadCloser {
 	return ioutil.NopCloser(strings.NewReader(s))
+}
+
+func MustFileExists(path string) bool {
+	if _, err := os.Stat(path); err == nil {
+		return true
+	} else if os.IsNotExist(err) {
+		return false
+	} else {
+		panic(err)
+	}
 }

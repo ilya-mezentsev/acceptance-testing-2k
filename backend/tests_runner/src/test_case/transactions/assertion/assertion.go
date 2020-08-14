@@ -23,6 +23,7 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) models.Transact
 			Code:            variableIsNotDefined.Error(),
 			Description:     t.variableIsNotDefinedDescription(),
 			TransactionText: t.data.GetTransactionText(),
+			TestCaseText:    t.data.GetTestCaseText(),
 		}
 	}
 
@@ -35,6 +36,7 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) models.Transact
 			Code:            err.Error(),
 			Description:     t.unableToGetValueByPathDescription(),
 			TransactionText: t.data.GetTransactionText(),
+			TestCaseText:    t.data.GetTestCaseText(),
 		}
 	}
 
@@ -45,6 +47,7 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) models.Transact
 			Code:            assertionFailed.Error(),
 			Description:     t.assertionFailedDescription(currentValue),
 			TransactionText: t.data.GetTransactionText(),
+			TestCaseText:    t.data.GetTestCaseText(),
 		}
 	}
 }

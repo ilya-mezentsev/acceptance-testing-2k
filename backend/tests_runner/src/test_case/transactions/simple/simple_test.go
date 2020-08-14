@@ -33,6 +33,7 @@ func TestTransaction_ExecuteBuildCommandError(t *testing.T) {
 	test_utils.AssertEqual(mockConst.BuildCommandError.Error(), err.Code, t)
 	test_utils.AssertEqual(unableToBuildCommandError, err.Description, t)
 	test_utils.AssertEqual(simple.MockData.GetTransactionText(), err.TransactionText, t)
+	test_utils.AssertEqual(simple.MockData.GetTestCaseText(), err.TestCaseText, t)
 }
 
 func TestTransaction_ExecuteCommandRunError(t *testing.T) {
@@ -46,4 +47,5 @@ func TestTransaction_ExecuteCommandRunError(t *testing.T) {
 	test_utils.AssertEqual(mockConst.RunCommandError.Error(), err.Code, t)
 	test_utils.AssertEqual(unableToRunCommand, err.Description, t)
 	test_utils.AssertEqual(simple.MockData.GetTransactionText(), err.TransactionText, t)
+	test_utils.AssertEqual(simple.MockData.GetTestCaseText(), err.TestCaseText, t)
 }

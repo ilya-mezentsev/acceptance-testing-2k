@@ -1,8 +1,12 @@
 package test_utils
 
-import "github.com/jmoiron/sqlx"
+import (
+	db2 "db"
+	"github.com/jmoiron/sqlx"
+)
 
 const (
+	dropAccountsQuery           = `DROP TABLE IF EXISTS accounts`
 	dropAccountCredentialsQuery = `DROP TABLE IF EXISTS account_credentials;`
 	dropObjectsQuery            = `DROP TABLE IF EXISTS objects;`
 	dropCommandsQuery           = `DROP TABLE IF EXISTS commands;`
@@ -10,48 +14,10 @@ const (
 	dropCommandsHeadersQuery    = `DROP TABLE IF EXISTS commands_headers;`
 	dropCommandsCookiesQuery    = `DROP TABLE IF EXISTS commands_cookies;`
 
-	createTablesQuery = `
-	CREATE TABLE IF NOT EXISTS account_credentials(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		login VARCHAR(64) NOT NULL UNIQUE,
-		password VARCHAR(32) NOT NULL,
-		verified BOOLEAN NOT NULL DEFAULT 0 CHECK (verified IN (0,1)),
-		hash VARCHAR(32) NOT NULL UNIQUE
-	);
-	CREATE TABLE IF NOT EXISTS objects(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL UNIQUE,
-		hash VARCHAR(32) NOT NULL UNIQUE
-	);
-	CREATE TABLE IF NOT EXISTS commands(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		object_name TEXT REFERENCES objects(name),
-		name TEXT NOT NULL UNIQUE,
-		hash VARCHAR(32) NOT NULL UNIQUE
-	);
-	CREATE TABLE IF NOT EXISTS commands_settings(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		method TEXT NOT NULL,
-		base_url TEXT NOT NULL,
-		endpoint TEXT DEFAULT '',
-		pass_arguments_in_url BOOLEAN NOT NULL CHECK (pass_arguments_in_url IN (0,1)),
-		command_hash VARCHAR(32) REFERENCES commands(hash)
-	);
-	CREATE TABLE IF NOT EXISTS commands_headers(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		key TEXT NOT NULL,
-		value TEXT NOT NULL,
-		command_hash VARCHAR(32) REFERENCES commands(hash)
-	);
-	CREATE TABLE IF NOT EXISTS commands_cookies(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		key TEXT NOT NULL,
-		value TEXT NOT NULL,
-		command_hash VARCHAR(32) REFERENCES commands(hash)
-	);`
-
+	addAccountQuery = `
+	INSERT INTO accounts(hash) VALUES(:hash)`
 	addAccountCredentialsQuery = `
-	INSERT INTO account_credentials(login, password, hash)
+	INSERT INTO account_credentials(login, password, account_hash)
 	VALUES(:login, :password, :hash)`
 	addObjectQuery = `
 	INSERT INTO objects(name, hash)
@@ -69,6 +35,7 @@ const (
 	INSERT INTO commands_cookies(key, value, command_hash)
 	VALUES(:key, :value, :command_hash)`
 
+	AccountHash       = "some-hash"
 	CredentialsLogin  = "some_login"
 	CredentialsHash   = "some_hash"
 	ObjectName        = "USER"
@@ -87,6 +54,11 @@ const (
 )
 
 var (
+	accounts = []map[string]interface{}{
+		{
+			"hash": AccountHash,
+		},
+	}
 	credentials = []map[string]interface{}{
 		{
 			"login":    CredentialsLogin,
@@ -178,6 +150,7 @@ var (
 	}
 
 	queryToData = map[string][]map[string]interface{}{
+		addAccountQuery:            accounts,
 		addAccountCredentialsQuery: credentials,
 		addObjectQuery:             objects,
 		addCommandQuery:            commands,
@@ -192,6 +165,7 @@ func DropTables(db *sqlx.DB) {
 		dropCommandsQuery, dropCommandsSettingsQuery,
 		dropCommandsHeadersQuery, dropCommandsCookiesQuery,
 		dropObjectsQuery, dropAccountCredentialsQuery,
+		dropAccountsQuery,
 	} {
 		exec(db, query)
 	}
@@ -219,14 +193,17 @@ func ReplaceBaseURLAndInitTables(db *sqlx.DB, baseURL string) {
 
 func InitTables(db *sqlx.DB) {
 	DropTables(db)
-	exec(db, createTablesQuery)
+	err := db2.Install(db)
+	if err != nil {
+		panic(err)
+	}
 
 	tx := db.MustBegin()
 	for query, data := range queryToData {
 		applyData(tx, query, data)
 	}
 
-	err := tx.Commit()
+	err = tx.Commit()
 	if err != nil {
 		panic(err)
 	}

@@ -1,14 +1,13 @@
 package db_connector
 
 import (
+	"env"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"logger"
 	"os"
 	"path"
 )
-
-const dbFilename = "db.db"
 
 type Connector struct {
 	dbRootPath              string
@@ -34,7 +33,7 @@ func (c *Connector) Connect(accountHash string) (*sqlx.DB, error) {
 }
 
 func (c Connector) connect(accountHash string) (*sqlx.DB, error) {
-	dbFilePath := path.Join(c.dbRootPath, accountHash, dbFilename)
+	dbFilePath := path.Join(c.dbRootPath, accountHash, env.DBFilename)
 	if _, err := os.Stat(dbFilePath); err == nil {
 		return sqlx.Open("sqlite3", dbFilePath)
 	} else if os.IsNotExist(err) {

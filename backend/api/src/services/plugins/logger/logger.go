@@ -26,6 +26,20 @@ func (l CRUDEntityErrorsLogger) LogCreateEntityRepositoryError(
 	}, logger.Warning)
 }
 
+func (l CRUDEntityErrorsLogger) LogCreateEntityRepositoryOrOSError(
+	err error,
+	context map[string]interface{},
+) {
+	context["entity_name"] = l.EntityName
+	logger.WithFields(logger.Fields{
+		MessageTemplate: "Repository or OS error while creating entity: %v",
+		Args: []interface{}{
+			err,
+		},
+		Optional: context,
+	}, logger.Warning)
+}
+
 func (l CRUDEntityErrorsLogger) LogGetAllEntitiesRepositoryError(
 	err error,
 	context map[string]interface{},

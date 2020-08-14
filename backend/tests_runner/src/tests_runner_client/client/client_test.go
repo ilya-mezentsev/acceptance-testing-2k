@@ -1,6 +1,7 @@
 package client
 
 import (
+	"env"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	"net/http/httptest"
@@ -36,7 +37,7 @@ func init() {
 	server = test_utils.GetTestServer(r)
 
 	var err error
-	db, err = sqlx.Open("sqlite3", path.Join(testDataPath, testHash, "db.db"))
+	db, err = sqlx.Open("sqlite3", path.Join(testDataPath, testHash, env.DBFilename))
 	if err != nil {
 		panic(err)
 	}
