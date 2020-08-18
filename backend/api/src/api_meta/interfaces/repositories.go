@@ -3,6 +3,10 @@ package interfaces
 import "api_meta/models"
 
 type (
+	SessionRepository interface {
+		AccountExists(accountHash string) (bool, error)
+	}
+
 	RegistrationRepository interface {
 		CreateAccount(accountHash string) error
 		CreateAccountCredentials(record models.AccountCredentialsRecord) error

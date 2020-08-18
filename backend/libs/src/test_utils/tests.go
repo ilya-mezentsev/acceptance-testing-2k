@@ -75,27 +75,31 @@ func GetTestServer(r *mux.Router) *httptest.Server {
 }
 
 func RequestGet(url string) io.ReadCloser {
-	return request(http.MethodGet, url, "")
+	return makeRequest(http.MethodGet, url, "")
 }
 
 func RequestPost(url, data string) io.ReadCloser {
-	return request(http.MethodPost, url, data)
+	return makeRequest(http.MethodPost, url, data)
 }
 
 func RequestPatch(url, data string) io.ReadCloser {
-	return request(http.MethodPatch, url, data)
+	return makeRequest(http.MethodPatch, url, data)
 }
 
 func RequestDelete(url string) io.ReadCloser {
-	return request(http.MethodDelete, url, "")
+	return makeRequest(http.MethodDelete, url, "")
 }
 
-func request(method, url, data string) io.ReadCloser {
+func makeRequest(method, url, data string) io.ReadCloser {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(data)))
 	if err != nil {
 		panic(err)
 	}
 
+	return MustDoRequest(req)
+}
+
+func MustDoRequest(req *http.Request) io.ReadCloser {
 	res, err := (&http.Client{}).Do(req)
 	if err != nil {
 		panic(err)
@@ -116,4 +120,12 @@ func MustFileExists(path string) bool {
 	} else {
 		panic(err)
 	}
+}
+
+func GetMockRequest(data string) *http.Request {
+	return httptest.NewRequest(
+		http.MethodPost,
+		"https://link.com",
+		bytes.NewBuffer([]byte(data)),
+	)
 }
