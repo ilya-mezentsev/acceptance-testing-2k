@@ -6,8 +6,8 @@ const (
 )
 
 const (
-	accountDoesNotExistsError  = "Account does not exists"
-	sessionCookieNotFoundError = "Session cookie not found"
+	accountDoesNotExistsError  = "account-does-not-exists"
+	sessionCookieNotFoundError = "session-cookie-not-found"
 	entityName                 = "session"
 )
 

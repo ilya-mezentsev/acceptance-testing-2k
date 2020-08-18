@@ -5,6 +5,6 @@ const (
 )
 
 const (
-	loginAlreadyExistsError = "Login already exists"
+	loginAlreadyExistsError = "login-already-exists"
 	entityName              = "registration"
 )

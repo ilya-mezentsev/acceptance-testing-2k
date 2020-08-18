@@ -1,8 +1,8 @@
 package errors
 
 const (
-	DecodingRequestError = "Json decoding error"
-	InvalidRequestError  = "Invalid request data"
-	RepositoryError      = "DB error"
-	UnknownError         = "Unknown error"
+	DecodingRequestError = "unable-to-decode-request"
+	InvalidRequestError  = "invalid-request-data"
+	RepositoryError      = "db-error"
+	UnknownError         = "unknown-error"
 )
