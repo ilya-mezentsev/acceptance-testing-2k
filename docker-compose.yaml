@@ -30,6 +30,8 @@ services:
 
   nginx:
     build: nginx
+    volumes:
+      - ./frontend:/var/www/apps/web-frontend
     ports:
       - 80:80
     links:

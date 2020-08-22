@@ -12,7 +12,14 @@ env.create_proto_files:
 env.install_backend_libs:
 	bash $(ROOT_DIR)/scripts/prepare_backend_libs.sh $(ROOT_DIR)
 
-env.prepare_workspace: env.fill_env_file env.prepare_test_files env.install_backend_libs
+env.install_frontend_libs:
+	bash $(ROOT_DIR)/scripts/prepare_frontend_libs.sh $(ROOT_DIR)
+
+env.prepare_workspace: \
+	env.fill_env_file \
+	env.prepare_test_files \
+	env.install_backend_libs \
+	env.install_frontend_libs
 
 util.calc_go_lines:
 	bash $(ROOT_DIR)/scripts/calc_go_lines.sh $(ROOT_DIR)
@@ -30,3 +37,6 @@ tests.backend: tests.test_runner tests.api tests.backend_libs
 
 build.backend:
 	bash $(ROOT_DIR)/scripts/build_backend.sh $(ROOT_DIR)
+
+build.frontend:
+	bash $(ROOT_DIR)/scripts/build_frontend.sh $(ROOT_DIR)
