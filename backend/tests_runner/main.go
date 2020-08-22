@@ -2,7 +2,6 @@ package main
 
 import (
 	"controller"
-	"fmt"
 	"google.golang.org/grpc"
 	"logger"
 	"net"
@@ -13,7 +12,7 @@ import (
 )
 
 var (
-	address     = fmt.Sprintf("0.0.0.0:%s", utils.MustGetEnv("TEST_RUNNER_GRPC_PORT"))
+	address     = utils.MustGetEnv("TESTS_RUNNER_ADDRESS")
 	dbFilesRoot = utils.MustGetEnv("DB_FILES_ROOT_PATH")
 )
 

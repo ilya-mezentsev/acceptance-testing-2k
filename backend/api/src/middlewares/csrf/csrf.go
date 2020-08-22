@@ -5,9 +5,14 @@ import (
 	"logger"
 	"middlewares/plugins/base64"
 	"net/http"
+	"regexp"
 	"services/plugins/hash"
 	"strings"
 	"time"
+)
+
+var (
+	sessionRequestPathRegex = regexp.MustCompile(`/session/?$`)
 )
 
 type Middleware struct {
@@ -16,6 +21,12 @@ type Middleware struct {
 
 func (m Middleware) CheckCSRFToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if m.isGetSessionRequest(r) {
+			next.ServeHTTP(w, r)
+			m.setTokens(w)
+			return
+		}
+
 		cookieToken, err := m.getTokenFromCookie(r)
 		if err != nil {
 			logger.WarningF("Cannot get csrf token from cookie or decode it")
@@ -38,6 +49,10 @@ func (m Middleware) CheckCSRFToken(next http.Handler) http.Handler {
 			http.Error(w, "CSRF tokens didn't match", http.StatusForbidden)
 		}
 	})
+}
+
+func (m Middleware) isGetSessionRequest(r *http.Request) bool {
+	return r.Method == http.MethodGet && sessionRequestPathRegex.MatchString(r.URL.Path)
 }
 
 func (m Middleware) getTokenFromCookie(r *http.Request) (string, error) {
