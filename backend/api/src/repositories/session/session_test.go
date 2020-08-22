@@ -27,7 +27,7 @@ func init() {
 }
 
 func TestRepository_AccountExistsTrue(t *testing.T) {
-	test_utils.InitTables(db)
+	test_utils.InitTablesWithAccounts(db)
 	defer test_utils.DropTables(db)
 
 	accountExists, err := r.AccountExists(test_utils.AccountHash)
@@ -37,7 +37,7 @@ func TestRepository_AccountExistsTrue(t *testing.T) {
 }
 
 func TestRepository_AccountExistsFalse(t *testing.T) {
-	test_utils.InitTables(db)
+	test_utils.InitTablesWithAccounts(db)
 	defer test_utils.DropTables(db)
 
 	accountExists, err := r.AccountExists("blah-blah")

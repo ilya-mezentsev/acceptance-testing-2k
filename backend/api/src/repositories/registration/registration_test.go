@@ -30,7 +30,7 @@ func init() {
 }
 
 func TestRepository_CreateAccountSuccess(t *testing.T) {
-	test_utils.InitTables(db)
+	test_utils.InitTablesWithAccounts(db)
 	defer test_utils.DropTables(db)
 
 	accountHash := hash.Md5WithTimeAsKey("some-hash")
@@ -43,7 +43,7 @@ func TestRepository_CreateAccountSuccess(t *testing.T) {
 }
 
 func TestRepository_CreateAccountAlreadyExistsError(t *testing.T) {
-	test_utils.InitTables(db)
+	test_utils.InitTablesWithAccounts(db)
 	defer test_utils.DropTables(db)
 
 	err := r.CreateAccount(test_utils.AccountHash)
@@ -63,7 +63,7 @@ func TestRepository_CreateAccountNoTableError(t *testing.T) {
 }
 
 func TestRepository_CreateAccountCredentialsSuccess(t *testing.T) {
-	test_utils.InitTables(db)
+	test_utils.InitTablesWithAccounts(db)
 	defer test_utils.DropTables(db)
 
 	err := r.CreateAccountCredentials(models.AccountCredentialsRecord{
@@ -84,7 +84,7 @@ func TestRepository_CreateAccountCredentialsSuccess(t *testing.T) {
 }
 
 func TestRepository_CreateAccountCredentialsBadAccountHashError(t *testing.T) {
-	test_utils.InitTables(db)
+	test_utils.InitTablesWithAccounts(db)
 	defer test_utils.DropTables(db)
 
 	err := r.CreateAccountCredentials(models.AccountCredentialsRecord{

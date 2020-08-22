@@ -14,6 +14,13 @@ const (
 	dropCommandsHeadersQuery    = `DROP TABLE IF EXISTS commands_headers;`
 	dropCommandsCookiesQuery    = `DROP TABLE IF EXISTS commands_cookies;`
 
+	addAccountsQuery = `
+	CREATE TABLE IF NOT EXISTS accounts(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		hash VARCHAR(32) NOT NULL UNIQUE,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);`
+
 	addAccountQuery = `
 	INSERT INTO accounts(hash) VALUES(:hash)`
 	addAccountCredentialsQuery = `
@@ -150,7 +157,6 @@ var (
 	}
 
 	queryToData = map[string][]map[string]interface{}{
-		addAccountQuery:            accounts,
 		addAccountCredentialsQuery: credentials,
 		addObjectQuery:             objects,
 		addCommandQuery:            commands,
@@ -189,6 +195,31 @@ func ReplaceBaseURLAndInitTables(db *sqlx.DB, baseURL string) {
 	}
 
 	InitTables(db)
+}
+
+func InitTablesWithAccounts(db *sqlx.DB) {
+	DropTables(db)
+
+	_, err := db.Exec(addAccountsQuery)
+	if err != nil {
+		panic(err)
+	}
+
+	err = db2.Install(db)
+	if err != nil {
+		panic(err)
+	}
+
+	tx := db.MustBegin()
+	for query, data := range queryToData {
+		applyData(tx, query, data)
+	}
+	applyData(tx, addAccountQuery, accounts)
+
+	err = tx.Commit()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func InitTables(db *sqlx.DB) {

@@ -5,6 +5,7 @@ import (
 	"logger"
 	"middlewares/plugins/base64"
 	"net/http"
+	"services/plugins/hash"
 	"strings"
 	"time"
 )
@@ -64,9 +65,13 @@ func (m Middleware) getTokenFromHeader(r *http.Request) (string, error) {
 
 func (m Middleware) setTokens(w http.ResponseWriter) {
 	publicKey := base64.Encode(fmt.Sprintf("%d", time.Now().Unix()))
-	token := base64.Encode(strings.Join([]string{m.PrivateKey, publicKey}, keysSeparator))
+	token := base64.Encode(strings.Join([]string{
+		hash.Md5(m.PrivateKey),
+		keysSeparator,
+		hash.Md5(publicKey),
+	}, keysSeparator))
 
-	w.Header().Add(csrfKey, token)
+	w.Header().Add(csrfPublicTokenKey, publicKey)
 	http.SetCookie(w, &http.Cookie{
 		Name:     csrfKey,
 		Value:    token,

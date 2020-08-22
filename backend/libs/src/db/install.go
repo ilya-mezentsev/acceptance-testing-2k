@@ -3,11 +3,6 @@ package db
 import "github.com/jmoiron/sqlx"
 
 const createTablesQuery = `
-	CREATE TABLE IF NOT EXISTS accounts(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		hash VARCHAR(32) NOT NULL UNIQUE,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	);
 	CREATE TABLE IF NOT EXISTS account_credentials(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		login VARCHAR(64) NOT NULL UNIQUE,
