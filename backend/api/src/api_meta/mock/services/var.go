@@ -4,6 +4,7 @@ import (
 	"api_meta/models"
 	"services/plugins/account_credentials"
 	"services/plugins/hash"
+	"test_case_runner"
 )
 
 var (
@@ -48,5 +49,11 @@ var (
 		},
 		Headers: "X-Header-1=x_value1;X-Header-2=x_value2",
 		Cookies: "Cookie-1=some-data;Cookie-2=value",
+	}
+	MockTestCasesReport = &test_case_runner.TestsReport{
+		Report: &test_case_runner.TestCaseRunReport{
+			PassedCount: 3,
+			FailedCount: 4,
+		},
 	}
 )

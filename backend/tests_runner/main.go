@@ -13,9 +13,8 @@ import (
 )
 
 var (
-	address       = fmt.Sprintf("0.0.0.0:%s", utils.MustGetEnv("TEST_RUNNER_GRPC_PORT"))
-	dbFilesRoot   = utils.MustGetEnv("DB_FILES_ROOT_PATH")
-	testCasesRoot = utils.MustGetEnv("TEST_CASES_ROOT_PATH")
+	address     = fmt.Sprintf("0.0.0.0:%s", utils.MustGetEnv("TEST_RUNNER_GRPC_PORT"))
+	dbFilesRoot = utils.MustGetEnv("DB_FILES_ROOT_PATH")
 )
 
 func main() {
@@ -36,7 +35,7 @@ func main() {
 	s := grpc.NewServer()
 	test_case_runner.RegisterTestRunnerServiceServer(
 		s,
-		controller.New(client.New(dbFilesRoot, testCasesRoot)),
+		controller.New(client.New(dbFilesRoot)),
 	)
 
 	logger.Info("Starting GRPC server on address: " + address)

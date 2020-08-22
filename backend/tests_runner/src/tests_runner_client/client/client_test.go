@@ -18,9 +18,8 @@ import (
 var (
 	testDataPath      string
 	testCasesRootPath string
-	testCasesFilename string
+	testCasesPath     string
 	testHash          string
-	testCasesFilePath string
 	db                *sqlx.DB
 	r                 *mux.Router
 	server            *httptest.Server
@@ -29,10 +28,13 @@ var (
 func init() {
 	testDataPath = path.Dir(utils.MustGetEnv("TEST_DB_FILE"))
 	testCasesRootPath = utils.MustGetEnv("TEST_CASES_ROOT_PATH")
-	testCasesFilename = utils.MustGetEnv("TEST_CASES_FILENAME")
 	testHash = utils.MustGetEnv("TEST_ACCOUNT_HASH")
+	testCasesPath = path.Join(
+		testCasesRootPath,
+		testHash,
+		utils.MustGetEnv("TEST_CASES_FILENAME"),
+	)
 
-	testCasesFilePath = path.Join(testCasesRootPath, testHash, testCasesFilename)
 	r = mux.NewRouter()
 	server = test_utils.GetTestServer(r)
 
@@ -43,7 +45,7 @@ func init() {
 	}
 
 	mockCommand.Init(r)
-	testRunnerClientMock.FillTestCasesFile(testCasesFilePath)
+	testRunnerClientMock.FillTestCasesFile(testCasesPath)
 	test_utils.ReplaceBaseURLAndInitTables(db, server.URL)
 }
 
@@ -55,9 +57,9 @@ func TestMain(m *testing.M) {
 }
 
 func TestClient_RunSuccess(t *testing.T) {
-	client := New(testDataPath, testCasesRootPath)
+	client := New(testDataPath)
 
-	report, err := client.Run(testHash, testCasesFilename)
+	report, err := client.Run(testHash, testCasesPath)
 
 	test_utils.AssertEqual(errors.EmptyApplicationError, err, t)
 	test_utils.AssertEqual(testRunnerClientMock.PassedCount, report.PassedCount, t)
@@ -66,28 +68,28 @@ func TestClient_RunSuccess(t *testing.T) {
 }
 
 func TestClient_RunInvalidDBFilesRootPath(t *testing.T) {
-	client := New("/home", testCasesRootPath)
+	client := New("/home")
 
-	_, err := client.Run(testHash, testCasesFilename)
+	_, err := client.Run(testHash, testCasesPath)
 
 	test_utils.AssertEqual(unableToEstablishDBConnectionCode, err.Code, t)
 }
 
 func TestClient_RunInvalidTestCasesRootPath(t *testing.T) {
-	client := New(testDataPath, "/home")
+	client := New(testDataPath)
 
-	_, err := client.Run(testHash, testCasesFilename)
+	_, err := client.Run(testHash, "/home/tmp.txt")
 
 	test_utils.AssertEqual(unableToReadTestCasesCode, err.Code, t)
 }
 
 func TestClient_RunNoDB(t *testing.T) {
-	testRunnerClientMock.FillBadTestCasesData(testCasesFilePath)
-	defer testRunnerClientMock.FillTestCasesFile(testCasesFilePath)
+	testRunnerClientMock.FillBadTestCasesData(testCasesPath)
+	defer testRunnerClientMock.FillTestCasesFile(testCasesPath)
 
-	client := New(testDataPath, testCasesRootPath)
+	client := New(testDataPath)
 
-	_, err := client.Run(testHash, testCasesFilename)
+	_, err := client.Run(testHash, testCasesPath)
 
 	test_utils.AssertEqual(unableToInitTestRunnersCode, err.Code, t)
 }

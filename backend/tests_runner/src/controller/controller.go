@@ -20,7 +20,7 @@ func (c *Controller) Run(
 	_ context.Context,
 	request *test_case_runner.TestCasesRequest,
 ) (*test_case_runner.TestsReport, error) {
-	report, applicationError := c.testsRunnerClient.Run(request.AccountHash, request.TestCasesFilename)
+	report, applicationError := c.testsRunnerClient.Run(request.AccountHash, request.TestCasesPath)
 	if applicationError != errors.EmptyApplicationError {
 		return &test_case_runner.TestsReport{
 			ApplicationError: &test_case_runner.ApplicationError{

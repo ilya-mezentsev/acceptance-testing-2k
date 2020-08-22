@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -128,4 +129,52 @@ func GetMockRequest(data string) *http.Request {
 		"https://link.com",
 		bytes.NewBuffer([]byte(data)),
 	)
+}
+
+func MustGetFileUploadRequest(url, paramName, filePath string) *http.Request {
+	file, err := os.Open(filePath)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+
+	fileContents, err := ioutil.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+	fileInfo, err := file.Stat()
+	if err != nil {
+		panic(err)
+	}
+
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(paramName, fileInfo.Name())
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = part.Write(fileContents)
+	if err != nil {
+		panic(err)
+	}
+
+	err = writer.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	req, err := http.NewRequest(http.MethodPost, url, body)
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header.Add("Content-Type", writer.FormDataContentType())
+	return req
+}
+
+func MustGetFileUploadMockRequest(paramName, filePath string) *http.Request {
+	return MustGetFileUploadRequest("https://link.com", paramName, filePath)
 }

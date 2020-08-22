@@ -4,19 +4,10 @@ import (
 	"io/ioutil"
 	"logger"
 	"os"
-	"path"
 )
 
-type Reader struct {
-	rootTestsPath string
-}
-
-func New(rootTestsPath string) Reader {
-	return Reader{rootTestsPath}
-}
-
-func (r Reader) Read(accountHash, testCasesFilename string) (string, error) {
-	data, err := ioutil.ReadFile(path.Join(r.rootTestsPath, accountHash, testCasesFilename))
+func Read(testCasesPath string) (string, error) {
+	data, err := ioutil.ReadFile(testCasesPath)
 
 	switch {
 	case err == nil:
@@ -30,9 +21,7 @@ func (r Reader) Read(accountHash, testCasesFilename string) (string, error) {
 				err,
 			},
 			Optional: map[string]interface{}{
-				"root_tests_path": r.rootTestsPath,
-				"account_hash":    accountHash,
-				"tests_filename":  testCasesFilename,
+				"tests_filename": testCasesPath,
 			},
 		}, logger.Error)
 

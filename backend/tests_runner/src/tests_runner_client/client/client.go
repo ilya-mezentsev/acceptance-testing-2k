@@ -19,26 +19,19 @@ const (
 
 type Client struct {
 	dbConnector db_connector.Connector
-	testsReader tests_reader.Reader
 }
 
-func New(
-	dbRootPath string,
-	rootTestsPath string,
-) interfaces.TestsRunnerClient {
-	return Client{
-		dbConnector: db_connector.New(dbRootPath),
-		testsReader: tests_reader.New(rootTestsPath),
-	}
+func New(dbRootPath string) interfaces.TestsRunnerClient {
+	return Client{db_connector.New(dbRootPath)}
 }
 
 func (c Client) Run(
 	accountHash,
-	testCasesFilename string,
+	testCasesPath string,
 ) (models.TestsReport, models.ApplicationError) {
 	db, testCases, applicationError := c.getDBConnectionAndTestCasesData(
 		accountHash,
-		testCasesFilename,
+		testCasesPath,
 	)
 	if applicationError != errors.EmptyApplicationError {
 		return models.TestsReport{}, applicationError
@@ -57,7 +50,7 @@ func (c Client) Run(
 
 func (c Client) getDBConnectionAndTestCasesData(
 	accountHash,
-	testCasesFilename string,
+	testCasesPath string,
 ) (*sqlx.DB, string, models.ApplicationError) {
 	db, err := c.dbConnector.Connect(accountHash)
 	if err != nil {
@@ -67,7 +60,7 @@ func (c Client) getDBConnectionAndTestCasesData(
 		}
 	}
 
-	testCases, err := c.testsReader.Read(accountHash, testCasesFilename)
+	testCases, err := tests_reader.Read(testCasesPath)
 	if err != nil {
 		return nil, "", models.ApplicationError{
 			Code:        unableToReadTestCasesCode,

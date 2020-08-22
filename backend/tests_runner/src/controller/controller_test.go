@@ -2,50 +2,17 @@ package controller
 
 import (
 	"context"
-	"fmt"
 	"google.golang.org/grpc"
-	"math/rand"
-	"net"
 	"test_case_runner"
-	"test_runner_meta/interfaces"
 	mockController "test_runner_meta/mock/controller"
 	"test_utils"
 	"testing"
 	"time"
 )
 
-var (
-	testNameToServerAddress    = map[string]string{}
-	beforeServerStartsDuration = 5 * time.Millisecond
-)
-
-func addServerAddressForTest(testName string) {
-	var port int
-	for port < 1000 {
-		port = rand.Intn(8000)
-	}
-
-	testNameToServerAddress[testName] = fmt.Sprintf("0.0.0.0:%d", port)
-}
-
-func initGRPCServer(testName string, client interfaces.TestsRunnerClient) {
-	lis, err := net.Listen("tcp", testNameToServerAddress[testName])
-	if err != nil {
-		panic(err)
-	}
-
-	s := grpc.NewServer()
-	test_case_runner.RegisterTestRunnerServiceServer(s, New(client))
-
-	err = s.Serve(lis)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func makeRequest(testName, accountHash, testCasesFilename string) *test_case_runner.TestsReport {
+func makeRequest(testName, accountHash, testCasesPath string) *test_case_runner.TestsReport {
 	opts := grpc.WithInsecure()
-	clientConn, err := grpc.Dial(testNameToServerAddress[testName], opts)
+	clientConn, err := grpc.Dial(test_utils.TestNameToServerAddress[testName], opts)
 	if err != nil {
 		panic(err)
 	}
@@ -55,8 +22,8 @@ func makeRequest(testName, accountHash, testCasesFilename string) *test_case_run
 
 	client := test_case_runner.NewTestRunnerServiceClient(clientConn)
 	request := &test_case_runner.TestCasesRequest{
-		AccountHash:       accountHash,
-		TestCasesFilename: testCasesFilename,
+		AccountHash:   accountHash,
+		TestCasesPath: testCasesPath,
 	}
 
 	report, err := client.Run(context.Background(), request)
@@ -68,10 +35,10 @@ func makeRequest(testName, accountHash, testCasesFilename string) *test_case_run
 }
 
 func TestController_RunSimple(t *testing.T) {
-	addServerAddressForTest(t.Name())
+	test_utils.AddServerAddressForTest(t.Name())
 	simpleClient := &mockController.SimpleTestRunnerClientMock{}
-	serverStarted := time.After(beforeServerStartsDuration)
-	go initGRPCServer(t.Name(), simpleClient)
+	serverStarted := time.After(test_utils.BeforeServerStartsDuration)
+	go test_utils.InitGRPCServer(t.Name(), New(simpleClient))
 	<-serverStarted
 
 	makeRequest(t.Name(), "hash", "filename")
@@ -80,30 +47,45 @@ func TestController_RunSimple(t *testing.T) {
 }
 
 func TestController_RunCheckResponse(t *testing.T) {
-	addServerAddressForTest(t.Name())
+	test_utils.AddServerAddressForTest(t.Name())
 	respondClient := &mockController.WithReportTestRunnerClientMock{}
-	serverStarted := time.After(beforeServerStartsDuration)
-	go initGRPCServer(t.Name(), respondClient)
+	serverStarted := time.After(test_utils.BeforeServerStartsDuration)
+	go test_utils.InitGRPCServer(t.Name(), New(respondClient))
 	<-serverStarted
 
 	response := makeRequest(t.Name(), "hash", "filename")
 
 	test_utils.AssertTrue(respondClient.CalledWith("hash", "filename"), t)
-	test_utils.AssertEqual(int64(mockController.TestsReport.PassedCount), response.Report.PassedCount, t)
-	test_utils.AssertEqual(int64(mockController.TestsReport.FailedCount), response.Report.FailedCount, t)
-	test_utils.AssertEqual(len(mockController.TestsReport.Errors), len(response.Report.Errors), t)
+	test_utils.AssertEqual(
+		int64(mockController.TestsReport.PassedCount),
+		response.Report.PassedCount,
+		t,
+	)
+	test_utils.AssertEqual(
+		int64(mockController.TestsReport.FailedCount),
+		response.Report.FailedCount,
+		t,
+	)
+	test_utils.AssertEqual(
+		len(mockController.TestsReport.Errors),
+		len(response.Report.Errors),
+		t,
+	)
 }
 
 func TestController_RunCheckApplicationError(t *testing.T) {
-	addServerAddressForTest(t.Name())
+	test_utils.AddServerAddressForTest(t.Name())
 	applicationErrorClient := &mockController.WithApplicationErrorTestRunnerClientMock{}
-	serverStarted := time.After(beforeServerStartsDuration)
-	go initGRPCServer(t.Name(), applicationErrorClient)
+	serverStarted := time.After(test_utils.BeforeServerStartsDuration)
+	go test_utils.InitGRPCServer(t.Name(), New(applicationErrorClient))
 	<-serverStarted
 
 	response := makeRequest(t.Name(), "hash", "filename")
 
-	test_utils.AssertTrue(applicationErrorClient.CalledWith("hash", "filename"), t)
+	test_utils.AssertTrue(
+		applicationErrorClient.CalledWith("hash", "filename"),
+		t,
+	)
 	test_utils.AssertEqual(
 		response.ApplicationError.Code,
 		mockController.ApplicationError.Code,

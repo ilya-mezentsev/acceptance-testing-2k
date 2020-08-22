@@ -5,7 +5,7 @@ option go_package = "test_case_runner";
 
 message testCasesRequest {
   string accountHash = 1;
-  string testCasesFilename = 2;
+  string testCasesPath = 2;
 }
 
 message transactionError {
