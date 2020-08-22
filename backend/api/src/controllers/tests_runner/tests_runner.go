@@ -11,14 +11,9 @@ type controller struct {
 	service runner.Service
 }
 
-func Init(
-	r *mux.Router,
-	service runner.Service,
-	middlewares ...mux.MiddlewareFunc,
-) {
+func Init(r *mux.Router, service runner.Service) {
 	c := controller{service}
 	testsRunnerAPI := r.PathPrefix("/tests").Subrouter()
-	testsRunnerAPI.Use(middlewares...)
 
 	testsRunnerAPI.HandleFunc("/{account_hash:[a-f0-9]{32}}", c.run).Methods(http.MethodPost)
 }

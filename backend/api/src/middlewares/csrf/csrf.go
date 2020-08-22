@@ -22,8 +22,8 @@ type Middleware struct {
 func (m Middleware) CheckCSRFToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if m.isGetSessionRequest(r) {
-			next.ServeHTTP(w, r)
 			m.setTokens(w)
+			next.ServeHTTP(w, r)
 			return
 		}
 
@@ -42,8 +42,8 @@ func (m Middleware) CheckCSRFToken(next http.Handler) http.Handler {
 		}
 
 		if cookieToken == headerToken {
-			next.ServeHTTP(w, r)
 			m.setTokens(w)
+			next.ServeHTTP(w, r)
 		} else {
 			logger.Warning("CSRF tokens didn't match")
 			http.Error(w, "CSRF tokens didn't match", http.StatusForbidden)

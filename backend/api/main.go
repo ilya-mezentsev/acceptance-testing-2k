@@ -124,10 +124,11 @@ func initMiddleware() {
 }
 
 func initControllers() {
-	crudController.Init(r, crudServicesPool, csrfMiddleware.CheckCSRFToken)
-	sessionController.Init(r, sessionService, csrfMiddleware.CheckCSRFToken)
-	tests_runner.Init(r, testsRunnerService, csrfMiddleware.CheckCSRFToken)
+	r.Use(csrfMiddleware.CheckCSRFToken)
 
+	crudController.Init(r, crudServicesPool)
+	sessionController.Init(r, sessionService)
+	tests_runner.Init(r, testsRunnerService)
 	registrationController.Init(r, registrationService)
 }
 

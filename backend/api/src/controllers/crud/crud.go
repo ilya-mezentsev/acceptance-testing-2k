@@ -11,14 +11,9 @@ type controller struct {
 	crudServicesPool interfaces.CRUDServicesPool
 }
 
-func Init(
-	r *mux.Router,
-	pool interfaces.CRUDServicesPool,
-	middlewares ...mux.MiddlewareFunc,
-) {
+func Init(r *mux.Router, pool interfaces.CRUDServicesPool) {
 	c := controller{crudServicesPool: pool}
 	crudAPI := r.PathPrefix("/entity").Subrouter()
-	crudAPI.Use(middlewares...)
 
 	crudAPI.HandleFunc("/{entity_type:[a-z_]+?}/{account_hash:[a-f0-9]{32}}", c.getAll).Methods(http.MethodGet)
 	crudAPI.HandleFunc(

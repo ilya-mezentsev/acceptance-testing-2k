@@ -11,10 +11,9 @@ type controller struct {
 	service session.Service
 }
 
-func Init(r *mux.Router, service session.Service, middlewares ...mux.MiddlewareFunc) {
+func Init(r *mux.Router, service session.Service) {
 	c := controller{service}
 	sessionAPI := r.PathPrefix("/session").Subrouter()
-	sessionAPI.Use(middlewares...)
 
 	sessionAPI.HandleFunc("/", c.getSession).Methods(http.MethodGet)
 	sessionAPI.HandleFunc("/", c.createSession).Methods(http.MethodPost)

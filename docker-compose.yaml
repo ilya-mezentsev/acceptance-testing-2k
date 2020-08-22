@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  tests_runner:
+    build:
+      context: backend/tests_runner
+      args:
+        TESTS_RUNNER_SRC: "/var/www/apps/tests_runner"
+    environment:
+      TESTS_RUNNER_ADDRESS: "0.0.0.0:6789"
+      DB_FILES_ROOT_PATH: "/var/www/apps/data"
+    volumes:
+      - ./data:/var/www/apps/data
+    ports:
+      - 6789:6789
+
+  api:
+    build:
+      context: backend/api
+      args:
+        API_SRC: "/var/www/apps/api"
+    environment:
+      TESTS_RUNNER_ADDRESS: "0.0.0.0:6789"
+      PROJECT_DB_FILE_PATH: "/var/www/apps/data/data.db"
+      FILES_ROOT_PATH: "/var/www/apps/data"
+      CSRF_PRIVATE_KEY: "ac385b85095bd187e68607f61a580845"
+      API_ADDRESS: "0.0.0.0:8080"
+    ports:
+      - 8080:8080
+
+  nginx:
+    build: nginx
+    ports:
+      - 80:80
+    links:
+      - api
+    depends_on:
+      - api

@@ -1,0 +1,8 @@
+FROM golang:1.14.6 AS build
+
+ARG API_SRC
+WORKDIR $API_SRC
+COPY main $API_SRC
+
+CMD ./main
+EXPOSE 8080

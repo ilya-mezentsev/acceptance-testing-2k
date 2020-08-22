@@ -27,3 +27,6 @@ tests.backend_libs:
 	bash $(ROOT_DIR)/scripts/backend_libs_tests.sh $(ROOT_DIR)
 
 tests.backend: tests.test_runner tests.api tests.backend_libs
+
+build.backend:
+	bash $(ROOT_DIR)/scripts/build_backend.sh $(ROOT_DIR)

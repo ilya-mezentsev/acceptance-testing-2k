@@ -28,6 +28,7 @@ static
 .idea
 
 # golang libs and built
+main
 pkg
 bin
 github.com
