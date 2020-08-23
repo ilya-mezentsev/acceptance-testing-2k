@@ -9,3 +9,17 @@ $ make env.prepare_workspace
 ```bash
 $ make tests.backend
 ```
+
+## Run project
+### Build project:
+```bash
+$ make build.project
+```
+### Run backend containers:
+```bash
+$ docker-compose up
+```
+### ... and frontend:
+```bash
+$ cd frontend && npm run start
+```

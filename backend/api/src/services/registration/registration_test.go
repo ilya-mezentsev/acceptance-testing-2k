@@ -44,7 +44,7 @@ func TestService_RegisterSuccess(t *testing.T) {
 
 	response := s.Register(test_utils.GetReadCloser(`{"login": "some-login", "password": "!@#@!%@#%"}`))
 
-	expectedHash := account_credentials.GenerateAccountHash("some-login", "!@#@!%@#%")
+	expectedHash := account_credentials.GenerateAccountHash("some-login")
 	_, hashCreated := repository.AccountHashes[expectedHash]
 	_, credentialsCreated := repository.AccountCredentials[expectedHash]
 	test_utils.AssertTrue(hashCreated, t)
@@ -140,7 +140,7 @@ func TestService_RegisterCannotCreateDir(t *testing.T) {
 func TestService_RegisterCannotCreateDBFile(t *testing.T) {
 	defer repository.Reset()
 
-	expectedHash := account_credentials.GenerateAccountHash("some-login", "!@#@!%@#%")
+	expectedHash := account_credentials.GenerateAccountHash("some-login")
 	_ = os.Chmod(path.Join(filesRootPath, expectedHash, env.DBFilename), 0100)
 
 	response := s.Register(test_utils.GetReadCloser(`{"login": "some-login", "password": "!@#@!%@#%"}`))

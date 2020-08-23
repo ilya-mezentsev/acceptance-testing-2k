@@ -25,6 +25,8 @@ services:
       FILES_ROOT_PATH: "/var/www/apps/data"
       CSRF_PRIVATE_KEY: "ac385b85095bd187e68607f61a580845"
       API_ADDRESS: "0.0.0.0:8080"
+    volumes:
+      - ./data:/var/www/apps/data
     ports:
       - 8080:8080
 

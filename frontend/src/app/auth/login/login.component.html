@@ -1,0 +1,21 @@
+<div class="col s12">
+  <div class="row">
+    <app-input
+      [type]="'text'"
+      [label]="'Login'"
+      (valueEmitter)="changeLogin($event)"
+    ></app-input>
+    <app-input
+      [type]="'password'"
+      [label]="'Password'"
+      (valueEmitter)="changePassword($event)"
+    ></app-input>
+    <div class="col s12">
+      <a
+        class="waves-effect waves-light btn purple darken-1 with-tooltip"
+        (click)="tryLogin()"
+        [class.grey]="loginDisabled"
+      >Login</a>
+    </div>
+  </div>
+</div>

@@ -43,10 +43,7 @@ func (s Service) CreateSession(w http.ResponseWriter, r *http.Request) interface
 		})
 	}
 
-	accountHash := account_credentials.GenerateAccountHash(
-		createSessionRequest.Login,
-		createSessionRequest.Password,
-	)
+	accountHash := account_credentials.GenerateAccountHash(createSessionRequest.Login)
 	accountExists, err := s.repository.AccountExists(accountHash)
 	if err != nil {
 		s.logger.LogCreateEntityRepositoryError(err, map[string]interface{}{

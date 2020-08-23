@@ -58,7 +58,11 @@ func TestService_CreateSessionDecodeBodyError(t *testing.T) {
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
-	test_utils.AssertEqual(unableToCreateSessionCode, response.GetData().(errors.ServiceError).Code, t)
+	test_utils.AssertEqual(
+		unableToCreateSessionCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
 	test_utils.AssertEqual(
 		errors.DecodingRequestError,
 		response.GetData().(errors.ServiceError).Description,
@@ -74,7 +78,11 @@ func TestService_CreateSessionInvalidLogin(t *testing.T) {
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
-	test_utils.AssertEqual(unableToCreateSessionCode, response.GetData().(errors.ServiceError).Code, t)
+	test_utils.AssertEqual(
+		unableToCreateSessionCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
 	test_utils.AssertEqual(
 		errors.InvalidRequestError,
 		response.GetData().(errors.ServiceError).Description,
@@ -94,7 +102,11 @@ func TestService_CreateSessionBadAccountHash(t *testing.T) {
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
-	test_utils.AssertEqual(unableToCreateSessionCode, response.GetData().(errors.ServiceError).Code, t)
+	test_utils.AssertEqual(
+		unableToCreateSessionCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
 	test_utils.AssertEqual(
 		errors.RepositoryError,
 		response.GetData().(errors.ServiceError).Description,
@@ -104,17 +116,17 @@ func TestService_CreateSessionBadAccountHash(t *testing.T) {
 
 func TestService_CreateSessionAccountDoesNotExists(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
-	request := test_utils.GetMockRequest(fmt.Sprintf(
-		`{"login": "%s", "password": "%s"}`,
-		services.ExistsLogin,
-		services.BadPassword,
-	))
+	request := test_utils.GetMockRequest(`{"login": "blah-blah", "password": "saf435"}`)
 
 	response := s.CreateSession(responseRecorder, request)
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
-	test_utils.AssertEqual(unableToCreateSessionCode, response.GetData().(errors.ServiceError).Code, t)
+	test_utils.AssertEqual(
+		unableToCreateSessionCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
 	test_utils.AssertEqual(
 		accountDoesNotExistsError,
 		response.GetData().(errors.ServiceError).Description,
@@ -155,7 +167,11 @@ func TestService_GetSessionNoSessionCookieError(t *testing.T) {
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
-	test_utils.AssertEqual(unableToGetSessionCode, response.GetData().(errors.ServiceError).Code, t)
+	test_utils.AssertEqual(
+		unableToGetSessionCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
 	test_utils.AssertEqual(
 		sessionCookieNotFoundError,
 		response.GetData().(errors.ServiceError).Description,

@@ -52,10 +52,7 @@ func (s Service) Register(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	accountHash := account_credentials.GenerateAccountHash(
-		registrationRequest.Login,
-		registrationRequest.Password,
-	)
+	accountHash := account_credentials.GenerateAccountHash(registrationRequest.Login)
 	err = s.repository.CreateAccount(accountHash)
 	if err != nil {
 		s.logger.LogCreateEntityRepositoryError(err, map[string]interface{}{

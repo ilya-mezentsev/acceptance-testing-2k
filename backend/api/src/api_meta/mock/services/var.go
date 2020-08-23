@@ -13,8 +13,8 @@ var (
 	BadLogin              = "bad-login"
 	BadPassword           = "bad-password"
 	SomeHash              = hash.Md5WithTimeAsKey("some-hash")
-	BadAccountHash        = account_credentials.GenerateAccountHash(BadLogin, BadPassword)
-	ExistsAccountHash     = account_credentials.GenerateAccountHash(ExistsLogin, ExistsPassword)
+	BadAccountHash        = account_credentials.GenerateAccountHash(BadLogin)
+	ExistsAccountHash     = account_credentials.GenerateAccountHash(ExistsLogin)
 	PredefinedAccountHash = hash.Md5WithTimeAsKey("account-hash-1")
 	PredefinedTestObject1 = models.TestObject{
 		Name: "USER",

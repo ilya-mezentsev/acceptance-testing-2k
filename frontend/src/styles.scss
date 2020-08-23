@@ -1,1 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+
+.toast {
+  &.toast-success {
+    background-color: green;
+  }
+
+  &.toast-error {
+    background-color: red;
+  }
+}

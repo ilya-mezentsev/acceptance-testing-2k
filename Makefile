@@ -40,3 +40,8 @@ build.backend:
 
 build.frontend:
 	bash $(ROOT_DIR)/scripts/build_frontend.sh $(ROOT_DIR)
+
+build.containers:
+	docker-compose build
+
+build.project: build.backend build.frontend build.containers
