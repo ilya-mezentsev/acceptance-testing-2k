@@ -4,7 +4,7 @@ import "api_meta/models"
 
 type (
 	SessionRepository interface {
-		AccountExists(accountHash string) (bool, error)
+		CredentialsExists(accountHash, login, password string) (bool, error)
 	}
 
 	RegistrationRepository interface {

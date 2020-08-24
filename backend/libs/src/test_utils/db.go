@@ -24,8 +24,8 @@ const (
 	addAccountQuery = `
 	INSERT INTO accounts(hash) VALUES(:hash)`
 	addAccountCredentialsQuery = `
-	INSERT INTO account_credentials(login, password, account_hash)
-	VALUES(:login, :password, :hash)`
+	INSERT INTO account_credentials(login, password)
+	VALUES(:login, :password)`
 	addObjectQuery = `
 	INSERT INTO objects(name, hash)
 	VALUES(:name, :hash)`
@@ -42,19 +42,19 @@ const (
 	INSERT INTO commands_cookies(key, value, command_hash)
 	VALUES(:key, :value, :command_hash)`
 
-	AccountHash       = "some-hash"
-	CredentialsLogin  = "some_login"
-	CredentialsHash   = "some_hash"
-	ObjectName        = "USER"
-	ObjectHash        = "hash-1"
-	CreateCommandName = "CREATE"
-	GetCommandName    = "GET"
-	PatchCommandName  = "PATCH"
-	DeleteCommandName = "DELETE"
-	CreateCommandHash = "hash-1"
-	GetCommandHash    = "hash-2"
-	PatchCommandHash  = "hash-3"
-	DeleteCommandHash = "hash-4"
+	AccountHash         = "some-hash"
+	CredentialsLogin    = "some_login"
+	CredentialsPassword = "some_password"
+	ObjectName          = "USER"
+	ObjectHash          = "hash-1"
+	CreateCommandName   = "CREATE"
+	GetCommandName      = "GET"
+	PatchCommandName    = "PATCH"
+	DeleteCommandName   = "DELETE"
+	CreateCommandHash   = "hash-1"
+	GetCommandHash      = "hash-2"
+	PatchCommandHash    = "hash-3"
+	DeleteCommandHash   = "hash-4"
 
 	NotExistsAccountHash = "not-exists-account-hash"
 	NotExistsObjectHash  = "not-exists-object-hash"
@@ -69,8 +69,7 @@ var (
 	credentials = []map[string]interface{}{
 		{
 			"login":    CredentialsLogin,
-			"password": "some_password",
-			"hash":     CredentialsHash,
+			"password": CredentialsPassword,
 		},
 	}
 	objects = []map[string]interface{}{

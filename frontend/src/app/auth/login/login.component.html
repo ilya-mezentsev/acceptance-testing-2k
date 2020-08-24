@@ -1,5 +1,8 @@
 <div class="col s12">
   <div class="row">
+    <div class="col s12">
+      <h6>Enter your login and password to Sign in</h6>
+    </div>
     <app-input
       [type]="'text'"
       [label]="'Login'"
@@ -12,10 +15,14 @@
     ></app-input>
     <div class="col s12">
       <a
-        class="waves-effect waves-light btn purple darken-1 with-tooltip"
+        class="waves-effect waves-light btn purple darken-1"
         (click)="tryLogin()"
         [class.grey]="loginDisabled"
-      >Login</a>
+      >Sign in</a>
+      <a
+        class="waves-effect waves-light btn purple darken-1"
+        [routerLink]="['../registration']"
+      >Sign up</a>
     </div>
   </div>
 </div>

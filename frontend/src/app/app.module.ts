@@ -6,7 +6,6 @@ import { AppComponent } from './app.component';
 import {FetcherService} from './services/fetcher/fetcher.service';
 import { LoginComponent } from './auth/login/login.component';
 import { RegistrationComponent } from './auth/registration/registration.component';
-import { NavigationComponent } from './auth/navigation/navigation.component';
 import { AuthComponent } from './auth/auth.component';
 import { InputComponent } from './shared/input/input.component';
 import {FormsModule} from '@angular/forms';
@@ -18,7 +17,6 @@ import { NotFoundComponent } from './not-found/not-found.component';
     AppComponent,
     LoginComponent,
     RegistrationComponent,
-    NavigationComponent,
     AuthComponent,
     InputComponent,
     AdminComponent,

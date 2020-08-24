@@ -12,8 +12,8 @@ import (
 const (
 	addAccountQuery            = `INSERT INTO accounts(hash) VALUES(?)`
 	addAccountCredentialsQuery = `
-	INSERT INTO account_credentials(login, password, account_hash)
-	VALUES(:login, :password, :account_hash)`
+	INSERT INTO account_credentials(login, password)
+	VALUES(:login, :password)`
 )
 
 type repository struct {

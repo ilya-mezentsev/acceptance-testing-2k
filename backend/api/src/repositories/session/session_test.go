@@ -2,54 +2,79 @@ package session
 
 import (
 	"api_meta/interfaces"
+	"db_connector"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
+	"path"
 	"test_utils"
 	"testing"
 	"utils"
 )
 
 var (
-	db *sqlx.DB
-	r  interfaces.SessionRepository
+	testHash  string
+	db        *sqlx.DB
+	connector db_connector.Connector
+	r         interfaces.SessionRepository
 )
 
 func init() {
-	dbFile := utils.MustGetEnv("TEST_DB_FILE")
+	testHash = utils.MustGetEnv("TEST_ACCOUNT_HASH")
+	connector = db_connector.New(path.Dir(utils.MustGetEnv("TEST_DB_FILE")))
+	db, _ = connector.Connect(testHash)
 
-	var err error
-	db, err = sqlx.Open("sqlite3", dbFile)
-	if err != nil {
-		panic(err)
-	}
-
-	r = New(db)
+	r = New(connector)
 }
 
-func TestRepository_AccountExistsTrue(t *testing.T) {
+func TestRepository_CredentialsExistsTrue(t *testing.T) {
 	test_utils.InitTablesWithAccounts(db)
 	defer test_utils.DropTables(db)
 
-	accountExists, err := r.AccountExists(test_utils.AccountHash)
+	credentialsExists, err := r.CredentialsExists(
+		testHash,
+		test_utils.CredentialsLogin,
+		test_utils.CredentialsPassword,
+	)
 
 	test_utils.AssertNil(err, t)
-	test_utils.AssertTrue(accountExists, t)
+	test_utils.AssertTrue(credentialsExists, t)
 }
 
-func TestRepository_AccountExistsFalse(t *testing.T) {
+func TestRepository_CredentialsExistsFalse(t *testing.T) {
 	test_utils.InitTablesWithAccounts(db)
 	defer test_utils.DropTables(db)
 
-	accountExists, err := r.AccountExists("blah-blah")
+	credentialsExists, err := r.CredentialsExists(
+		testHash,
+		"foo",
+		"bar",
+	)
 
 	test_utils.AssertNil(err, t)
-	test_utils.AssertFalse(accountExists, t)
+	test_utils.AssertFalse(credentialsExists, t)
 }
 
-func TestRepository_AccountExistsError(t *testing.T) {
+func TestRepository_CredentialsExistsBadAccountHash(t *testing.T) {
+	test_utils.InitTablesWithAccounts(db)
+	defer test_utils.DropTables(db)
+
+	_, err := r.CredentialsExists(
+		"blah-blah",
+		test_utils.CredentialsLogin,
+		test_utils.CredentialsPassword,
+	)
+
+	test_utils.AssertErrorsEqual(db_connector.DBFileNotFound, err, t)
+}
+
+func TestRepository_CredentialsExistsError(t *testing.T) {
 	test_utils.DropTables(db)
 
-	_, err := r.AccountExists(test_utils.AccountHash)
+	_, err := r.CredentialsExists(
+		testHash,
+		test_utils.CredentialsLogin,
+		test_utils.CredentialsPassword,
+	)
 
 	test_utils.AssertNotNil(err, t)
 }

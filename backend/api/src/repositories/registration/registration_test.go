@@ -76,7 +76,7 @@ func TestRepository_CreateAccountCredentialsSuccess(t *testing.T) {
 	_ = db.Get(
 		&credentialsCreated,
 		`SELECT 1 FROM account_credentials
-		WHERE account_hash = ? AND login = 'some-login' AND password = 'some-password'`,
+		WHERE login = 'some-login' AND password = 'some-password'`,
 		testHash,
 	)
 	test_utils.AssertNil(err, t)

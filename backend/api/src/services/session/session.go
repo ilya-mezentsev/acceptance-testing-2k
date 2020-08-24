@@ -3,6 +3,7 @@ package session
 import (
 	"api_meta/interfaces"
 	"api_meta/models"
+	"db_connector"
 	"net/http"
 	"services/errors"
 	"services/plugins/account_credentials"
@@ -44,10 +45,17 @@ func (s Service) CreateSession(w http.ResponseWriter, r *http.Request) interface
 	}
 
 	accountHash := account_credentials.GenerateAccountHash(createSessionRequest.Login)
-	accountExists, err := s.repository.AccountExists(accountHash)
-	if err != nil {
+	credentialsExists, err := s.repository.CredentialsExists(
+		accountHash,
+		createSessionRequest.Login,
+		account_credentials.GenerateAccountPassword(
+			createSessionRequest.Login,
+			createSessionRequest.Password,
+		),
+	)
+	if err != nil && err != db_connector.DBFileNotFound {
 		s.logger.LogCreateEntityRepositoryError(err, map[string]interface{}{
-			"account_hash": accountHash,
+			"login": createSessionRequest.Login,
 		})
 
 		return response_factory.ErrorResponse(errors.ServiceError{
@@ -56,9 +64,15 @@ func (s Service) CreateSession(w http.ResponseWriter, r *http.Request) interface
 		})
 	}
 
-	if accountExists {
+	// if err == db_connector.DBFileNotFound then account with
+	// particular accountHash does not exits
+	accountExists := err == nil
+
+	if accountExists && credentialsExists {
 		setSessionCookie(w, accountHash)
-		return response_factory.DefaultResponse()
+		return response_factory.SuccessResponse(models.SessionResponse{
+			AccountHash: accountHash,
+		})
 	} else {
 		return response_factory.ErrorResponse(errors.ServiceError{
 			Code:        unableToCreateSessionCode,
@@ -75,7 +89,9 @@ func (s Service) GetSession(r *http.Request) interfaces.Response {
 			Description: sessionCookieNotFoundError,
 		})
 	} else {
-		return response_factory.SuccessResponse(models.SessionResponse{AccountHash: cookie.Value})
+		return response_factory.SuccessResponse(models.SessionResponse{
+			AccountHash: cookie.Value,
+		})
 	}
 }
 

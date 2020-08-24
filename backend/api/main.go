@@ -93,7 +93,7 @@ func init() {
 
 func initRepositories() {
 	registrationRepository = registrationRepo.New(db, connector)
-	sessionRepository = sessionRepo.New(db)
+	sessionRepository = sessionRepo.New(connector)
 
 	testCommandRepository = crud.New(connector, query_providers.TestCommandQueryProvider{})
 	testObjectRepository = crud.New(connector, query_providers.TestObjectQueryProvider{})
