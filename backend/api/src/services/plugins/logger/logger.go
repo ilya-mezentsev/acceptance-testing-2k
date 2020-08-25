@@ -26,6 +26,20 @@ func (l CRUDEntityErrorsLogger) LogCreateEntityRepositoryError(
 	}, logger.Warning)
 }
 
+func (l CRUDEntityErrorsLogger) LogCreateEntityUniqueConstraintError(
+	err error,
+	context map[string]interface{},
+) {
+	context["entity_name"] = l.EntityName
+	logger.WithFields(logger.Fields{
+		MessageTemplate: "Unique constraint error while creating entity: %v",
+		Args: []interface{}{
+			err,
+		},
+		Optional: context,
+	}, logger.Warning)
+}
+
 func (l CRUDEntityErrorsLogger) LogCreateEntityRepositoryOrOSError(
 	err error,
 	context map[string]interface{},

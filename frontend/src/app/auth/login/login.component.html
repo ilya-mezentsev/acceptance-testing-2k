@@ -14,15 +14,16 @@
       (valueEmitter)="changePassword($event)"
     ></app-input>
     <div class="col s12">
-      <a
-        class="waves-effect waves-light btn purple darken-1"
-        (click)="tryLogin()"
-        [class.grey]="loginDisabled"
-      >Sign in</a>
-      <a
-        class="waves-effect waves-light btn purple darken-1"
+      <app-button
+        (clicked)="tryLogin()"
+        [isDisabled]="loginDisabled"
+        [text]="'Sign in'"
+      ></app-button>
+      <app-router-button
+        class="margin-l10"
         [routerLink]="['../registration']"
-      >Sign up</a>
+        [text]="'Sign up'"
+      ></app-router-button>
     </div>
   </div>
 </div>

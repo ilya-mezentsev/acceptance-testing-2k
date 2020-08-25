@@ -83,6 +83,30 @@ func TestService_CreateInvalidRequestError(t *testing.T) {
 	)
 }
 
+func TestService_CreateObjectExistsError(t *testing.T) {
+	defer repository.Reset()
+
+	response := s.Create(test_utils.GetReadCloser(
+		fmt.Sprintf(
+			`{"account_hash": "%s", "test_object": {"name": "%s"}}`,
+			services.PredefinedAccountHash, services.PredefinedTestObject1.Name,
+		),
+	))
+
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		unableToCreateTestObjectCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
+	test_utils.AssertEqual(
+		errors.UniqueEntityExistsError,
+		response.GetData().(errors.ServiceError).Description,
+		t,
+	)
+}
+
 func TestService_CreateRepositoryError(t *testing.T) {
 	defer repository.Reset()
 

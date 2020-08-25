@@ -1,0 +1,17 @@
+<div class="col s12">
+  <ul>
+    <li><a
+      [routerLink]="['./objects-list']"
+      [routerLinkActive]="['is-active']"
+    >Objects list</a></li>
+    <li><a
+      [routerLink]="['./create-object']"
+      [routerLinkActive]="['is-active']"
+    >Create object</a></li>
+    <li><a
+      [routerLink]="['./run-tests']"
+      [routerLinkActive]="['is-active']"
+    >Run tests</a></li>
+    <li class="sign-out"><a (click)="signOut()">Sign out</a></li>
+  </ul>
+</div>

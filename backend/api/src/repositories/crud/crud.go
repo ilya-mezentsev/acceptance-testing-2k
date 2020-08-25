@@ -3,8 +3,10 @@ package crud
 import (
 	"api_meta/interfaces"
 	"api_meta/models"
+	"api_meta/types"
 	"db_connector"
 	"github.com/jmoiron/sqlx"
+	"strings"
 )
 
 type Repository struct {
@@ -26,6 +28,10 @@ func (r Repository) Create(accountHash string, entity map[string]interface{}) er
 	}
 
 	_, err = db.NamedExec(r.queryProvider.CreateQuery(), entity)
+	if err != nil && strings.Contains(err.Error(), "UNIQUE constraint failed") {
+		err = types.UniqueEntityAlreadyExists{}
+	}
+
 	return err
 }
 

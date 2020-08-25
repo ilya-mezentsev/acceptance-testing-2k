@@ -56,11 +56,6 @@ var (
 	testsRunnerAddress string
 	csrfPrivateKey     string
 	apiAddress         string
-
-	entityTypeToCRUDService = map[string]interfaces.CRUDService{
-		"test-object":  testObjectService,
-		"test-command": testCommandService,
-	}
 )
 
 func init() {
@@ -81,7 +76,10 @@ func init() {
 	// should be called after initializing repositories
 	initServices()
 
-	for entityType, crudService := range entityTypeToCRUDService {
+	for entityType, crudService := range map[string]interfaces.CRUDService{
+		"test-object":  testObjectService,
+		"test-command": testCommandService,
+	} {
 		crudServicesPool.AddService(entityType, crudService)
 	}
 

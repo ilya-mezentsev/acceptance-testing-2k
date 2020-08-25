@@ -3,8 +3,10 @@ package test_object
 import (
 	"api_meta/interfaces"
 	"api_meta/models"
+	"api_meta/types"
+	"errors"
 	"io"
-	"services/errors"
+	servicesErrors "services/errors"
 	"services/plugins/hash"
 	"services/plugins/logger"
 	"services/plugins/request_decoder"
@@ -30,9 +32,9 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 	if err != nil {
 		s.logger.LogCreateEntityDecodeError(err)
 
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToCreateTestObjectCode,
-			Description: errors.DecodingRequestError,
+			Description: servicesErrors.DecodingRequestError,
 		})
 	}
 
@@ -40,9 +42,9 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 		createTestObjectRequest.TestObject.Name,
 	)
 	if !validation.IsValid(&createTestObjectRequest) {
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToCreateTestObjectCode,
-			Description: errors.InvalidRequestError,
+			Description: servicesErrors.InvalidRequestError,
 		})
 	}
 
@@ -50,14 +52,23 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 		"name": createTestObjectRequest.TestObject.Name,
 		"hash": createTestObjectRequest.TestObject.Hash,
 	})
-	if err != nil {
+	if errors.As(err, &types.UniqueEntityAlreadyExists{}) {
+		s.logger.LogCreateEntityUniqueConstraintError(err, map[string]interface{}{
+			"account_hash": createTestObjectRequest.AccountHash,
+		})
+
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
+			Code:        unableToCreateTestObjectCode,
+			Description: servicesErrors.UniqueEntityExistsError,
+		})
+	} else if err != nil {
 		s.logger.LogCreateEntityRepositoryError(err, map[string]interface{}{
 			"account_hash": createTestObjectRequest.AccountHash,
 		})
 
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToCreateTestObjectCode,
-			Description: errors.RepositoryError,
+			Description: servicesErrors.RepositoryError,
 		})
 	}
 
@@ -66,9 +77,9 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 
 func (s service) GetAll(accountHash string) interfaces.Response {
 	if !validation.IsMd5Hash(accountHash) {
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToFetchTestObjectsCode,
-			Description: errors.InvalidRequestError,
+			Description: servicesErrors.InvalidRequestError,
 		})
 	}
 
@@ -79,9 +90,9 @@ func (s service) GetAll(accountHash string) interfaces.Response {
 			"account_hash": accountHash,
 		})
 
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToFetchTestObjectsCode,
-			Description: errors.RepositoryError,
+			Description: servicesErrors.RepositoryError,
 		})
 	}
 
@@ -90,9 +101,9 @@ func (s service) GetAll(accountHash string) interfaces.Response {
 
 func (s service) Get(accountHash, testObjectHash string) interfaces.Response {
 	if !validation.IsMd5Hash(accountHash) || !validation.IsMd5Hash(testObjectHash) {
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToFetchTestObjectCode,
-			Description: errors.InvalidRequestError,
+			Description: servicesErrors.InvalidRequestError,
 		})
 	}
 
@@ -104,9 +115,9 @@ func (s service) Get(accountHash, testObjectHash string) interfaces.Response {
 			"test_object_hash": testObjectHash,
 		})
 
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToFetchTestObjectCode,
-			Description: errors.RepositoryError,
+			Description: servicesErrors.RepositoryError,
 		})
 	}
 
@@ -119,16 +130,16 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 	if err != nil {
 		s.logger.LogUpdateEntityDecodeError(err)
 
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToUpdateTestObjectCode,
-			Description: errors.DecodingRequestError,
+			Description: servicesErrors.DecodingRequestError,
 		})
 	}
 
 	if !validation.IsValid(&updateTestObjectRequest) {
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToUpdateTestObjectCode,
-			Description: errors.InvalidRequestError,
+			Description: servicesErrors.InvalidRequestError,
 		})
 	}
 
@@ -139,9 +150,9 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 			"update_payload": updateTestObjectRequest.UpdatePayload,
 		})
 
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToUpdateTestObjectCode,
-			Description: errors.RepositoryError,
+			Description: servicesErrors.RepositoryError,
 		})
 	}
 
@@ -150,9 +161,9 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 
 func (s service) Delete(accountHash, testObjectHash string) interfaces.Response {
 	if !validation.IsMd5Hash(accountHash) || !validation.IsMd5Hash(testObjectHash) {
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToDeleteTestObjectCode,
-			Description: errors.InvalidRequestError,
+			Description: servicesErrors.InvalidRequestError,
 		})
 	}
 
@@ -163,9 +174,9 @@ func (s service) Delete(accountHash, testObjectHash string) interfaces.Response 
 			"test_object_hash": testObjectHash,
 		})
 
-		return response_factory.ErrorResponse(errors.ServiceError{
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToDeleteTestObjectCode,
-			Description: errors.RepositoryError,
+			Description: servicesErrors.RepositoryError,
 		})
 	}
 

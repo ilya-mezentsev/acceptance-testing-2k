@@ -1,6 +1,9 @@
 package services
 
-import "api_meta/models"
+import (
+	"api_meta/models"
+	"api_meta/types"
+)
 
 type TestObjectRepositoryMock struct {
 	Objects map[string][]models.TestObject
@@ -12,9 +15,18 @@ func (m *TestObjectRepositoryMock) Reset() {
 	}
 }
 
-func (m *TestObjectRepositoryMock) Create(accountHash string, entity map[string]interface{}) error {
+func (m *TestObjectRepositoryMock) Create(
+	accountHash string,
+	entity map[string]interface{},
+) error {
 	if accountHash == BadAccountHash {
 		return someError
+	}
+
+	for _, object := range m.Objects[accountHash] {
+		if object.Name == entity["name"].(string) {
+			return types.UniqueEntityAlreadyExists{}
+		}
 	}
 
 	m.Objects[accountHash] = append(m.Objects[accountHash], models.TestObject{
@@ -51,7 +63,10 @@ func (m *TestObjectRepositoryMock) Get(accountHash, entityHash string, dest inte
 	return nil
 }
 
-func (m *TestObjectRepositoryMock) Update(accountHash string, entities []models.UpdateModel) error {
+func (m *TestObjectRepositoryMock) Update(
+	accountHash string,
+	entities []models.UpdateModel,
+) error {
 	if accountHash == BadAccountHash {
 		return someError
 	}

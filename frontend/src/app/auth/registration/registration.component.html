@@ -13,16 +13,22 @@
       [label]="'Password'"
       (valueEmitter)="changePassword($event)"
     ></app-input>
+    <app-input
+      [type]="'password'"
+      [label]="'Repeat password'"
+      (valueEmitter)="changeRepeatedPassword($event)"
+    ></app-input>
     <div class="col s12">
-      <a
-        class="waves-effect waves-light btn purple darken-1"
+      <app-router-button
         [routerLink]="['../login']"
-      >Sign in</a>
-      <a
-        class="waves-effect waves-light btn purple darken-1"
-        (click)="tryRegister()"
-        [class.grey]="registrationDisabled"
-      >Sign up</a>
+        [text]="'Sign in'"
+      ></app-router-button>
+      <app-button
+        class="margin-l10"
+        (clicked)="tryRegister()"
+        [isDisabled]="registrationDisabled"
+        [text]="'Sign up'"
+      ></app-button>
     </div>
   </div>
 </div>

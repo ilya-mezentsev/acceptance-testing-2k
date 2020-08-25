@@ -15,7 +15,7 @@ func Init(r *mux.Router, service runner.Service) {
 	c := controller{service}
 	testsRunnerAPI := r.PathPrefix("/tests").Subrouter()
 
-	testsRunnerAPI.HandleFunc("/{account_hash:[a-f0-9]{32}}", c.run).Methods(http.MethodPost)
+	testsRunnerAPI.HandleFunc("/{account_hash:[a-f0-9]{32}}/", c.run).Methods(http.MethodPost)
 }
 
 func (c controller) run(w http.ResponseWriter, r *http.Request) {

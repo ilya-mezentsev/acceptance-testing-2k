@@ -71,6 +71,7 @@ func (s Service) CreateSession(w http.ResponseWriter, r *http.Request) interface
 	if accountExists && credentialsExists {
 		setSessionCookie(w, accountHash)
 		return response_factory.SuccessResponse(models.SessionResponse{
+			Login:       createSessionRequest.Login,
 			AccountHash: accountHash,
 		})
 	} else {

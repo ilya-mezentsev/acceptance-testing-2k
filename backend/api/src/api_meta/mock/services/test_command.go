@@ -1,6 +1,9 @@
 package services
 
-import "api_meta/models"
+import (
+	"api_meta/models"
+	"api_meta/types"
+)
 
 type TestCommandsRepositoryMock struct {
 	Commands map[string][]models.TestCommandRecord
@@ -15,6 +18,12 @@ func (m *TestCommandsRepositoryMock) Reset() {
 func (m *TestCommandsRepositoryMock) Create(accountHash string, entity map[string]interface{}) error {
 	if accountHash == BadAccountHash {
 		return someError
+	}
+
+	for _, command := range m.Commands[accountHash] {
+		if command.Name == entity["name"].(string) {
+			return types.UniqueEntityAlreadyExists{}
+		}
 	}
 
 	m.Commands[accountHash] = append(m.Commands[accountHash], models.TestCommandRecord{

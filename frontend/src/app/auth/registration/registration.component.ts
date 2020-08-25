@@ -13,8 +13,9 @@ import {CodesService} from '../services/errors/codes.service';
   styleUrls: ['./registration.component.scss']
 })
 export class RegistrationComponent implements OnInit {
-  public login = '';
-  public password = '';
+  private login = '';
+  private password = '';
+  private repeatedPassword = '';
 
   constructor(
     private readonly validation: ValidationService,
@@ -33,12 +34,25 @@ export class RegistrationComponent implements OnInit {
     this.password = value;
   }
 
+  public changeRepeatedPassword(value: string): void {
+    this.repeatedPassword = value;
+  }
+
   public get registrationDisabled(): boolean {
     return !this.validation.validLogin(this.login) ||
       !this.validation.validPassword(this.password);
   }
 
+  private get passwordsArentMatch(): boolean {
+    return this.password != this.repeatedPassword;
+  }
+
   public tryRegister(): void {
+    if (this.passwordsArentMatch) {
+      this.toastNotification.info('Passwords are not match');
+      return;
+    }
+
     if (this.registrationDisabled) {
       this.toastNotification.info('You need to enter valid data to register');
       return;

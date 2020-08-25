@@ -68,7 +68,7 @@ func TestRun_Success(t *testing.T) {
 	<-serverStarted
 
 	req := test_utils.MustGetFileUploadRequest(
-		fmt.Sprintf("%s/tests/%s", server.URL, testHash),
+		fmt.Sprintf("%s/tests/%s/", server.URL, testHash),
 		"tests_cases_file",
 		testCasesPath,
 	)
@@ -95,7 +95,7 @@ func TestRun_Error(t *testing.T) {
 	<-serverStarted
 
 	req := test_utils.MustGetFileUploadRequest(
-		fmt.Sprintf("%s/tests/%s", server.URL, hash.Md5(testHash)),
+		fmt.Sprintf("%s/tests/%s/", server.URL, hash.Md5(testHash)),
 		"tests_cases_file",
 		testCasesPath,
 	)

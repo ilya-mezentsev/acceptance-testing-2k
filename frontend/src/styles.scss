@@ -1,5 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 
+* {
+  margin: 0;
+  padding: 0;
+}
+
 .toast {
   &.toast-success {
     background-color: green;
@@ -8,4 +13,8 @@
   &.toast-error {
     background-color: red;
   }
+}
+
+.margin-l10 {
+  margin-left: 10px;
 }

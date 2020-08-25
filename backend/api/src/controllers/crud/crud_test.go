@@ -35,7 +35,7 @@ func TestController_GetAllSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestGet(fmt.Sprintf(
-		"%s/entity/test/%s",
+		"%s/entity/test/%s/",
 		server.URL, services.SomeHash,
 	))
 
@@ -53,7 +53,7 @@ func TestController_GetAllError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestGet(fmt.Sprintf(
-		"%s/entity/test/%s",
+		"%s/entity/test/%s/",
 		server.URL, controllers.BadAccountHash,
 	))
 
@@ -72,7 +72,7 @@ func TestController_GetOneSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestGet(fmt.Sprintf(
-		"%s/entity/test/%s/%s",
+		"%s/entity/test/%s/%s/",
 		server.URL, services.SomeHash, services.PredefinedTestCommand1.Hash,
 	))
 
@@ -95,7 +95,7 @@ func TestController_GetOneError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestGet(fmt.Sprintf(
-		"%s/entity/test/%s/%s",
+		"%s/entity/test/%s/%s/",
 		server.URL, controllers.BadAccountHash, controllers.BadEntityHash,
 	))
 
@@ -119,7 +119,7 @@ func TestController_CreateSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestPost(fmt.Sprintf(
-		"%s/entity/test",
+		"%s/entity/test/",
 		server.URL,
 	), `some-data`)
 
@@ -137,7 +137,7 @@ func TestController_CreateError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestPost(fmt.Sprintf(
-		"%s/entity/test",
+		"%s/entity/test/",
 		server.URL,
 	), controllers.BadRequestData)
 
@@ -156,7 +156,7 @@ func TestController_UpdateSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestPatch(fmt.Sprintf(
-		"%s/entity/test",
+		"%s/entity/test/",
 		server.URL,
 	), `some-data`)
 
@@ -174,7 +174,7 @@ func TestController_UpdateError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestPatch(fmt.Sprintf(
-		"%s/entity/test",
+		"%s/entity/test/",
 		server.URL,
 	), controllers.BadRequestData)
 
@@ -193,7 +193,7 @@ func TestController_DeleteSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestDelete(fmt.Sprintf(
-		"%s/entity/test/%s/%s",
+		"%s/entity/test/%s/%s/",
 		server.URL, services.SomeHash, services.PredefinedTestCommand1.Hash,
 	))
 
@@ -216,7 +216,7 @@ func TestController_DeleteError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestDelete(fmt.Sprintf(
-		"%s/entity/test/%s/%s",
+		"%s/entity/test/%s/%s/",
 		server.URL, controllers.BadAccountHash, controllers.BadEntityHash,
 	))
 

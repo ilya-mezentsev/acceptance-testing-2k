@@ -11,6 +11,12 @@ import { InputComponent } from './shared/input/input.component';
 import {FormsModule} from '@angular/forms';
 import { AdminComponent } from './admin/admin.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { NavigationComponent } from './admin/navigation/navigation.component';
+import { RunTestsComponent } from './admin/run-tests/run-tests.component';
+import { ObjectsListComponent } from './admin/objects-list/objects-list.component';
+import { CreateObjectComponent } from './admin/create-object/create-object.component';
+import { ButtonComponent } from './shared/button/button.component';
+import { RouterButtonComponent } from './shared/router-button/router-button.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +27,12 @@ import { NotFoundComponent } from './not-found/not-found.component';
     InputComponent,
     AdminComponent,
     NotFoundComponent,
+    NavigationComponent,
+    RunTestsComponent,
+    ObjectsListComponent,
+    CreateObjectComponent,
+    ButtonComponent,
+    RouterButtonComponent,
   ],
   imports: [
     BrowserModule,

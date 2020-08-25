@@ -14,7 +14,7 @@ export class SessionGuard implements CanActivate {
   ) { }
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    if (!!this.sessionStorage.getSessionId()) {
+    if (!!this.sessionStorage.hasSession()) {
       return true;
     } else {
       this.router.navigate(['/authorization'])

@@ -6,6 +6,9 @@ import {RegistrationComponent} from './auth/registration/registration.component'
 import {AdminComponent} from './admin/admin.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {SessionGuard} from './session.guard';
+import {ObjectsListComponent} from './admin/objects-list/objects-list.component';
+import {RunTestsComponent} from './admin/run-tests/run-tests.component';
+import {CreateObjectComponent} from './admin/create-object/create-object.component';
 
 
 const routes: Routes = [
@@ -16,7 +19,13 @@ const routes: Routes = [
     {path: 'registration', component: RegistrationComponent},
     {path: '**', redirectTo: 'login'},
   ]},
-  {path: 'admin', component: AdminComponent, canActivate: [SessionGuard]},
+  {path: 'admin', component: AdminComponent, canActivate: [SessionGuard], children: [
+    {path: '', redirectTo: 'objects-list', pathMatch: 'full'},
+    {path: 'objects-list', component: ObjectsListComponent},
+    {path: 'create-object', component: CreateObjectComponent},
+    {path: 'run-tests', component: RunTestsComponent},
+    {path: '**', redirectTo: 'objects-list'},
+  ]},
   {path: '**', component: NotFoundComponent}
 ];
 

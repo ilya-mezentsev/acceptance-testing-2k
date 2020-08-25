@@ -17,8 +17,9 @@ const createTablesQuery = `
 	CREATE TABLE IF NOT EXISTS commands(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		object_name TEXT REFERENCES objects(name),
-		name TEXT NOT NULL UNIQUE,
-		hash VARCHAR(32) NOT NULL UNIQUE
+		name TEXT NOT NULL,
+		hash VARCHAR(32) NOT NULL UNIQUE,
+		UNIQUE(object_name, name)
 	);
 	CREATE TABLE IF NOT EXISTS commands_settings(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,

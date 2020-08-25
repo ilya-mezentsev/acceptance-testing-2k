@@ -3,6 +3,7 @@ package crud
 import (
 	"api_meta/interfaces"
 	"api_meta/models"
+	"api_meta/types"
 	"db_connector"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -33,8 +34,9 @@ func init() {
 
 func TestRepository(t *testing.T) {
 	for name, fn := range map[string]func(t *testing.T){
-		"Create TestObject Success":        createTestObjectSuccess,
-		"Create TestObject BadAccountHash": createTestObjectBadAccountHash,
+		"Create TestObject Success":           createTestObjectSuccess,
+		"Create TestObject BadAccountHash":    createTestObjectBadAccountHash,
+		"Create TestObject NameAlreadyExists": createTestObjectWithExistsName,
 
 		"Create TestCommand Success": createTestCommandSuccess,
 
@@ -91,6 +93,15 @@ func createTestObjectBadAccountHash(t *testing.T) {
 	})
 
 	test_utils.AssertNotNil(err, t)
+}
+
+func createTestObjectWithExistsName(t *testing.T) {
+	err := testObjectRepository.Create(testHash, map[string]interface{}{
+		"name": test_utils.ObjectName,
+		"hash": "some-hash",
+	})
+
+	test_utils.AssertErrorsEqual(types.UniqueEntityAlreadyExists{}, err, t)
 }
 
 func getAllTestObjectsSuccess(t *testing.T) {

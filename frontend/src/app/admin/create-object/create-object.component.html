@@ -1,0 +1,14 @@
+<div class="col s6 offset-s3">
+  <app-input
+    [label]="'Object name'"
+    [type]="'text'"
+    (valueEmitter)="changeObjectName($event)"
+  ></app-input>
+  <div class="col s12">
+    <app-button
+      (clicked)="createObject()"
+      [isDisabled]="creatingDisabled"
+      [text]="'Create'"
+    ></app-button>
+  </div>
+</div>

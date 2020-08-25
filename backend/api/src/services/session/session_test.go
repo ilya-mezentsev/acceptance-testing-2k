@@ -46,6 +46,11 @@ func TestService_CreateSessionSuccess(t *testing.T) {
 		response.GetData().(models.SessionResponse).AccountHash,
 		t,
 	)
+	test_utils.AssertEqual(
+		services.ExistsLogin,
+		response.GetData().(models.SessionResponse).Login,
+		t,
+	)
 
 	cookie := responseRecorder.Result().Cookies()[0]
 	test_utils.AssertEqual(CookieName, cookie.Name, t)
