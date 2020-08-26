@@ -9,6 +9,8 @@ import {SessionGuard} from './session.guard';
 import {ObjectsListComponent} from './admin/objects-list/objects-list.component';
 import {RunTestsComponent} from './admin/run-tests/run-tests.component';
 import {CreateObjectComponent} from './admin/create-object/create-object.component';
+import {AccountComponent} from "./admin/account/account.component";
+import {EditObjectComponent} from "./admin/edit-object/edit-object.component";
 
 
 const routes: Routes = [
@@ -23,7 +25,9 @@ const routes: Routes = [
     {path: '', redirectTo: 'objects-list', pathMatch: 'full'},
     {path: 'objects-list', component: ObjectsListComponent},
     {path: 'create-object', component: CreateObjectComponent},
+    {path: 'edit-object/:object_hash', component: EditObjectComponent},
     {path: 'run-tests', component: RunTestsComponent},
+    {path: 'account', component: AccountComponent},
     {path: '**', redirectTo: 'objects-list'},
   ]},
   {path: '**', component: NotFoundComponent}

@@ -1,3 +1,16 @@
 <div class="col s12">
-  <p>objects-list works!</p>
+  <h4>Objects list:</h4>
+  <div *ngIf="hasObjects(); else noObjects">
+    <ul class="collection with-header" *ngFor="let object of getObjects()">
+      <li class="collection-header">
+        <h5 [routerLink]="['../edit-object', object.hash]">{{object.name}}</h5>
+      </li>
+      <li class="collection-item" *ngFor="let command of getObjectCommands(object.name)">
+        <div>{{command.name}}<a class="secondary-content"><i class="material-icons">edit</i></a></div>
+      </li>
+    </ul>
+  </div>
+  <ng-template #noObjects>
+    <h6>No objects created yet</h6>
+  </ng-template>
 </div>

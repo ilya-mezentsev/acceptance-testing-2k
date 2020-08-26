@@ -17,6 +17,8 @@ import { ObjectsListComponent } from './admin/objects-list/objects-list.componen
 import { CreateObjectComponent } from './admin/create-object/create-object.component';
 import { ButtonComponent } from './shared/button/button.component';
 import { RouterButtonComponent } from './shared/router-button/router-button.component';
+import { AccountComponent } from './admin/account/account.component';
+import { EditObjectComponent } from './admin/edit-object/edit-object.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +35,8 @@ import { RouterButtonComponent } from './shared/router-button/router-button.comp
     CreateObjectComponent,
     ButtonComponent,
     RouterButtonComponent,
+    AccountComponent,
+    EditObjectComponent,
   ],
   imports: [
     BrowserModule,
