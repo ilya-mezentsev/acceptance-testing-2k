@@ -69,6 +69,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	initProjectDB()
 
 	// should be called after reading env
 	initRepositories()
@@ -87,6 +88,19 @@ func init() {
 
 	// should be called after adding crud services to pool and initializing middleware
 	initControllers()
+}
+
+func initProjectDB() {
+	_, err := db.Exec(`
+	CREATE TABLE IF NOT EXISTS accounts(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		hash VARCHAR(32) NOT NULL UNIQUE,
+		verified BOOLEAN NOT NULL DEFAULT 0 CHECK (verified IN (0,1)),
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);`)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func initRepositories() {

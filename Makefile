@@ -1,5 +1,8 @@
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
+env.recreate_db_file:
+	bash $(ROOT_DIR)/scripts/recreate_db_file.sh $(ROOT_DIR)
+
 env.fill_env_file:
 	bash $(ROOT_DIR)/scripts/fill_env_file.sh $(ROOT_DIR)
 
@@ -16,6 +19,7 @@ env.install_frontend_libs:
 	bash $(ROOT_DIR)/scripts/prepare_frontend_libs.sh $(ROOT_DIR)
 
 env.prepare_workspace: \
+	env.recreate_db_file \
 	env.fill_env_file \
 	env.prepare_test_files \
 	env.install_backend_libs \
