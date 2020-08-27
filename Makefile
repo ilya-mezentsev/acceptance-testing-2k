@@ -1,5 +1,10 @@
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
+dev.push_all:
+	git add .
+	git commit -m "$m"
+	git push
+
 env.recreate_db_file:
 	bash $(ROOT_DIR)/scripts/recreate_db_file.sh $(ROOT_DIR)
 
@@ -27,6 +32,9 @@ env.prepare_workspace: \
 
 util.calc_go_lines:
 	bash $(ROOT_DIR)/scripts/calc_go_lines.sh $(ROOT_DIR)
+
+util.calc_ng_lines:
+	bash $(ROOT_DIR)/scripts/calc_ng_lines.sh $(ROOT_DIR)
 
 tests.test_runner:
 	bash $(ROOT_DIR)/scripts/test_runner_tests.sh $(ROOT_DIR)

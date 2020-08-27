@@ -1,3 +1,32 @@
-<div class="col s12">
-  <p>Edit of object: {{currentObjectName}}</p>
+<div class="col s6 offset-s3">
+  <app-input
+    [type]="'text'"
+    [value]="currentObjectName"
+    (valueEmitter)="setCurrentObjectName($event)"
+  ></app-input>
+  <div class="col s12">
+    <app-button
+      (clicked)="updateObject()"
+      [isDisabled]="updatingDisabled"
+      [text]="'Save'"
+    ></app-button>
+    <app-button-modal-trigger
+      class="margin-l10"
+      [dataTarget]="'deleteObjectConfirm'"
+      [text]="'Delete'"
+    ></app-button-modal-trigger>
+  </div>
+</div>
+
+<div id="deleteObjectConfirm" class="modal">
+  <div class="modal-content">
+    <h4>Are you sure you ant to delete this object?</h4>
+  </div>
+  <div class="modal-footer">
+    <a
+      class="modal-close waves-effect waves-green btn-flat"
+      (click)="deleteObject()"
+    >Delete</a>
+    <a class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+  </div>
 </div>

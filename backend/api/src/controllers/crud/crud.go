@@ -15,15 +15,18 @@ func Init(r *mux.Router, pool interfaces.CRUDServicesPool) {
 	c := controller{crudServicesPool: pool}
 	crudAPI := r.PathPrefix("/entity").Subrouter()
 
-	crudAPI.HandleFunc("/{entity_type:[a-zA-Z-_]+?}/{account_hash:[a-f0-9]{32}}/", c.getAll).Methods(http.MethodGet)
 	crudAPI.HandleFunc(
-		"/{entity_type:[a-zA-Z-_]+?}/{account_hash:[a-f0-9]{32}}/{entity_hash:[a-f0-9]+?}/",
+		"/{entity_type:[a-zA-Z-_]+?}/{account_hash:[a-f0-9]{32}}/",
+		c.getAll,
+	).Methods(http.MethodGet)
+	crudAPI.HandleFunc(
+		"/{entity_type:[a-zA-Z-_]+?}/{account_hash:[a-f0-9]{32}}/{entity_hash:[a-f0-9]{32}}/",
 		c.getOne,
 	).Methods(http.MethodGet)
 	crudAPI.HandleFunc("/{entity_type:[a-zA-Z-_]+?}/", c.create).Methods(http.MethodPost)
 	crudAPI.HandleFunc("/{entity_type:[a-zA-Z-_]+?}/", c.update).Methods(http.MethodPatch)
 	crudAPI.HandleFunc(
-		"/{entity_type:[a-z_]+?}/{account_hash:[a-f0-9]{32}}/{entity_hash:[a-f0-9]+?}/",
+		"/{entity_type:[a-zA-Z-_]+?}/{account_hash:[a-f0-9]{32}}/{entity_hash:[a-f0-9]{32}}/",
 		c.delete,
 	).Methods(http.MethodDelete)
 }

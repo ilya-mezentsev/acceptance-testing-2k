@@ -14,7 +14,7 @@ export class SessionStorageService {
   }
 
   public hasSession(): boolean {
-    const hasSession = !!this.session;
+    const hasSession = !!this.session?.account_hash && !!this.session?.login;
     if (!hasSession) {
       this.tryRestoreSession();
     }
@@ -23,11 +23,11 @@ export class SessionStorageService {
   }
 
   private tryRestoreSession(): void {
-    this.session = JSON.parse(sessionStorage.getItem(this.sessionKey));
+    this.session = JSON.parse(localStorage.getItem(this.sessionKey));
   }
 
   public saveSession(session: Session): void {
-    sessionStorage.setItem(this.sessionKey, JSON.stringify(session));
+    localStorage.setItem(this.sessionKey, JSON.stringify(session));
     this.session = session;
   }
 

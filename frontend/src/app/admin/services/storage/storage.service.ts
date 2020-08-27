@@ -9,6 +9,10 @@ export class StorageService {
   private readonly testCommandsKey = 'test-commands'
   private readonly storage: Map<string, any> = new Map<string, any>();
 
+  public invalidateObjects(): void {
+    this.storage.delete(this.testObjectsKey);
+  }
+
   public hasObjects(): boolean {
     return this.storage.has(this.testObjectsKey);
   }

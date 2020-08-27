@@ -7,6 +7,7 @@ import {Router} from '@angular/router';
 import {ErrorHandlerService} from '../../services/errors/error-handler.service';
 import {ResponseStatus} from '../../services/fetcher/statuses';
 import {CodesService} from '../services/errors/codes.service';
+import {StorageService} from "../services/storage/storage.service";
 
 @Component({
   selector: 'app-create-object',
@@ -23,6 +24,7 @@ export class CreateObjectComponent implements OnInit {
     private readonly errorHandler: ErrorHandlerService,
     private readonly toastNotification: ToastNotificationService,
     private readonly codesService: CodesService,
+    private readonly storage: StorageService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
   ) { }
 
@@ -52,6 +54,7 @@ export class CreateObjectComponent implements OnInit {
 
   private processResponse(response: DefaultResponse | ErrorResponse): void {
     if (response.status === ResponseStatus.OK) {
+      this.storage.invalidateObjects();
       this.toastNotification.success('Object is successfully created');
       this.router.navigate(['/admin'])
         .catch(err => this.errorHandler.handle(err));

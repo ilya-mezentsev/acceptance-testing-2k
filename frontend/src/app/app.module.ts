@@ -19,6 +19,7 @@ import { ButtonComponent } from './shared/button/button.component';
 import { RouterButtonComponent } from './shared/router-button/router-button.component';
 import { AccountComponent } from './admin/account/account.component';
 import { EditObjectComponent } from './admin/edit-object/edit-object.component';
+import { ButtonModalTriggerComponent } from './shared/button-modal-trigger/button-modal-trigger.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { EditObjectComponent } from './admin/edit-object/edit-object.component';
     RouterButtonComponent,
     AccountComponent,
     EditObjectComponent,
+    ButtonModalTriggerComponent,
   ],
   imports: [
     BrowserModule,
