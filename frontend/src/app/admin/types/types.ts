@@ -11,3 +11,5 @@ export type Command = {
   headers: Map<string, string>,
   cookies: Map<string, string>
 };
+
+export type KeyValueMapping = {key: string, value: string};

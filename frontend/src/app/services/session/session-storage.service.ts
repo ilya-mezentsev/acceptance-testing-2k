@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-type Session = {account_hash: string, login: string};
+type Session = {account_hash: string};
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class SessionStorageService {
   }
 
   public hasSession(): boolean {
-    const hasSession = !!this.session?.account_hash && !!this.session?.login;
+    const hasSession = !!this.session;
     if (!hasSession) {
       this.tryRestoreSession();
     }
@@ -33,9 +33,5 @@ export class SessionStorageService {
 
   public getSessionId(): string {
     return this.session?.account_hash;
-  }
-
-  public getSessionLogin(): string {
-    return this.session?.login;
   }
 }

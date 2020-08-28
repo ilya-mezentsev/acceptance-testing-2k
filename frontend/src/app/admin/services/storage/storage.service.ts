@@ -44,4 +44,8 @@ export class StorageService {
   public set commands(commands: Command[]) {
     this.storage.set(this.testCommandsKey, commands);
   }
+
+  public invalidateCommands(): void {
+    this.storage.delete(this.testCommandsKey);
+  }
 }

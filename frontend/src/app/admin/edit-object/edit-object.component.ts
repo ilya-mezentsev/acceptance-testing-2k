@@ -17,7 +17,7 @@ import {MaterializeInitService} from "../../services/materialize/materialize-ini
   styleUrls: ['./edit-object.component.scss']
 })
 export class EditObjectComponent implements OnInit {
-  private objectHash = '';
+  public objectHash = '';
   private currentObject: Object;
 
   constructor(

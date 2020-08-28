@@ -17,9 +17,10 @@ import { ObjectsListComponent } from './admin/objects-list/objects-list.componen
 import { CreateObjectComponent } from './admin/create-object/create-object.component';
 import { ButtonComponent } from './shared/button/button.component';
 import { RouterButtonComponent } from './shared/router-button/router-button.component';
-import { AccountComponent } from './admin/account/account.component';
 import { EditObjectComponent } from './admin/edit-object/edit-object.component';
 import { ButtonModalTriggerComponent } from './shared/button-modal-trigger/button-modal-trigger.component';
+import { ButtonWithIconComponent } from './shared/button-with-icon/button-with-icon.component';
+import { CreateCommandComponent } from './admin/create-command/create-command.component';
 
 @NgModule({
   declarations: [
@@ -36,9 +37,10 @@ import { ButtonModalTriggerComponent } from './shared/button-modal-trigger/butto
     CreateObjectComponent,
     ButtonComponent,
     RouterButtonComponent,
-    AccountComponent,
     EditObjectComponent,
     ButtonModalTriggerComponent,
+    ButtonWithIconComponent,
+    CreateCommandComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,128 @@
+<div class="col s6 offset-s3">
+  <app-input
+    [type]="'text'"
+    [label]="'Name of command'"
+    (valueEmitter)="setCommandName($event)"
+  ></app-input>
+
+  <!-- It's placed here coz i couldn't extract it to separate component( -->
+  <div class="input-field col s12">
+    <select id="commandMethod" [(ngModel)]="method">
+      <option selected>GET</option>
+      <option>POST</option>
+      <option>PATCH</option>
+      <option>PATCH</option>
+    </select>
+    <label for="commandMethod">Choose command method</label>
+  </div>
+
+  <app-input
+    [type]="'url'"
+    [label]="'Base URL'"
+    (valueEmitter)="setBaseURL($event)"
+  ></app-input>
+
+  <app-input
+    [type]="'text'"
+    [label]="'Endpoint'"
+    (valueEmitter)="setEndpoint($event)"
+  ></app-input>
+
+  <div class="col s12">
+    <p>
+      <label>
+        <input
+          type="checkbox"
+          [checked]="passArgumentsInURL"
+          (change)="passArgumentsInURL = !passArgumentsInURL"
+        />
+        <span>Pass arguments in URL</span>
+      </label>
+    </p>
+  </div>
+
+  <div class="col s12">
+    <h5>Headers:</h5>
+    <app-button-with-icon
+      [iconName]="'add'"
+      [iconPosition]="'right'"
+      [text]="'Add'"
+      [small]="true"
+      (clicked)="addHeader()"
+    ></app-button-with-icon>
+  </div>
+
+  <ng-template #noHeaders>
+    <div class="col s12">
+      <h6>No headers added yet</h6>
+    </div>
+  </ng-template>
+
+  <div *ngIf="hasHeaders(); else noHeaders">
+    <div *ngFor="let header of headers; let i = index">
+      <div class="input-field col s6">
+        <input type="text" [(ngModel)]="header.key" id="header-key-{{i}}">
+        <label for="header-key-{{i}}">Header key</label>
+      </div>
+
+      <div class="input-field col s6">
+        <input type="text" [(ngModel)]="header.value" id="header-value-{{i}}">
+        <label for="header-value-{{i}}">Header value</label>
+      </div>
+
+      <div class="col s12">
+        <app-button
+          [text]="'Remove'"
+          [small]="true"
+          (clicked)="removeHeader(i)"
+        ></app-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col s12">
+    <h5>Cookies:</h5>
+    <app-button-with-icon
+      [iconName]="'add'"
+      [iconPosition]="'right'"
+      [text]="'Add'"
+      [small]="true"
+      (clicked)="addCookie()"
+    ></app-button-with-icon>
+  </div>
+
+  <ng-template #noCookies>
+    <div class="col s12">
+      <h6>No cookies added yet</h6>
+    </div>
+  </ng-template>
+
+  <div *ngIf="hasCookies(); else noCookies">
+    <div *ngFor="let cookie of cookies; let i = index">
+      <div class="input-field col s6">
+        <input type="text" [(ngModel)]="cookie.key" id="cookie-key-{{i}}">
+        <label for="cookie-key-{{i}}">Cookie key</label>
+      </div>
+
+      <div class="input-field col s6">
+        <input type="text" [(ngModel)]="cookie.value" id="cookie-value-{{i}}">
+        <label for="cookie-value-{{i}}">Cookie value</label>
+      </div>
+
+      <div class="col s12">
+        <app-button
+          [text]="'Remove'"
+          [small]="true"
+          (clicked)="removeCookie(i)"
+        ></app-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col s12 margin-t10">
+    <app-button
+      [text]="'Save'"
+      (clicked)="createCommand()"
+    ></app-button>
+  </div>
+</div>

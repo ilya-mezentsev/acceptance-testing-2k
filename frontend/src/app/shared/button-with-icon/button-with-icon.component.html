@@ -2,5 +2,7 @@
   class="waves-effect waves-light btn purple darken-1"
   [class.btn-small]="small"
   (click)="clicked.emit()"
-  [class.grey]="isDisabled"
->{{text}}</a>
+>
+  <i class="material-icons {{iconPosition}}">{{iconName}}</i>
+  {{text}}
+</a>

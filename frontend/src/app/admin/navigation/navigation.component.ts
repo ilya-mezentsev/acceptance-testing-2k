@@ -25,10 +25,6 @@ export class NavigationComponent implements OnInit {
       .catch(err => this.errorHandler.handle(err));
   }
 
-  public get login(): string {
-    return this.sessionStorage.getSessionLogin();
-  }
-
   ngOnInit(): void {
   }
 }
