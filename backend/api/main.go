@@ -3,7 +3,6 @@ package main
 import (
 	"api_meta/interfaces"
 	crudController "controllers/crud"
-	registrationController "controllers/registration"
 	sessionController "controllers/session"
 	"controllers/tests_runner"
 	"db_connector"
@@ -36,7 +35,7 @@ var (
 	connector        db_connector.Connector
 	crudServicesPool pool.CRUDServicesPool
 
-	registrationService registration.Service
+	registrationService interfaces.CreateService
 	sessionService      session.Service
 	testCommandService  interfaces.CRUDService
 	testObjectService   interfaces.CRUDService
@@ -77,12 +76,13 @@ func init() {
 	// should be called after initializing repositories
 	initServices()
 
-	for entityType, crudService := range map[string]interfaces.CRUDService{
-		"test-object":  testObjectService,
-		"test-command": testCommandService,
-	} {
-		crudServicesPool.AddService(entityType, crudService)
-	}
+	crudServicesPool.AddCRUDService("test-object", testObjectService)
+	crudServicesPool.AddCRUDService("test-command", testCommandService)
+	crudServicesPool.AddService(
+		"registration",
+		[]string{pool.CreateServiceOperationType},
+		registrationService,
+	)
 
 	initMiddleware()
 
@@ -141,7 +141,6 @@ func initControllers() {
 	crudController.Init(r, crudServicesPool)
 	sessionController.Init(r, sessionService)
 	tests_runner.Init(r, testsRunnerService)
-	registrationController.Init(r, registrationService)
 }
 
 func main() {

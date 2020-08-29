@@ -17,23 +17,75 @@ func TestMain(m *testing.M) {
 
 func TestCRUDServicesPool_GetSuccess(t *testing.T) {
 	pool := New()
-	pool.AddService("test", services.CRUDServiceMock{})
+	expectedService := services.CRUDServiceMock{}
+	pool.AddCRUDService("test", expectedService)
 
-	service := pool.Get("test")
+	createService := pool.GetCreateService("test")
+	readService := pool.GetReadService("test")
+	updateService := pool.GetUpdateService("test")
+	deleteService := pool.GetDeleteService("test")
 
-	test_utils.AssertNotNil(service, t)
+	test_utils.AssertEqual(expectedService, createService, t)
+	test_utils.AssertEqual(expectedService, readService, t)
+	test_utils.AssertEqual(expectedService, updateService, t)
+	test_utils.AssertEqual(expectedService, deleteService, t)
+}
+
+func TestCRUDServicesPool_AddServiceSuccess(t *testing.T) {
+	pool := New()
+	expectedService := services.CRUDServiceMock{}
+	pool.AddService(
+		"test",
+		[]string{CreateServiceOperationType, ReadServiceOperationType, UpdateServiceOperationType},
+		expectedService,
+	)
+
+	createService := pool.GetCreateService("test")
+	readService := pool.GetReadService("test")
+	updateService := pool.GetUpdateService("test")
+	deleteService := pool.GetDeleteService("test")
+
+	test_utils.AssertEqual(expectedService, createService, t)
+	test_utils.AssertEqual(expectedService, readService, t)
+	test_utils.AssertEqual(expectedService, updateService, t)
+
+	_, ok := deleteService.(defaultCRUDService)
+	test_utils.AssertTrue(ok, t)
+
+	pool.AddService(
+		"test",
+		[]string{DeleteServiceOperationType},
+		expectedService,
+	)
+	deleteService = pool.GetDeleteService("test")
+
+	test_utils.AssertEqual(expectedService, deleteService, t)
+}
+
+func TestCRUDServicesPool_AddService(t *testing.T) {
+	defer func() {
+		p := recover()
+		test_utils.AssertEqual(
+			"Unexpected operation type: bad-type",
+			p.(string),
+			t,
+		)
+	}()
+
+	New().AddService("test", []string{"bad-type"}, services.CRUDServiceMock{})
+	test_utils.AssertTrue(false, t)
 }
 
 func TestCRUDServicesPool_GetNotExistsService(t *testing.T) {
 	pool := New()
 
-	service := pool.Get("test")
+	createService := pool.GetCreateService("test")
 
-	_, ok := service.(defaultCRUDService)
+	_, ok := createService.(defaultCRUDService)
 	test_utils.AssertTrue(ok, t)
 
 	var (
-		response     = service.Create(nil)
+		response     = createService.Create(nil)
 		responseData errors.ServiceError
 	)
 	responseData = response.GetData().(errors.ServiceError)
@@ -46,7 +98,8 @@ func TestCRUDServicesPool_GetNotExistsService(t *testing.T) {
 		t,
 	)
 
-	response = service.GetAll("")
+	readService := pool.GetReadService("test")
+	response = readService.GetAll("")
 	responseData = response.GetData().(errors.ServiceError)
 	test_utils.AssertEqual("error", response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -57,7 +110,7 @@ func TestCRUDServicesPool_GetNotExistsService(t *testing.T) {
 		t,
 	)
 
-	response = service.Get("", "")
+	response = readService.Get("", "")
 	responseData = response.GetData().(errors.ServiceError)
 	test_utils.AssertEqual("error", response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -68,7 +121,8 @@ func TestCRUDServicesPool_GetNotExistsService(t *testing.T) {
 		t,
 	)
 
-	response = service.Update(nil)
+	updateService := pool.GetUpdateService("test")
+	response = updateService.Update(nil)
 	responseData = response.GetData().(errors.ServiceError)
 	test_utils.AssertEqual("error", response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -79,7 +133,8 @@ func TestCRUDServicesPool_GetNotExistsService(t *testing.T) {
 		t,
 	)
 
-	response = service.Delete("", "")
+	deleteService := pool.GetDeleteService("test")
+	response = deleteService.Delete("", "")
 	responseData = response.GetData().(errors.ServiceError)
 	test_utils.AssertEqual("error", response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)

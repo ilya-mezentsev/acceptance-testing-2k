@@ -11,15 +11,34 @@ type (
 		GetData() interface{}
 	}
 
-	CRUDService interface {
+	CreateService interface {
 		Create(request io.ReadCloser) Response
+	}
+
+	ReadService interface {
 		GetAll(accountHash string) Response
 		Get(accountHash, entityHash string) Response
+	}
+
+	UpdateService interface {
 		Update(request io.ReadCloser) Response
+	}
+
+	DeleteService interface {
 		Delete(accountHash, entityHash string) Response
 	}
 
+	CRUDService interface {
+		CreateService
+		ReadService
+		UpdateService
+		DeleteService
+	}
+
 	CRUDServicesPool interface {
-		Get(serviceType string) CRUDService
+		GetCreateService(entityType string) CreateService
+		GetReadService(entityType string) ReadService
+		GetUpdateService(entityType string) UpdateService
+		GetDeleteService(entityType string) DeleteService
 	}
 )

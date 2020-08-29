@@ -24,7 +24,7 @@ func init() {
 	p = pool.New()
 
 	serviceMock = controllers.CRUDServiceMock{CalledWith: map[string]interface{}{}}
-	p.AddService("test", &serviceMock)
+	p.AddCRUDService("test", &serviceMock)
 
 	Init(r, p)
 }

@@ -58,7 +58,7 @@ export class RegistrationComponent implements OnInit {
       return;
     }
 
-    this.fetcher.post('/registration/', {
+    this.fetcher.post('entity/registration/', {
       login: this.login,
       password: this.password
     })

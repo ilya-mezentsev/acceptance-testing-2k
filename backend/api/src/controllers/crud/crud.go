@@ -35,7 +35,7 @@ func (c controller) getAll(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	entityType, accountHash := vars["entity_type"], vars["account_hash"]
 
-	response := c.crudServicesPool.Get(entityType).GetAll(accountHash)
+	response := c.crudServicesPool.GetReadService(entityType).GetAll(accountHash)
 	response_writer.Write(w, response)
 }
 
@@ -43,7 +43,7 @@ func (c controller) getOne(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	entityType, accountHash, entityHash := vars["entity_type"], vars["account_hash"], vars["entity_hash"]
 
-	response := c.crudServicesPool.Get(entityType).Get(accountHash, entityHash)
+	response := c.crudServicesPool.GetReadService(entityType).Get(accountHash, entityHash)
 	response_writer.Write(w, response)
 }
 
@@ -51,7 +51,7 @@ func (c controller) create(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	entityType := vars["entity_type"]
 
-	response := c.crudServicesPool.Get(entityType).Create(r.Body)
+	response := c.crudServicesPool.GetCreateService(entityType).Create(r.Body)
 	response_writer.Write(w, response)
 }
 
@@ -59,7 +59,7 @@ func (c controller) update(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	entityType := vars["entity_type"]
 
-	response := c.crudServicesPool.Get(entityType).Update(r.Body)
+	response := c.crudServicesPool.GetUpdateService(entityType).Update(r.Body)
 	response_writer.Write(w, response)
 }
 
@@ -67,6 +67,6 @@ func (c controller) delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	entityType, accountHash, entityHash := vars["entity_type"], vars["account_hash"], vars["entity_hash"]
 
-	response := c.crudServicesPool.Get(entityType).Delete(accountHash, entityHash)
+	response := c.crudServicesPool.GetDeleteService(entityType).Delete(accountHash, entityHash)
 	response_writer.Write(w, response)
 }

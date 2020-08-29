@@ -25,7 +25,10 @@ type Service struct {
 	repository    interfaces.RegistrationRepository
 }
 
-func New(repository interfaces.RegistrationRepository, filesRootPath string) Service {
+func New(
+	repository interfaces.RegistrationRepository,
+	filesRootPath string,
+) interfaces.CreateService {
 	return Service{
 		filesRootPath: filesRootPath,
 		repository:    repository,
@@ -33,7 +36,7 @@ func New(repository interfaces.RegistrationRepository, filesRootPath string) Ser
 	}
 }
 
-func (s Service) Register(request io.ReadCloser) interfaces.Response {
+func (s Service) Create(request io.ReadCloser) interfaces.Response {
 	var registrationRequest models.RegistrationRequest
 	err := request_decoder.Decode(request, &registrationRequest)
 	if err != nil {
