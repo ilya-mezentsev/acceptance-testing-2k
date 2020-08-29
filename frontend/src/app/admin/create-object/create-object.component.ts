@@ -7,7 +7,7 @@ import {Router} from '@angular/router';
 import {ErrorHandlerService} from '../../services/errors/error-handler.service';
 import {ResponseStatus} from '../../services/fetcher/statuses';
 import {CodesService} from '../services/errors/codes.service';
-import {StorageService} from "../services/storage/storage.service";
+import {StorageService} from '../services/storage/storage.service';
 
 @Component({
   selector: 'app-create-object',

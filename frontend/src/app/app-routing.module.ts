@@ -9,8 +9,8 @@ import {SessionGuard} from './session.guard';
 import {ObjectsListComponent} from './admin/objects-list/objects-list.component';
 import {RunTestsComponent} from './admin/run-tests/run-tests.component';
 import {CreateObjectComponent} from './admin/create-object/create-object.component';
-import {EditObjectComponent} from "./admin/edit-object/edit-object.component";
-import {CreateCommandComponent} from "./admin/create-command/create-command.component";
+import {EditObjectComponent} from './admin/edit-object/edit-object.component';
+import {CreateCommandComponent} from './admin/create-command/create-command.component';
 
 
 const routes: Routes = [

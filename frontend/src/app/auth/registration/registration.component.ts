@@ -44,7 +44,7 @@ export class RegistrationComponent implements OnInit {
   }
 
   private get passwordsArentMatch(): boolean {
-    return this.password != this.repeatedPassword;
+    return this.password !== this.repeatedPassword;
   }
 
   public tryRegister(): void {

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import {Command, Object} from "../../types/types";
+import {TestCommand, TestObject} from '../../types/types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
   private readonly testObjectsKey = 'test-objects';
-  private readonly testCommandsKey = 'test-commands'
+  private readonly testCommandsKey = 'test-commands';
   private readonly storage: Map<string, any> = new Map<string, any>();
 
   public invalidateObjects(): void {
@@ -17,7 +17,7 @@ export class StorageService {
     return this.storage.has(this.testObjectsKey);
   }
 
-  public get objects(): Object[] {
+  public get objects(): TestObject[] {
     if (!this.storage.has(this.testObjectsKey)) {
       return [];
     }
@@ -25,7 +25,7 @@ export class StorageService {
     return this.storage.get(this.testObjectsKey);
   }
 
-  public set objects(objects: Object[]) {
+  public set objects(objects: TestObject[]) {
     this.storage.set(this.testObjectsKey, objects);
   }
 
@@ -33,7 +33,7 @@ export class StorageService {
     return this.storage.has(this.testCommandsKey);
   }
 
-  public get commands(): Command[] {
+  public get commands(): TestCommand[] {
     if (!this.storage.has(this.testCommandsKey)) {
       return [];
     }
@@ -41,7 +41,7 @@ export class StorageService {
     return this.storage.get(this.testCommandsKey);
   }
 
-  public set commands(commands: Command[]) {
+  public set commands(commands: TestCommand[]) {
     this.storage.set(this.testCommandsKey, commands);
   }
 

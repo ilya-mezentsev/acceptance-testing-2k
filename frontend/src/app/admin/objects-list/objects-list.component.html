@@ -1,12 +1,18 @@
 <div class="col s12">
-  <h4>Objects list:</h4>
   <div *ngIf="hasObjects(); else noObjects">
-    <ul class="collection with-header" *ngFor="let object of getObjects()">
+    <ul class="collection with-header">
       <li class="collection-header">
-        <h5 [routerLink]="['../edit-object', object.hash]">{{object.name}}</h5>
+        <h5>Objects list:</h5>
       </li>
-      <li class="collection-item" *ngFor="let command of getObjectCommands(object.name)">
-        <div>{{command.name}}<a class="secondary-content"></a></div>
+      <li
+        class="collection-item"
+        *ngFor="let object of getObjects()"
+      >
+        {{object.name}}
+        <a
+          [routerLink]="['../edit-object', object.hash]"
+          class="secondary-content"
+        ><i class="material-icons">edit</i></a>
       </li>
     </ul>
   </div>

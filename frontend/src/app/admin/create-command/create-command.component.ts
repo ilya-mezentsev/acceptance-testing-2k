@@ -1,14 +1,14 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MaterializeInitService} from "../../services/materialize/materialize-init.service";
+import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
 import { KeyValueMapping } from '../types/types';
-import {DefaultResponse, ErrorResponse, Fetcher} from "../../interfaces/fetcher";
-import {SessionStorageService} from "../../services/session/session-storage.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {ErrorHandlerService} from "../../services/errors/error-handler.service";
-import {StorageService} from "../services/storage/storage.service";
-import {ResponseStatus} from "../../services/fetcher/statuses";
-import {ToastNotificationService} from "../../services/notification/toast-notification.service";
-import {CodesService} from "../services/errors/codes.service";
+import {DefaultResponse, ErrorResponse, Fetcher} from '../../interfaces/fetcher';
+import {SessionStorageService} from '../../services/session/session-storage.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ErrorHandlerService} from '../../services/errors/error-handler.service';
+import {StorageService} from '../services/storage/storage.service';
+import {ResponseStatus} from '../../services/fetcher/statuses';
+import {ToastNotificationService} from '../../services/notification/toast-notification.service';
+import {CodesService} from '../services/errors/codes.service';
 
 @Component({
   selector: 'app-create-command',
@@ -123,12 +123,10 @@ export class CreateCommandComponent implements OnInit {
   }
 
   private setCurrentObjectName(): void {
-    if (this.storage.hasObjects()) {
-      for (const object of this.storage.objects) {
-        if (object.hash === this.objectHash) {
-          this.objectName = object.name;
-          return;
-        }
+    for (const object of this.storage.objects) {
+      if (object.hash === this.objectHash) {
+        this.objectName = object.name;
+        return;
       }
     }
 

@@ -1,6 +1,6 @@
-export type Object = {name: string, hash: string};
+export type TestObject = {name: string, hash: string};
 
-export type Command = {
+export type TestCommand = {
   name: string,
   hash: string,
   object_name: string,
@@ -8,8 +8,8 @@ export type Command = {
   base_url: string,
   endpoint: string,
   pass_arguments_in_url: boolean,
-  headers: Map<string, string>,
-  cookies: Map<string, string>
+  headers: {[k: string]: string},
+  cookies: {[k: string]: string}
 };
 
 export type KeyValueMapping = {key: string, value: string};

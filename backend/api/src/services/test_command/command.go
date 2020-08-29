@@ -127,6 +127,10 @@ func (s service) testCommandsRecordToTestCommandRequest(
 }
 
 func (s service) keyValueToMapping(keyValues string) types.Mapping {
+	if keyValues == "" {
+		return nil
+	}
+
 	var mapping types.Mapping = map[string]string{}
 	for _, keyValue := range strings.Split(keyValues, ";") {
 		keyValue := strings.Split(keyValue, "=")

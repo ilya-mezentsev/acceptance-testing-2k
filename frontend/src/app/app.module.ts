@@ -45,7 +45,7 @@ import { CreateCommandComponent } from './admin/create-command/create-command.co
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
   ],
   providers: [
     {provide: 'Fetcher', useClass: FetcherService}

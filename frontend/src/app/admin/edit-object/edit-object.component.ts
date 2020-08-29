@@ -1,15 +1,15 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
-import {StorageService} from "../services/storage/storage.service";
-import {ErrorHandlerService} from "../../services/errors/error-handler.service";
-import {Object} from "../types/types";
-import {ValidationService} from "../services/validation/validation.service";
-import {ToastNotificationService} from "../../services/notification/toast-notification.service";
-import {DefaultResponse, ErrorResponse, Fetcher} from "../../interfaces/fetcher";
-import {SessionStorageService} from "../../services/session/session-storage.service";
-import {ResponseStatus} from "../../services/fetcher/statuses";
-import {CodesService} from "../services/errors/codes.service";
-import {MaterializeInitService} from "../../services/materialize/materialize-init.service";
+import {ActivatedRoute, Router} from '@angular/router';
+import {StorageService} from '../services/storage/storage.service';
+import {ErrorHandlerService} from '../../services/errors/error-handler.service';
+import {TestCommand, TestObject} from '../types/types';
+import {ValidationService} from '../services/validation/validation.service';
+import {ToastNotificationService} from '../../services/notification/toast-notification.service';
+import {DefaultResponse, ErrorResponse, Fetcher} from '../../interfaces/fetcher';
+import {SessionStorageService} from '../../services/session/session-storage.service';
+import {ResponseStatus} from '../../services/fetcher/statuses';
+import {CodesService} from '../services/errors/codes.service';
+import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
 
 @Component({
   selector: 'app-edit-object',
@@ -18,7 +18,9 @@ import {MaterializeInitService} from "../../services/materialize/materialize-ini
 })
 export class EditObjectComponent implements OnInit {
   public objectHash = '';
-  private currentObject: Object;
+  public objectName = '';
+  public commands: TestCommand[] = [];
+  private currentObject: TestObject;
 
   constructor(
     private readonly router: Router,
@@ -33,21 +35,36 @@ export class EditObjectComponent implements OnInit {
     @Inject('Fetcher') private readonly fetcher: Fetcher,
   ) { }
 
-  public get currentObjectName(): string {
-    return this.currentObject?.name;
+  public hasCommands(): boolean {
+    return this.commands.length > 0;
   }
 
-  public setCurrentObjectName(name: string) {
-    this.currentObject.name = name;
+  public prepareKeyValue(keyValue: {[k: string]: string}): string {
+    if (!keyValue) {
+      return 'No values provided';
+    }
+
+    return Array.from(Object.entries(keyValue)).map(kv => `${kv[0]}=${kv[1]}`).join(';');
+  }
+
+  public setCurrentObjectName(name: string): void {
+    this.objectName = name;
   }
 
   public get updatingDisabled(): boolean {
-    return !this.validation.isObjectNameValid(this.currentObjectName);
+    return !this.validation.isObjectNameValid(this.objectName);
   }
 
   public updateObject(): void {
     if (this.updatingDisabled) {
       this.toastNotification.info('You need to enter valid object name');
+      return;
+    }
+
+    if (this.objectName === this.currentObject.name) {
+      this.toastNotification.info('Object name did not changed so not updated');
+      this.router.navigate(['/admin'])
+        .catch(err => this.errorHandler.handle(err));
       return;
     }
 
@@ -57,7 +74,7 @@ export class EditObjectComponent implements OnInit {
         {
           hash: this.currentObject.hash,
           field_name: 'name',
-          new_value: this.currentObjectName
+          new_value: this.objectName
         }
       ]
     })
@@ -104,23 +121,28 @@ export class EditObjectComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       this.objectHash = params.get('object_hash');
-      this.setCurrentObject();
+      this.initCurrentObject();
     });
 
     this.materializeInit.initModals();
+    this.materializeInit.initCollapsible();
   }
 
-  private setCurrentObject(): void {
-    if (this.storage.hasObjects()) {
-      for (const object of this.storage.objects) {
-        if (object.hash === this.objectHash) {
-          this.currentObject = object;
-          return;
-        }
+  private initCurrentObject(): void {
+    for (const object of this.storage.objects) {
+      if (object.hash === this.objectHash) {
+        this.currentObject = object;
+        this.objectName = object.name;
+        this.setCurrentCommands();
+        return;
       }
     }
 
     this.router.navigate(['/admin'])
       .catch(err => this.errorHandler.handle(err));
+  }
+
+  private setCurrentCommands(): void {
+    this.commands = this.storage.commands.filter(c => c.object_name === this.currentObject.name);
   }
 }

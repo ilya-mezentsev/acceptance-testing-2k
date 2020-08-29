@@ -1,7 +1,7 @@
 <div class="col s6 offset-s3">
   <app-input
     [type]="'text'"
-    [value]="currentObjectName"
+    [value]="objectName"
     (valueEmitter)="setCurrentObjectName($event)"
   ></app-input>
   <div class="col s12">
@@ -38,4 +38,25 @@
     [iconName]="'add'"
     [iconPosition]="'right'"
   ></app-button-with-icon>
+</div>
+
+<div class="col s12">
+  <h5>Commands list:</h5>
+  <ul class="collapsible popout">
+    <li *ngFor="let command of commands">
+      <div class="collapsible-header">{{command.name}}</div>
+      <div class="collapsible-body">
+        <p>Base URL: {{command.base_url}}</p>
+        <p>Method: {{command.method}}</p>
+        <p>Endpoint: {{command.endpoint}}</p>
+        <p>Pass arguments in URL: {{command.pass_arguments_in_url}}</p>
+        <p>Headers: {{prepareKeyValue(command.headers)}}</p>
+        <p>Cookies: {{prepareKeyValue(command.cookies)}}</p>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<div class="col s12" *ngIf="!hasCommands()">
+  <h6>No commands created yet</h6>
 </div>
