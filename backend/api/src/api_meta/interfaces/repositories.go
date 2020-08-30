@@ -12,6 +12,20 @@ type (
 		CreateAccountCredentials(record models.AccountCredentialsRecord) error
 	}
 
+	TestCommandKeyValueCreatorRepository interface {
+		Create(accountHash string, keyValues models.CommandKeyValue) error
+	}
+
+	TestCommandHeadersEditorRepository interface {
+		UpdateHeaders(accountHash string, entities []models.UpdateModel) error
+		DeleteHeader(accountHash, headerHash string) error
+	}
+
+	TestCommandCookiesEditorRepository interface {
+		UpdateCookies(accountHash string, entities []models.UpdateModel) error
+		DeleteCookie(accountHash, cookieHash string) error
+	}
+
 	CRUDRepository interface {
 		Create(accountHash string, entity map[string]interface{}) error
 		GetAll(accountHash string, dest interface{}) error

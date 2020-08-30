@@ -38,7 +38,7 @@ func TestRepository(t *testing.T) {
 		"Create TestObject BadAccountHash":    createTestObjectBadAccountHash,
 		"Create TestObject NameAlreadyExists": createTestObjectWithExistsName,
 
-		"Create TestCommand Success": createTestCommandSuccess,
+		"Create CommandSettings Success": createTestCommandSuccess,
 
 		"GetAll TestObjects Success":        getAllTestObjectsSuccess,
 		"GetAll TestObjects BadAccountHash": getAllTestObjectsBadAccountHash,
@@ -49,19 +49,19 @@ func TestRepository(t *testing.T) {
 		"Get TestObject NotFound":       getTestObjectNotFound,
 		"Get TestObject BadAccountHash": getTestObjectBadAccountHash,
 
-		"Get TestCommand Success": getTestCommandSuccess,
+		"Get CommandSettings Success": getTestCommandSuccess,
 
 		"Update TestObject Success":        updateTestObjectSuccess,
 		"Update TestObject BadFieldName":   updateTestObjectBadFieldName,
 		"Update TestObject BadAccountHash": updateTestObjectBadAccountHash,
 
-		"Update TestCommand Success":         updateTestCommandSuccess,
-		"Update TestCommand BadUpdateTarget": updateTestObjectBadUpdateTarget,
+		"Update CommandSettings Success":         updateTestCommandSuccess,
+		"Update CommandSettings BadUpdateTarget": updateTestObjectBadUpdateTarget,
 
 		"Delete TestObject Success":        deleteTestObjectSuccess,
 		"Delete TestObject BadAccountHash": deleteTestObjectBadAccountHash,
 
-		"Delete TestCommand Success": deleteTestCommandSuccess,
+		"Delete CommandSettings Success": deleteTestCommandSuccess,
 	} {
 		t.Run(name, func(t *testing.T) {
 			test_utils.InitTables(db)
@@ -194,21 +194,13 @@ func deleteTestObjectBadAccountHash(t *testing.T) {
 }
 
 func createTestCommandSuccess(t *testing.T) {
-	expectedCommand := models.TestCommandRequest{
-		CommandSettings: models.CommandSettings{
-			Name:       "FOO",
-			Hash:       "some-hash",
-			ObjectName: test_utils.ObjectName,
-			Method:     "GET",
-			BaseURL:    "https://link.com",
-			Endpoint:   "api/v2/user",
-		},
-		Headers: map[string]string{
-			"X-Test": "header-value",
-		},
-		Cookies: map[string]string{
-			"Test": "cookie-value",
-		},
+	expectedCommand := models.CommandSettings{
+		Name:       "FOO",
+		Hash:       "some-hash",
+		ObjectName: test_utils.ObjectName,
+		Method:     "GET",
+		BaseURL:    "https://link.com",
+		Endpoint:   "api/v2/user",
 	}
 	err := testCommandRepository.Create(testHash, map[string]interface{}{
 		"name":                  expectedCommand.Name,
@@ -218,8 +210,6 @@ func createTestCommandSuccess(t *testing.T) {
 		"base_url":              expectedCommand.BaseURL,
 		"endpoint":              expectedCommand.Endpoint,
 		"pass_arguments_in_url": expectedCommand.PassArgumentsInURL,
-		"command_headers":       expectedCommand.Headers.ReduceToRecordable(),
-		"command_cookies":       expectedCommand.Cookies.ReduceToRecordable(),
 	})
 
 	var createdCommand models.TestCommandRecord
@@ -232,8 +222,6 @@ func createTestCommandSuccess(t *testing.T) {
 	test_utils.AssertEqual(expectedCommand.BaseURL, createdCommand.BaseURL, t)
 	test_utils.AssertEqual(expectedCommand.Endpoint, createdCommand.Endpoint, t)
 	test_utils.AssertEqual(expectedCommand.PassArgumentsInURL, createdCommand.PassArgumentsInURL, t)
-	test_utils.AssertEqual(expectedCommand.Headers.ReduceToRecordable(), createdCommand.Headers, t)
-	test_utils.AssertEqual(expectedCommand.Cookies.ReduceToRecordable(), createdCommand.Cookies, t)
 }
 
 func getAllTestCommandsSuccess(t *testing.T) {
@@ -313,16 +301,6 @@ func updateTestCommandSuccess(t *testing.T) {
 			FieldName: "command_setting:endpoint",
 			NewValue:  "api/v2/foo",
 		},
-		{
-			Hash:      test_utils.CreateCommandHash,
-			FieldName: "command_header:key",
-			NewValue:  "X-Foo",
-		},
-		{
-			Hash:      test_utils.CreateCommandHash,
-			FieldName: "command_cookie:value",
-			NewValue:  "test-foo",
-		},
 	})
 
 	var updatedCommand models.TestCommandRecord
@@ -330,8 +308,6 @@ func updateTestCommandSuccess(t *testing.T) {
 	test_utils.AssertNil(err, t)
 	test_utils.AssertEqual("FOO", updatedCommand.Name, t)
 	test_utils.AssertEqual("api/v2/foo", updatedCommand.Endpoint, t)
-	test_utils.AssertTrue(strings.Contains(updatedCommand.Headers, "X-Foo="), t)
-	test_utils.AssertTrue(strings.Contains(updatedCommand.Cookies, "=test-foo"), t)
 }
 
 func updateTestObjectBadUpdateTarget(t *testing.T) {

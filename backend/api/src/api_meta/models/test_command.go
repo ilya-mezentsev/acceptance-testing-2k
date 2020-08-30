@@ -1,7 +1,5 @@
 package models
 
-import "api_meta/types"
-
 type (
 	CommandSettings struct {
 		Name               string `json:"name" db:"name" validation:"regular-name"`
@@ -15,18 +13,34 @@ type (
 
 	TestCommandRecord struct {
 		CommandSettings
-		Headers string `db:"command_headers" validation:"key-value-mapping; no-validate-empty-string"`
-		Cookies string `db:"command_cookies" validation:"key-value-mapping; no-validate-empty-string"`
-	}
-
-	TestCommandRequest struct {
-		CommandSettings
-		Headers types.Mapping `json:"headers"`
-		Cookies types.Mapping `json:"cookies"`
+		Headers string `db:"command_headers" json:"headers"`
+		Cookies string `db:"command_cookies" json:"cookies"`
 	}
 
 	CreateTestCommandRequest struct {
-		AccountHash string             `json:"account_hash"`
-		TestCommand TestCommandRequest `json:"test_command"`
+		AccountHash     string          `json:"account_hash"`
+		CommandSettings CommandSettings `json:"command_settings"`
+	}
+
+	CreatedTestCommandResponse struct {
+		CommandHash string `json:"command_hash"`
+	}
+
+	KeyValueMapping struct {
+		Hash        string `db:"hash" validation:"md5-hash"`
+		Key         string `db:"key" validation:"regular-name"`
+		Value       string `db:"value"`
+		CommandHash string `db:"command_hash" validation:"md5-hash"`
+	}
+
+	CommandKeyValue struct {
+		Headers []KeyValueMapping `json:"headers"`
+		Cookies []KeyValueMapping `json:"cookies"`
+	}
+
+	CreateMetaRequest struct {
+		AccountHash string          `json:"account_hash" validation:"md5-hash"`
+		CommandHash string          `json:"command_hash" validation:"md5-hash"`
+		CommandMeta CommandKeyValue `json:"command_meta"`
 	}
 )

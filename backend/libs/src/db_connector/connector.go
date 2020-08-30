@@ -7,6 +7,7 @@ import (
 	"logger"
 	"os"
 	"path"
+	"time"
 )
 
 type Connector struct {
@@ -26,7 +27,7 @@ func (c *Connector) Connect(accountHash string) (*sqlx.DB, error) {
 			return nil, err
 		}
 
-		c.accountHashToConnection[accountHash] = connection
+		c.accountHashToConnection[accountHash] = c.configureConnection(connection)
 	}
 
 	return c.accountHashToConnection[accountHash], nil
@@ -52,4 +53,12 @@ func (c Connector) connect(accountHash string) (*sqlx.DB, error) {
 
 		return nil, UnknownError
 	}
+}
+
+func (c Connector) configureConnection(connection *sqlx.DB) *sqlx.DB {
+	connection.SetMaxOpenConns(50)
+	connection.SetMaxIdleConns(50)
+	connection.SetConnMaxLifetime(time.Hour)
+
+	return connection
 }

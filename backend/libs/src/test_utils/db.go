@@ -36,11 +36,11 @@ const (
 	INSERT INTO commands_settings(method, base_url, endpoint, pass_arguments_in_url, command_hash)
 	VALUES(:method, :base_url, :endpoint, :pass_arguments_in_url, :command_hash)`
 	addCommandHeadersQuery = `
-	INSERT INTO commands_headers(key, value, command_hash)
-	VALUES(:key, :value, :command_hash)`
+	INSERT INTO commands_headers(key, value, hash, command_hash)
+	VALUES(:key, :value, :hash, :command_hash)`
 	addCommandCookiesQuery = `
-	INSERT INTO commands_cookies(key, value, command_hash)
-	VALUES(:key, :value, :command_hash)`
+	INSERT INTO commands_cookies(key, value, hash, command_hash)
+	VALUES(:key, :value, :hash, :command_hash)`
 
 	AccountHash         = "some-hash"
 	CredentialsLogin    = "some_login"
@@ -55,6 +55,10 @@ const (
 	GetCommandHash      = "hash-2"
 	PatchCommandHash    = "hash-3"
 	DeleteCommandHash   = "hash-4"
+	HeaderHash1         = "some-hash-1"
+	HeaderHash2         = "some-hash-2"
+	CookieHash1         = "some-hash-1"
+	CookieHash2         = "some-hash-2"
 
 	NotExistsAccountHash = "not-exists-account-hash"
 	NotExistsObjectHash  = "not-exists-object-hash"
@@ -132,11 +136,13 @@ var (
 	}
 	Headers = []map[string]interface{}{
 		{
+			"hash":         HeaderHash1,
 			"key":          "X-Test-1",
 			"value":        "test1",
 			"command_hash": CreateCommandHash,
 		},
 		{
+			"hash":         HeaderHash2,
 			"key":          "X-Test-2",
 			"value":        "test2",
 			"command_hash": CreateCommandHash,
@@ -144,11 +150,13 @@ var (
 	}
 	Cookies = []map[string]interface{}{
 		{
+			"hash":         CookieHash1,
 			"key":          "Test-Value-1",
 			"value":        "test1",
 			"command_hash": CreateCommandHash,
 		},
 		{
+			"hash":         CookieHash2,
 			"key":          "Test-Value-2",
 			"value":        "test2",
 			"command_hash": CreateCommandHash,

@@ -14,7 +14,6 @@ var validationRuleToMethod = map[string]func(string) bool{
 	"meaning-http-method": IsMeaningHttpMethod,
 	"base-url":            IsValidBaseUrl,
 	"endpoint":            IsValidEndpoint,
-	"key-value-mapping":   IsValidKeyValue,
 }
 
 var (
@@ -22,9 +21,6 @@ var (
 	fieldNamePattern         = regexp.MustCompile(`^(?P<updateTarget>[a-zA-Z_]+?:)?[a-zA-Z0-9_]{1,64}$`)
 	md5Pattern               = regexp.MustCompile(`^[a-f0-9]{32}$`)
 	meaningHttpMethodPattern = regexp.MustCompile(`POST|GET|PATCH|DELETE`)
-	keyValuePattern          = regexp.MustCompile(
-		`^([a-zA-Z0-9_-]+?=[a-zA-Z0-9_-]+?);?([a-zA-Z0-9_-]+?=[a-zA-Z0-9_-]+?;?)*$`,
-	)
 )
 
 func IsMd5Hash(s string) bool {
@@ -79,13 +75,4 @@ func IsValidEndpoint(s string) bool {
 	}
 
 	return err == nil
-}
-
-func IsValidKeyValue(s string) bool {
-	validKeyValue := keyValuePattern.MatchString(s)
-	if !validKeyValue {
-		logger.WarningF("Invalid key value mapping: %s", s)
-	}
-
-	return validKeyValue
 }

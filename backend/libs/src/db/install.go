@@ -26,19 +26,21 @@ const createTablesQuery = `
 		base_url TEXT NOT NULL,
 		endpoint TEXT DEFAULT '',
 		pass_arguments_in_url BOOLEAN NOT NULL CHECK (pass_arguments_in_url IN (0,1)),
-		command_hash VARCHAR(32) REFERENCES commands(hash)
+		command_hash VARCHAR(32) REFERENCES commands(hash) ON DELETE CASCADE
 	);
 	CREATE TABLE IF NOT EXISTS commands_headers(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		key TEXT NOT NULL,
 		value TEXT NOT NULL,
-		command_hash VARCHAR(32) REFERENCES commands(hash)
+		hash VARCHAR(32) NOT NULL UNIQUE,
+		command_hash VARCHAR(32) REFERENCES commands(hash) ON DELETE CASCADE
 	);
 	CREATE TABLE IF NOT EXISTS commands_cookies(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		key TEXT NOT NULL,
 		value TEXT NOT NULL,
-		command_hash VARCHAR(32) REFERENCES commands(hash)
+		hash VARCHAR(32) NOT NULL UNIQUE,
+		command_hash VARCHAR(32) REFERENCES commands(hash) ON DELETE CASCADE
 	);`
 
 func Install(db *sqlx.DB) error {

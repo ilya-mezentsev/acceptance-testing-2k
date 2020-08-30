@@ -36,8 +36,6 @@ func (m *TestCommandsRepositoryMock) Create(accountHash string, entity map[strin
 			Endpoint:           entity["endpoint"].(string),
 			PassArgumentsInURL: entity["pass_arguments_in_url"].(bool),
 		},
-		Headers: entity["command_headers"].(string),
-		Cookies: entity["command_cookies"].(string),
 	})
 
 	return nil
@@ -99,10 +97,6 @@ func (m *TestCommandsRepositoryMock) Update(accountHash string, entities []model
 					m.Commands[accountHash][commandIndex].Endpoint = entity.NewValue.(string)
 				case "pass_arguments_in_url":
 					m.Commands[accountHash][commandIndex].PassArgumentsInURL = entity.NewValue.(bool)
-				case "headers":
-					m.Commands[accountHash][commandIndex].Headers = entity.NewValue.(string)
-				case "cookies":
-					m.Commands[accountHash][commandIndex].Cookies = entity.NewValue.(string)
 				}
 			}
 		}
@@ -126,4 +120,30 @@ func (m *TestCommandsRepositoryMock) Delete(accountHash, entityHash string) erro
 	}
 
 	return nil
+}
+
+type TestCommandKeyValueCreatorRepositoryMock struct {
+	KeyValues map[string][]models.CommandKeyValue
+}
+
+func (m *TestCommandKeyValueCreatorRepositoryMock) Reset() {
+	m.KeyValues = map[string][]models.CommandKeyValue{}
+}
+
+func (m *TestCommandKeyValueCreatorRepositoryMock) Create(
+	accountHash string,
+	keyValues models.CommandKeyValue,
+) error {
+	m.KeyValues[accountHash] = append(m.KeyValues[accountHash], keyValues)
+	return nil
+}
+
+type TestCommandKeyValueCreatorErroredRepositoryMock struct {
+}
+
+func (m TestCommandKeyValueCreatorErroredRepositoryMock) Create(
+	_ string,
+	_ models.CommandKeyValue,
+) error {
+	return someError
 }

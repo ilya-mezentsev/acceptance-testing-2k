@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
-import { KeyValueMapping } from '../types/types';
-import {DefaultResponse, ErrorResponse, Fetcher} from '../../interfaces/fetcher';
+import {CreateTestCommandResponse, KeyValueMapping, TestCommandMeta} from '../types/types';
+import {DefaultResponse, ErrorResponse, Fetcher, Response, ServerResponse} from '../../interfaces/fetcher';
 import {SessionStorageService} from '../../services/session/session-storage.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ErrorHandlerService} from '../../services/errors/error-handler.service';
@@ -77,38 +77,58 @@ export class CreateCommandComponent implements OnInit {
   public createCommand(): void {
     this.fetcher.post('entity/test-command/', {
       account_hash: this.session.getSessionId(),
-      test_command: {
+      command_settings: {
         name: this.commandName,
         object_name: this.objectName,
         method: this.method,
         base_url: this.baseURL,
         endpoint: this.endpoint,
-        pass_arguments_in_url: this.passArgumentsInURL,
-        headers: this.headers.reduce(
-          (headers, header) => ({...headers, [header.key]: header.value}),
-          {}
-        ),
-        cookies: this.cookies.reduce(
-          (cookies, cookie) => ({...cookies, [cookie.key]: cookie.value}),
-          {}
-        ),
+        pass_arguments_in_url: this.passArgumentsInURL
       }
     })
-      .then(r => this.processCreateCommandResponse(r))
+      .then(r => this.tryCreateCommandMeta(r))
       .catch(err => this.errorHandler.handle(err));
   }
 
-  private processCreateCommandResponse(response: DefaultResponse | ErrorResponse): void {
+  private tryCreateCommandMeta(response: ServerResponse): void {
     if (response.status === ResponseStatus.OK) {
-      this.toastNotification.success('Command created successfully');
-      this.storage.invalidateCommands();
-      this.router.navigate(['/admin'])
-        .catch(err => this.errorHandler.handle(err));
+      if (this.hasHeaders() || this.hasCookies()) {
+        const commandMeta: TestCommandMeta = {} as any;
+        this.hasHeaders() && (commandMeta.headers = this.headers);
+        this.hasCookies() && (commandMeta.cookies = this.cookies);
+
+        this.fetcher.post('entity/test-command-meta/', {
+          account_hash: this.session.getSessionId(),
+          command_hash: (response as Response<CreateTestCommandResponse>).data.command_hash,
+          command_meta: commandMeta
+        })
+          .then(r => this.processCreateCommandResponse(r))
+          .catch(err => this.errorHandler.handle(err));
+      } else {
+       this.onSuccessCreation();
+      }
     } else {
       this.toastNotification.error(this.codes.getMessageByDescription(
         (response as ErrorResponse).data.description
       ));
     }
+  }
+
+  private processCreateCommandResponse(response: DefaultResponse | ErrorResponse): void {
+    if (response.status === ResponseStatus.OK) {
+      this.onSuccessCreation();
+    } else {
+      this.toastNotification.error(this.codes.getMessageByDescription(
+        (response as ErrorResponse).data.description
+      ));
+    }
+  }
+
+  private onSuccessCreation(): void {
+    this.toastNotification.success('Command created successfully');
+    this.storage.invalidateCommands();
+    this.router.navigate(['/admin'])
+      .catch(err => this.errorHandler.handle(err));
   }
 
   ngOnInit(): void {

@@ -8,8 +8,6 @@ import (
 var updateTargetToTableNameAndHashColumnName = map[string][2]string{
 	"command":         {"commands", "hash"},
 	"command_setting": {"commands_settings", "command_hash"},
-	"command_header":  {"commands_headers", "command_hash"},
-	"command_cookie":  {"commands_cookies", "command_hash"},
 }
 
 type TestCommandQueryProvider struct {
@@ -21,33 +19,7 @@ func (p TestCommandQueryProvider) CreateQuery() string {
 	VALUES(:name, :hash, :object_name);
 
 	INSERT INTO commands_settings(method, base_url, endpoint, pass_arguments_in_url, command_hash)
-	VALUES(:method, :base_url, :endpoint, :pass_arguments_in_url, :hash);
-
-	WITH RECURSIVE split(key, value, str) AS (
-    SELECT '', '', :command_headers||';'
-    UNION
-  	SELECT
-      substr(str, 0, instr(str, '=')),
-      substr(str, instr(str, '=')+1),
-      substr(str, instr(str, ';')+1)
-    FROM split WHERE str != ''
-	)
-		INSERT INTO commands_headers(key, value, command_hash)
-		SELECT key, substr(value, 0, instr(value, ';')), :hash
-		FROM split WHERE key != '' and value != '';
-
-	WITH RECURSIVE split(key, value, str) AS (
-    SELECT '', '', :command_cookies||';'
-    UNION
-  	SELECT
-      substr(str, 0, instr(str, '=')),
-      substr(str, instr(str, '=')+1),
-      substr(str, instr(str, ';')+1)
-    FROM split WHERE str != ''
-	)
-		INSERT INTO commands_cookies(key, value, command_hash)
-		SELECT key, substr(value, 0, instr(value, ';')), :hash
-		FROM split WHERE key != '' and value != '';`
+	VALUES(:method, :base_url, :endpoint, :pass_arguments_in_url, :hash);`
 }
 
 func (p TestCommandQueryProvider) GetAllQuery() string {

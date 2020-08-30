@@ -9,7 +9,6 @@ import (
 	"os"
 	"services/errors"
 	"services/plugins/response_factory"
-	"strings"
 	"test_utils"
 	"testing"
 )
@@ -34,25 +33,34 @@ func TestService_CreateSuccess(t *testing.T) {
 	defer repository.Reset()
 
 	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(`{"account_hash": "%s", "test_command": {
+		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
 			"name": "CREATE",
 			"object_name": "FOO",
 			"method": "POST",
 			"base_url": "https://link.com/api/v1",
 			"endpoint": "user/settings",
-			"pass_arguments_in_url": true,
-			"headers": {
-				"X-Test-1": "x-value-1"
-			}
+			"pass_arguments_in_url": true
 		}}`, services.SomeHash),
 	))
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
-	test_utils.AssertFalse(response.HasData(), t)
-	test_utils.AssertNil(response.GetData(), t)
-	test_utils.AssertEqual("CREATE", repository.Commands[services.SomeHash][0].Name, t)
-	test_utils.AssertEqual("FOO", repository.Commands[services.SomeHash][0].ObjectName, t)
-	test_utils.AssertEqual("POST", repository.Commands[services.SomeHash][0].Method, t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertNotNil(response.GetData(), t)
+	test_utils.AssertEqual(
+		"CREATE",
+		repository.Commands[services.SomeHash][0].Name,
+		t,
+	)
+	test_utils.AssertEqual(
+		"FOO",
+		repository.Commands[services.SomeHash][0].ObjectName,
+		t,
+	)
+	test_utils.AssertEqual(
+		"POST",
+		repository.Commands[services.SomeHash][0].Method,
+		t,
+	)
 	test_utils.AssertEqual(
 		repository.Commands[services.SomeHash][0].BaseURL,
 		"https://link.com/api/v1",
@@ -68,12 +76,6 @@ func TestService_CreateSuccess(t *testing.T) {
 		true,
 		t,
 	)
-	test_utils.AssertEqual(
-		"X-Test-1=x-value-1",
-		repository.Commands[services.SomeHash][0].Headers,
-		t,
-	)
-	test_utils.AssertEqual("", repository.Commands[services.SomeHash][0].Cookies, t)
 }
 
 func TestService_CreateDecodeBodyError(t *testing.T) {
@@ -99,7 +101,7 @@ func TestService_CreateInvalidRequestError(t *testing.T) {
 	defer repository.Reset()
 
 	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(`{"account_hash": "%s", "test_command": {
+		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
 			"name": "@#$!@#4",
 			"object_name": "",
 			"method": "HEAD",
@@ -126,16 +128,13 @@ func TestService_CreateCommandExistsError(t *testing.T) {
 	defer repository.Reset()
 
 	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(`{"account_hash": "%s", "test_command": {
+		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
 			"name": "%s",
 			"object_name": "%s",
 			"method": "POST",
 			"base_url": "https://link.com/api/v1",
 			"endpoint": "user/settings",
-			"pass_arguments_in_url": true,
-			"headers": {
-				"X-Test-1": "x-value-1"
-			}
+			"pass_arguments_in_url": true
 		}}`,
 			services.PredefinedAccountHash,
 			services.PredefinedTestCommand1.Name,
@@ -161,16 +160,13 @@ func TestService_CreateRepositoryError(t *testing.T) {
 	defer repository.Reset()
 
 	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(`{"account_hash": "%s", "test_command": {
+		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
 			"name": "CREATE",
 			"object_name": "FOO",
 			"method": "POST",
 			"base_url": "https://link.com/api/v1",
 			"endpoint": "user/settings",
-			"pass_arguments_in_url": true,
-			"headers": {
-				"X-Test-1": "x-value-1"
-			}
+			"pass_arguments_in_url": true
 		}}`, services.BadAccountHash),
 	))
 
@@ -196,7 +192,7 @@ func TestService_GetAllSuccess(t *testing.T) {
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	for expectedCommandIndex, expectedCommand := range repository.Commands[services.PredefinedAccountHash] {
-		currentCommand := response.GetData().([]models.TestCommandRequest)[expectedCommandIndex]
+		currentCommand := response.GetData().([]models.TestCommandRecord)[expectedCommandIndex]
 
 		test_utils.AssertEqual(currentCommand.Name, expectedCommand.Name, t)
 		test_utils.AssertEqual(currentCommand.ObjectName, expectedCommand.ObjectName, t)
@@ -204,18 +200,16 @@ func TestService_GetAllSuccess(t *testing.T) {
 		test_utils.AssertEqual(expectedCommand.BaseURL, currentCommand.BaseURL, t)
 		test_utils.AssertEqual(expectedCommand.Endpoint, currentCommand.Endpoint, t)
 		test_utils.AssertEqual(expectedCommand.PassArgumentsInURL, currentCommand.PassArgumentsInURL, t)
-		for key, value := range currentCommand.Headers {
-			test_utils.AssertTrue(
-				strings.Contains(expectedCommand.Headers, fmt.Sprintf("%s=%s", key, value)),
-				t,
-			)
-		}
-		for key, value := range currentCommand.Cookies {
-			test_utils.AssertTrue(
-				strings.Contains(expectedCommand.Cookies, fmt.Sprintf("%s=%s", key, value)),
-				t,
-			)
-		}
+		test_utils.AssertEqual(
+			expectedCommand.Headers,
+			currentCommand.Headers,
+			t,
+		)
+		test_utils.AssertEqual(
+			expectedCommand.Cookies,
+			currentCommand.Cookies,
+			t,
+		)
 	}
 }
 
@@ -261,25 +255,23 @@ func TestService_GetSuccess(t *testing.T) {
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	expectedCommand, currentCommand :=
-		services.PredefinedTestCommand1, response.GetData().(models.TestCommandRequest)
+		services.PredefinedTestCommand1, response.GetData().(models.TestCommandRecord)
 	test_utils.AssertEqual(currentCommand.Name, expectedCommand.Name, t)
 	test_utils.AssertEqual(currentCommand.ObjectName, expectedCommand.ObjectName, t)
 	test_utils.AssertEqual(currentCommand.Method, expectedCommand.Method, t)
 	test_utils.AssertEqual(expectedCommand.BaseURL, currentCommand.BaseURL, t)
 	test_utils.AssertEqual(expectedCommand.Endpoint, currentCommand.Endpoint, t)
 	test_utils.AssertEqual(expectedCommand.PassArgumentsInURL, currentCommand.PassArgumentsInURL, t)
-	for key, value := range currentCommand.Headers {
-		test_utils.AssertTrue(
-			strings.Contains(expectedCommand.Headers, fmt.Sprintf("%s=%s", key, value)),
-			t,
-		)
-	}
-	for key, value := range currentCommand.Cookies {
-		test_utils.AssertTrue(
-			strings.Contains(expectedCommand.Cookies, fmt.Sprintf("%s=%s", key, value)),
-			t,
-		)
-	}
+	test_utils.AssertEqual(
+		expectedCommand.Headers,
+		currentCommand.Headers,
+		t,
+	)
+	test_utils.AssertEqual(
+		expectedCommand.Cookies,
+		currentCommand.Cookies,
+		t,
+	)
 }
 
 func TestService_GetInvalidRequestError(t *testing.T) {

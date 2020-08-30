@@ -50,8 +50,8 @@
         <p>Method: {{command.method}}</p>
         <p>Endpoint: {{command.endpoint}}</p>
         <p>Pass arguments in URL: {{command.pass_arguments_in_url}}</p>
-        <p>Headers: {{prepareKeyValue(command.headers)}}</p>
-        <p>Cookies: {{prepareKeyValue(command.cookies)}}</p>
+        <p>Headers: {{command.headers || 'No values provided'}}</p>
+        <p>Cookies: {{command.cookies || 'No values provided'}}</p>
       </div>
     </li>
   </ul>

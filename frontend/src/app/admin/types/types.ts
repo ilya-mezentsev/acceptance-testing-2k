@@ -8,8 +8,15 @@ export type TestCommand = {
   base_url: string,
   endpoint: string,
   pass_arguments_in_url: boolean,
-  headers: {[k: string]: string},
-  cookies: {[k: string]: string}
+  headers: string,
+  cookies: string
+};
+
+export type TestCommandMeta = {
+  headers: KeyValueMapping[],
+  cookies: KeyValueMapping[]
 };
 
 export type KeyValueMapping = {key: string, value: string};
+
+export type CreateTestCommandResponse = {command_hash: string};

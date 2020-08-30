@@ -39,14 +39,6 @@ export class EditObjectComponent implements OnInit {
     return this.commands.length > 0;
   }
 
-  public prepareKeyValue(keyValue: {[k: string]: string}): string {
-    if (!keyValue) {
-      return 'No values provided';
-    }
-
-    return Array.from(Object.entries(keyValue)).map(kv => `${kv[0]}=${kv[1]}`).join(';');
-  }
-
   public setCurrentObjectName(name: string): void {
     this.objectName = name;
   }

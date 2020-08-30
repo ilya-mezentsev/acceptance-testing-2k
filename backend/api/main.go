@@ -17,10 +17,12 @@ import (
 	"repositories/crud/query_providers"
 	registrationRepo "repositories/registration"
 	sessionRepo "repositories/session"
+	"repositories/test_command_meta"
 	"services/pool"
 	"services/registration"
 	"services/session"
 	"services/test_command"
+	"services/test_command/meta_creator"
 	"services/test_object"
 	"services/tests_runner/client"
 	"services/tests_runner/runner"
@@ -35,18 +37,20 @@ var (
 	connector        db_connector.Connector
 	crudServicesPool pool.CRUDServicesPool
 
-	registrationService interfaces.CreateService
-	sessionService      session.Service
-	testCommandService  interfaces.CRUDService
-	testObjectService   interfaces.CRUDService
-	testsRunnerService  runner.Service
-	testsRunnerClient   client.Grpc
-	testsFileManager    tests_file.Manager
+	registrationService           interfaces.CreateService
+	sessionService                session.Service
+	testCommandService            interfaces.CRUDService
+	testCommandMetaCreatorService meta_creator.Service
+	testObjectService             interfaces.CRUDService
+	testsRunnerService            runner.Service
+	testsRunnerClient             client.Grpc
+	testsFileManager              tests_file.Manager
 
-	registrationRepository interfaces.RegistrationRepository
-	sessionRepository      interfaces.SessionRepository
-	testCommandRepository  interfaces.CRUDRepository
-	testObjectRepository   interfaces.CRUDRepository
+	registrationRepository    interfaces.RegistrationRepository
+	sessionRepository         interfaces.SessionRepository
+	testCommandRepository     interfaces.CRUDRepository
+	testCommandMetaRepository test_command_meta.Repository
+	testObjectRepository      interfaces.CRUDRepository
 
 	csrfMiddleware csrf.Middleware
 
@@ -79,6 +83,11 @@ func init() {
 	crudServicesPool.AddCRUDService("test-object", testObjectService)
 	crudServicesPool.AddCRUDService("test-command", testCommandService)
 	crudServicesPool.AddService(
+		"test-command-meta",
+		[]string{pool.CreateServiceOperationType},
+		testCommandMetaCreatorService,
+	)
+	crudServicesPool.AddService(
 		"registration",
 		[]string{pool.CreateServiceOperationType},
 		registrationService,
@@ -108,6 +117,7 @@ func initRepositories() {
 	sessionRepository = sessionRepo.New(connector)
 
 	testCommandRepository = crud.New(connector, query_providers.TestCommandQueryProvider{})
+	testCommandMetaRepository = test_command_meta.New(connector)
 	testObjectRepository = crud.New(connector, query_providers.TestObjectQueryProvider{})
 }
 
@@ -124,6 +134,7 @@ func initServices() {
 	sessionService = session.New(sessionRepository)
 
 	testCommandService = test_command.New(testCommandRepository)
+	testCommandMetaCreatorService = meta_creator.New(testCommandMetaRepository)
 	testObjectService = test_object.New(testObjectRepository)
 
 	testsRunnerClient = client.New(testsRunnerAddress)
