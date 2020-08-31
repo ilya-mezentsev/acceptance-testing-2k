@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
-* {
+html, body {
   margin: 0;
   padding: 0;
 }
@@ -16,11 +16,11 @@
 }
 
 .margin-l10 {
-  margin-left: 10px;
+  margin-left: 10px !important;
 }
 
 .margin-t10 {
-  margin-top: 10px;
+  margin-top: 10px !important;
 }
 
 .dropdown-content li>span {
@@ -29,22 +29,22 @@
 
 /* label color */
 .input-field label {
-  color: #000;
+  color: #000 !important;
 }
 
 /* label focus color */
 .input-field input:focus + label {
-  color: #000;
+  color: #000 !important;
 }
 
 /* label underline focus color */
 .input-field input:focus {
-  border-bottom: 1px solid #000;
-  box-shadow: 0 1px 0 0 #000;
+  border-bottom: 1px solid #000 !important;
+  box-shadow: 0 1px 0 0 #000 !important;
 }
 
 /* icon prefix focus color */
 .input-field .prefix.active {
-  color: #000;
+  color: #000 !important;
 }
 

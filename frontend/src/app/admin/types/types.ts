@@ -1,16 +1,19 @@
 export type TestObject = {name: string, hash: string};
 
-export type TestCommand = {
-  name: string,
-  hash: string,
-  object_name: string,
-  method: string,
-  base_url: string,
-  endpoint: string,
-  pass_arguments_in_url: boolean,
+export interface TestCommandSettings {
+  name: string
+  hash: string
+  object_name: string
+  method: string
+  base_url: string
+  endpoint: string
+  pass_arguments_in_url: boolean
+}
+
+export interface TestCommandRecord extends TestCommandSettings {
   headers: string,
   cookies: string
-};
+}
 
 export type TestCommandMeta = {
   headers: KeyValueMapping[],

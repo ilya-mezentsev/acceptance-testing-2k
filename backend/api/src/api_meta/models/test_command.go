@@ -33,14 +33,14 @@ type (
 		CommandHash string `db:"command_hash" validation:"md5-hash"`
 	}
 
-	CommandKeyValue struct {
+	CommandMeta struct {
 		Headers []KeyValueMapping `json:"headers"`
 		Cookies []KeyValueMapping `json:"cookies"`
 	}
 
 	CreateMetaRequest struct {
-		AccountHash string          `json:"account_hash" validation:"md5-hash"`
-		CommandHash string          `json:"command_hash" validation:"md5-hash"`
-		CommandMeta CommandKeyValue `json:"command_meta"`
+		AccountHash string      `json:"account_hash" validation:"md5-hash"`
+		CommandHash string      `json:"command_hash" validation:"md5-hash"`
+		CommandMeta CommandMeta `json:"command_meta"`
 	}
 )

@@ -177,3 +177,9 @@ func TestIsValidPanicNotStruct(t *testing.T) {
 	IsValid(&x)
 	test_utils.AssertTrue(false, t)
 }
+
+func TestIsKeyOrValue(t *testing.T) {
+	test_utils.AssertTrue(IsKeyOrValue("key"), t)
+	test_utils.AssertTrue(IsKeyOrValue("value"), t)
+	test_utils.AssertFalse(IsKeyOrValue("foo"), t)
+}

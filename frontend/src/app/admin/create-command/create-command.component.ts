@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
-import {CreateTestCommandResponse, KeyValueMapping, TestCommandMeta} from '../types/types';
+import {CreateTestCommandResponse, KeyValueMapping, TestCommandMeta, TestCommandSettings} from '../types/types';
 import {DefaultResponse, ErrorResponse, Fetcher, Response, ServerResponse} from '../../interfaces/fetcher';
 import {SessionStorageService} from '../../services/session/session-storage.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -16,13 +16,17 @@ import {CodesService} from '../services/errors/codes.service';
   styleUrls: ['./create-command.component.scss']
 })
 export class CreateCommandComponent implements OnInit {
-  public passArgumentsInURL = false;
-  public method = 'GET';
   public headers: KeyValueMapping[] = [];
   public cookies: KeyValueMapping[] = [];
-  private commandName: string;
-  private baseURL: string;
-  private endpoint: string;
+  public commandSettings: TestCommandSettings = {
+    name: '',
+    method: 'GET',
+    pass_arguments_in_url: false,
+    base_url: '',
+    endpoint: '',
+    hash: '',
+    object_name: ''
+  };
   private objectHash = '';
   private objectName = '';
 
@@ -37,18 +41,6 @@ export class CreateCommandComponent implements OnInit {
     private readonly toastNotification: ToastNotificationService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
   ) {}
-
-  public setCommandName(value: string): void {
-    this.commandName = value;
-  }
-
-  public setBaseURL(value: string): void {
-    this.baseURL = value;
-  }
-
-  public setEndpoint(value: string): void {
-    this.endpoint = value;
-  }
 
   public hasHeaders(): boolean {
     return this.headers.length > 0;
@@ -78,12 +70,12 @@ export class CreateCommandComponent implements OnInit {
     this.fetcher.post('entity/test-command/', {
       account_hash: this.session.getSessionId(),
       command_settings: {
-        name: this.commandName,
+        name: this.commandSettings.name,
         object_name: this.objectName,
-        method: this.method,
-        base_url: this.baseURL,
-        endpoint: this.endpoint,
-        pass_arguments_in_url: this.passArgumentsInURL
+        method: this.commandSettings.method,
+        base_url: this.commandSettings.base_url,
+        endpoint: this.commandSettings.endpoint,
+        pass_arguments_in_url: this.commandSettings.pass_arguments_in_url
       }
     })
       .then(r => this.tryCreateCommandMeta(r))

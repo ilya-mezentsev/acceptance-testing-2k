@@ -8,9 +8,9 @@ import {Md5} from 'ts-md5';
 })
 export class InputComponent implements OnInit {
   public id = '';
-  @Input() public value: any;
-  @Input() public readonly label: string;
-  @Input() public readonly type: string;
+  @Input() public value = '';
+  @Input() public readonly label = '';
+  @Input() public readonly type = '';
   @Output() public valueEmitter = new EventEmitter<string>();
 
   constructor() { }

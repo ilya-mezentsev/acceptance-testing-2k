@@ -12,17 +12,16 @@ type (
 		CreateAccountCredentials(record models.AccountCredentialsRecord) error
 	}
 
-	TestCommandKeyValueCreatorRepository interface {
-		Create(accountHash string, keyValues models.CommandKeyValue) error
+	TestCommandMetaRepository interface {
+		Create(accountHash string, meta models.CommandMeta) error
+		UpdateHeadersAndCookies(accountHash string, headers, cookies []models.UpdateModel) error
 	}
 
-	TestCommandHeadersEditorRepository interface {
-		UpdateHeaders(accountHash string, entities []models.UpdateModel) error
+	TestCommandHeadersDeleterRepository interface {
 		DeleteHeader(accountHash, headerHash string) error
 	}
 
-	TestCommandCookiesEditorRepository interface {
-		UpdateCookies(accountHash string, entities []models.UpdateModel) error
+	TestCommandCookiesDeleterRepository interface {
 		DeleteCookie(accountHash, cookieHash string) error
 	}
 

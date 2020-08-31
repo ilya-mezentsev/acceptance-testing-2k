@@ -1,4 +1,4 @@
-package meta_creator
+package meta
 
 import (
 	"api_meta/interfaces"
@@ -15,10 +15,10 @@ import (
 // Service for create headers/cookies
 type Service struct {
 	logger     logger.CRUDEntityErrorsLogger
-	repository interfaces.TestCommandKeyValueCreatorRepository
+	repository interfaces.TestCommandMetaRepository
 }
 
-func New(repository interfaces.TestCommandKeyValueCreatorRepository) Service {
+func New(repository interfaces.TestCommandMetaRepository) Service {
 	return Service{
 		repository: repository,
 		logger:     logger.CRUDEntityErrorsLogger{EntityName: entityName},
@@ -75,4 +75,53 @@ func (s Service) addHashAndCommandHashToKeyValue(
 		mapping[index].CommandHash = commandHash
 		mapping[index].Hash = hash.Md5WithTimeAsKey(commandHash)
 	}
+}
+
+func (s Service) Update(request io.ReadCloser) interfaces.Response {
+	var updateMetaRequest models.UpdateMetaRequest
+	err := request_decoder.Decode(request, &updateMetaRequest)
+	if err != nil {
+		s.logger.LogUpdateEntityDecodeError(err)
+
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
+			Code:        unableToUpdateCommandMeta,
+			Description: servicesErrors.DecodingRequestError,
+		})
+	}
+
+	if !validation.IsValid(&updateMetaRequest) ||
+		!s.isInvalidFieldName(append(updateMetaRequest.Headers, updateMetaRequest.Cookies...)) {
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
+			Code:        unableToUpdateCommandMeta,
+			Description: servicesErrors.InvalidRequestError,
+		})
+	}
+
+	err = s.repository.UpdateHeadersAndCookies(
+		updateMetaRequest.AccountHash,
+		updateMetaRequest.Headers,
+		updateMetaRequest.Cookies,
+	)
+	if err != nil {
+		s.logger.LogUpdateEntityRepositoryError(err, map[string]interface{}{
+			"update_meta_request": updateMetaRequest,
+		})
+
+		return response_factory.ErrorResponse(servicesErrors.ServiceError{
+			Code:        unableToUpdateCommandMeta,
+			Description: servicesErrors.RepositoryError,
+		})
+	}
+
+	return response_factory.DefaultResponse()
+}
+
+func (s Service) isInvalidFieldName(updatePayload []models.UpdateModel) bool {
+	for _, payload := range updatePayload {
+		if !validation.IsKeyOrValue(payload.FieldName) {
+			return false
+		}
+	}
+
+	return true
 }

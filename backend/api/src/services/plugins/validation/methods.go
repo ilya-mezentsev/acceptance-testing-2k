@@ -76,3 +76,7 @@ func IsValidEndpoint(s string) bool {
 
 	return err == nil
 }
+
+func IsKeyOrValue(s string) bool {
+	return s == "key" || s == "value"
+}

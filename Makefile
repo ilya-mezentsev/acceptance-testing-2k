@@ -28,7 +28,9 @@ env.prepare_workspace: \
 	env.fill_env_file \
 	env.prepare_test_files \
 	env.install_backend_libs \
-	env.install_frontend_libs
+	env.install_frontend_libs \
+	env.create_proto_files
+
 
 util.calc_go_lines:
 	bash $(ROOT_DIR)/scripts/calc_go_lines.sh $(ROOT_DIR)

@@ -4,7 +4,6 @@ import (
 	"api_meta/models"
 	"db_connector"
 	"fmt"
-	"github.com/jmoiron/sqlx"
 )
 
 const (
@@ -24,11 +23,73 @@ type Repository struct {
 	connector db_connector.Connector
 }
 
+type queryToData map[string]map[string]interface{}
+
 func New(connector db_connector.Connector) Repository {
 	return Repository{connector}
 }
 
-func (r Repository) Create(accountHash string, keyValues models.CommandKeyValue) error {
+func (r Repository) Create(accountHash string, meta models.CommandMeta) error {
+	return r.performTransactions(
+		accountHash,
+		append(
+			r.prepareInsertMap(addHeaderQuery, meta.Headers),
+			r.prepareInsertMap(addCookieQuery, meta.Cookies)...,
+		),
+	)
+}
+
+func (r Repository) prepareInsertMap(
+	query string,
+	mappings []models.KeyValueMapping,
+) []queryToData {
+	var insert []queryToData
+	for _, mapping := range mappings {
+		insert = append(insert, queryToData{
+			query: map[string]interface{}{
+				"key":          mapping.Key,
+				"value":        mapping.Value,
+				"hash":         mapping.Hash,
+				"command_hash": mapping.CommandHash,
+			},
+		})
+	}
+
+	return insert
+}
+
+func (r Repository) UpdateHeadersAndCookies(
+	accountHash string,
+	headers,
+	cookies []models.UpdateModel,
+) error {
+	return r.performTransactions(
+		accountHash,
+		append(
+			r.prepareUpdateMap(updateHeaderQuery, headers),
+			r.prepareUpdateMap(updateCookieQuery, cookies)...,
+		),
+	)
+}
+
+func (r Repository) prepareUpdateMap(
+	query string,
+	updateModels []models.UpdateModel,
+) []queryToData {
+	var d []queryToData
+	for _, updateModel := range updateModels {
+		d = append(d, queryToData{
+			fmt.Sprintf(query, updateModel.FieldName): {
+				"new_value": updateModel.NewValue,
+				"hash":      updateModel.Hash,
+			},
+		})
+	}
+
+	return d
+}
+
+func (r Repository) performTransactions(accountHash string, data []queryToData) error {
 	db, err := r.connector.Connect(accountHash)
 	if err != nil {
 		return err
@@ -39,81 +100,35 @@ func (r Repository) Create(accountHash string, keyValues models.CommandKeyValue)
 		return err
 	}
 
-	err = r.applyKeyValueInsert(tx, addHeaderQuery, keyValues.Headers)
-	if err != nil {
-		return err
-	}
-
-	err = r.applyKeyValueInsert(tx, addCookieQuery, keyValues.Cookies)
-	if err != nil {
-		return err
-	}
-
-	return tx.Commit()
-}
-
-func (r Repository) applyKeyValueInsert(
-	tx *sqlx.Tx,
-	query string,
-	mapping []models.KeyValueMapping,
-) error {
-	for _, keyValue := range mapping {
-		_, err := tx.NamedExec(query, keyValue)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (r Repository) UpdateHeaders(accountHash string, entities []models.UpdateModel) error {
-	return r.performUpdate(accountHash, updateHeaderQuery, entities)
-}
-
-func (r Repository) UpdateCookies(accountHash string, entities []models.UpdateModel) error {
-	return r.performUpdate(accountHash, updateCookieQuery, entities)
-}
-
-func (r Repository) performUpdate(
-	accountHash,
-	query string,
-	entities []models.UpdateModel,
-) error {
-	db, err := r.connector.Connect(accountHash)
-	if err != nil {
-		return err
-	}
-
-	tx, err := db.Beginx()
-	if err != nil {
-		return err
-	}
-
-	for _, entity := range entities {
-		_, err = tx.NamedExec(fmt.Sprintf(query, entity.FieldName), entity)
-		if err != nil {
-			return err
+	for _, queryToData := range data {
+		for query, data := range queryToData {
+			_, err = tx.NamedExec(query, data)
+			if err != nil {
+				_ = tx.Rollback()
+				return err
+			}
 		}
 	}
 
 	return tx.Commit()
-}
-
-func (r Repository) DeleteHeader(accountHash, headerHash string) error {
-	return r.performDelete(accountHash, deleteHeaderQuery, headerHash)
 }
 
 func (r Repository) DeleteCookie(accountHash, cookieHash string) error {
-	return r.performDelete(accountHash, deleteCookieQuery, cookieHash)
-}
-
-func (r Repository) performDelete(accountHash, query, entityHash string) error {
 	db, err := r.connector.Connect(accountHash)
 	if err != nil {
 		return err
 	}
 
-	_, err = db.Exec(query, entityHash)
+	_, err = db.Exec(deleteCookieQuery, cookieHash)
+	return err
+}
+
+func (r Repository) DeleteHeader(accountHash, headerHash string) error {
+	db, err := r.connector.Connect(accountHash)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(deleteHeaderQuery, headerHash)
 	return err
 }

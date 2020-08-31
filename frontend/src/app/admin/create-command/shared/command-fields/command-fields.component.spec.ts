@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RouterButtonComponent } from './router-button.component';
+import { CommandFieldsComponent } from './command-fields.component';
 
-describe('RouterButtonComponent', () => {
-  let component: RouterButtonComponent;
-  let fixture: ComponentFixture<RouterButtonComponent>;
+describe('CommandFieldsComponent', () => {
+  let component: CommandFieldsComponent;
+  let fixture: ComponentFixture<CommandFieldsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RouterButtonComponent ]
+      declarations: [ CommandFieldsComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RouterButtonComponent);
+    fixture = TestBed.createComponent(CommandFieldsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

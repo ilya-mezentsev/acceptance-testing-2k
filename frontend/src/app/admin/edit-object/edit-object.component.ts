@@ -2,7 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StorageService} from '../services/storage/storage.service';
 import {ErrorHandlerService} from '../../services/errors/error-handler.service';
-import {TestCommand, TestObject} from '../types/types';
+import {TestCommandRecord, TestObject} from '../types/types';
 import {ValidationService} from '../services/validation/validation.service';
 import {ToastNotificationService} from '../../services/notification/toast-notification.service';
 import {DefaultResponse, ErrorResponse, Fetcher} from '../../interfaces/fetcher';
@@ -19,7 +19,7 @@ import {MaterializeInitService} from '../../services/materialize/materialize-ini
 export class EditObjectComponent implements OnInit {
   public objectHash = '';
   public objectName = '';
-  public commands: TestCommand[] = [];
+  public commands: TestCommandRecord[] = [];
   private currentObject: TestObject;
 
   constructor(

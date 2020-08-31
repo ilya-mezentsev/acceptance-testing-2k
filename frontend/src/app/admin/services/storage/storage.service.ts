@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import {TestCommand, TestObject} from '../../types/types';
+import {TestCommandRecord, TestObject} from '../../types/types';
+import {RadioService} from "../../../services/radio/radio.service";
+import {InvalidateStorage} from "../../../services/radio/const";
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +11,14 @@ export class StorageService {
   private readonly testCommandsKey = 'test-commands';
   private readonly storage: Map<string, any> = new Map<string, any>();
 
+  constructor(
+    private readonly radio: RadioService
+  ) {}
+
   public invalidateObjects(): void {
     this.storage.delete(this.testObjectsKey);
+
+    this.radio.emit(InvalidateStorage);
   }
 
   public hasObjects(): boolean {
@@ -33,7 +41,7 @@ export class StorageService {
     return this.storage.has(this.testCommandsKey);
   }
 
-  public get commands(): TestCommand[] {
+  public get commands(): TestCommandRecord[] {
     if (!this.storage.has(this.testCommandsKey)) {
       return [];
     }
@@ -41,11 +49,13 @@ export class StorageService {
     return this.storage.get(this.testCommandsKey);
   }
 
-  public set commands(commands: TestCommand[]) {
+  public set commands(commands: TestCommandRecord[]) {
     this.storage.set(this.testCommandsKey, commands);
   }
 
   public invalidateCommands(): void {
     this.storage.delete(this.testCommandsKey);
+
+    this.radio.emit(InvalidateStorage);
   }
 }

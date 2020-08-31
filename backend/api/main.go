@@ -22,7 +22,9 @@ import (
 	"services/registration"
 	"services/session"
 	"services/test_command"
-	"services/test_command/meta_creator"
+	"services/test_command/cookies_deleter"
+	"services/test_command/headers_deleter"
+	"services/test_command/meta"
 	"services/test_object"
 	"services/tests_runner/client"
 	"services/tests_runner/runner"
@@ -37,14 +39,16 @@ var (
 	connector        db_connector.Connector
 	crudServicesPool pool.CRUDServicesPool
 
-	registrationService           interfaces.CreateService
-	sessionService                session.Service
-	testCommandService            interfaces.CRUDService
-	testCommandMetaCreatorService meta_creator.Service
-	testObjectService             interfaces.CRUDService
-	testsRunnerService            runner.Service
-	testsRunnerClient             client.Grpc
-	testsFileManager              tests_file.Manager
+	registrationService              interfaces.CreateService
+	sessionService                   session.Service
+	testCommandService               interfaces.CRUDService
+	testCommandMetaCreatorService    meta.Service
+	testCommandHeadersDeleterService headers_deleter.Service
+	testCommandCookiesDeleterService cookies_deleter.Service
+	testObjectService                interfaces.CRUDService
+	testsRunnerService               runner.Service
+	testsRunnerClient                client.Grpc
+	testsFileManager                 tests_file.Manager
 
 	registrationRepository    interfaces.RegistrationRepository
 	sessionRepository         interfaces.SessionRepository
@@ -84,8 +88,18 @@ func init() {
 	crudServicesPool.AddCRUDService("test-command", testCommandService)
 	crudServicesPool.AddService(
 		"test-command-meta",
-		[]string{pool.CreateServiceOperationType},
+		[]string{pool.CreateServiceOperationType, pool.UpdateServiceOperationType},
 		testCommandMetaCreatorService,
+	)
+	crudServicesPool.AddService(
+		"test-command-headers",
+		[]string{pool.DeleteServiceOperationType},
+		testCommandHeadersDeleterService,
+	)
+	crudServicesPool.AddService(
+		"test-command-cookies",
+		[]string{pool.DeleteServiceOperationType},
+		testCommandCookiesDeleterService,
 	)
 	crudServicesPool.AddService(
 		"registration",
@@ -134,7 +148,9 @@ func initServices() {
 	sessionService = session.New(sessionRepository)
 
 	testCommandService = test_command.New(testCommandRepository)
-	testCommandMetaCreatorService = meta_creator.New(testCommandMetaRepository)
+	testCommandMetaCreatorService = meta.New(testCommandMetaRepository)
+	testCommandHeadersDeleterService = headers_deleter.New(testCommandMetaRepository)
+	testCommandCookiesDeleterService = cookies_deleter.New(testCommandMetaRepository)
 	testObjectService = test_object.New(testObjectRepository)
 
 	testsRunnerClient = client.New(testsRunnerAddress)

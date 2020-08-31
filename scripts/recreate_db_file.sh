@@ -7,4 +7,5 @@ fi
 
 cd "${rootFolder}" || exit
 rm -f data/data.db
+mkdir -p data
 touch data/data.db

@@ -1,13 +1,14 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {ErrorResponse, Fetcher, Response} from '../interfaces/fetcher';
 import {ResponseStatus} from '../services/fetcher/statuses';
-import {TestCommand, TestObject} from './types/types';
-import {NavigationEnd, Router} from '@angular/router';
+import {TestCommandRecord, TestObject} from './types/types';
 import {ErrorHandlerService} from '../services/errors/error-handler.service';
 import {ToastNotificationService} from '../services/notification/toast-notification.service';
 import {CodesService} from './services/errors/codes.service';
 import {SessionStorageService} from '../services/session/session-storage.service';
 import {StorageService} from './services/storage/storage.service';
+import {RadioService} from "../services/radio/radio.service";
+import {InvalidateStorage} from "../services/radio/const";
 
 @Component({
   selector: 'app-admin',
@@ -16,20 +17,19 @@ import {StorageService} from './services/storage/storage.service';
 })
 export class AdminComponent implements OnInit {
   constructor(
-    private readonly router: Router,
     private readonly errorHandler: ErrorHandlerService,
     private readonly toastNotification: ToastNotificationService,
     private readonly codesService: CodesService,
     private readonly sessionStorage: SessionStorageService,
     private readonly storage: StorageService,
+    private readonly radio: RadioService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
   ) { }
 
   ngOnInit(): void {
     this.fetchData();
 
-    // we need to fetch data again because navigation is performed after some data changes
-    this.router.events.subscribe(event => event instanceof NavigationEnd && this.fetchData());
+    this.radio.on(InvalidateStorage, () => this.fetchData());
   }
 
   private fetchData(): void {
@@ -61,7 +61,7 @@ export class AdminComponent implements OnInit {
     this.fetcher.get(`entity/test-command/${this.sessionStorage.getSessionId()}/`)
       .then(r => {
         if (r.status === ResponseStatus.OK) {
-          this.storage.commands = (r as Response<TestCommand[]>).data || [];
+          this.storage.commands = (r as Response<TestCommandRecord[]>).data || [];
         } else {
           this.sendErrorNotification(r as ErrorResponse);
         }
