@@ -22,5 +22,9 @@ func (p TestObjectQueryProvider) UpdateQuery(fieldName string) string {
 }
 
 func (p TestObjectQueryProvider) DeleteQuery() string {
-	return `DELETE FROM objects WHERE hash = ?`
+	return `
+	PRAGMA foreign_keys=ON;
+	DELETE FROM objects WHERE hash = ?;
+	PRAGMA foreign_keys=OFF;
+	`
 }

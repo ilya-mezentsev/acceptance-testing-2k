@@ -14,14 +14,19 @@ import (
 )
 
 var (
-	repository            = services.TestCommandsRepositoryMock{}
-	s                     = New(&repository)
+	testCommandsRepositoryMock           = services.TestCommandsRepositoryMock{}
+	testCommandsMetaGetterRepositoryMock = services.TestCommandMetaGetterRepositoryMock{}
+	s                                    = New(
+		&testCommandsRepositoryMock,
+		&testCommandsMetaGetterRepositoryMock,
+	)
 	expectedSuccessStatus = response_factory.DefaultResponse().GetStatus()
 	expectedErrorStatus   = response_factory.ErrorResponse(nil).GetStatus()
 )
 
 func init() {
-	repository.Reset()
+	testCommandsRepositoryMock.Reset()
+	testCommandsMetaGetterRepositoryMock.Init()
 }
 
 func TestMain(m *testing.M) {
@@ -30,17 +35,17 @@ func TestMain(m *testing.M) {
 }
 
 func TestService_CreateSuccess(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Create(test_utils.GetReadCloser(
 		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
 			"name": "CREATE",
-			"object_name": "FOO",
+			"object_hash": "%s",
 			"method": "POST",
 			"base_url": "https://link.com/api/v1",
 			"endpoint": "user/settings",
 			"pass_arguments_in_url": true
-		}}`, services.SomeHash),
+		}}`, services.SomeHash, services.PredefinedTestObject1.Hash),
 	))
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
@@ -48,38 +53,38 @@ func TestService_CreateSuccess(t *testing.T) {
 	test_utils.AssertNotNil(response.GetData(), t)
 	test_utils.AssertEqual(
 		"CREATE",
-		repository.Commands[services.SomeHash][0].Name,
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].Name,
 		t,
 	)
 	test_utils.AssertEqual(
-		"FOO",
-		repository.Commands[services.SomeHash][0].ObjectName,
+		services.PredefinedTestObject1.Hash,
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].ObjectHash,
 		t,
 	)
 	test_utils.AssertEqual(
 		"POST",
-		repository.Commands[services.SomeHash][0].Method,
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].Method,
 		t,
 	)
 	test_utils.AssertEqual(
-		repository.Commands[services.SomeHash][0].BaseURL,
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].BaseURL,
 		"https://link.com/api/v1",
 		t,
 	)
 	test_utils.AssertEqual(
-		repository.Commands[services.SomeHash][0].Endpoint,
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].Endpoint,
 		"user/settings",
 		t,
 	)
 	test_utils.AssertEqual(
-		repository.Commands[services.SomeHash][0].PassArgumentsInURL,
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].PassArgumentsInURL,
 		true,
 		t,
 	)
 }
 
 func TestService_CreateDecodeBodyError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Create(test_utils.GetReadCloser(`1`))
 
@@ -98,7 +103,7 @@ func TestService_CreateDecodeBodyError(t *testing.T) {
 }
 
 func TestService_CreateInvalidRequestError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Create(test_utils.GetReadCloser(
 		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
@@ -125,12 +130,12 @@ func TestService_CreateInvalidRequestError(t *testing.T) {
 }
 
 func TestService_CreateCommandExistsError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Create(test_utils.GetReadCloser(
 		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
 			"name": "%s",
-			"object_name": "%s",
+			"object_hash": "%s",
 			"method": "POST",
 			"base_url": "https://link.com/api/v1",
 			"endpoint": "user/settings",
@@ -138,7 +143,7 @@ func TestService_CreateCommandExistsError(t *testing.T) {
 		}}`,
 			services.PredefinedAccountHash,
 			services.PredefinedTestCommand1.Name,
-			services.PredefinedTestCommand1.ObjectName,
+			services.PredefinedTestObject1.Hash,
 		),
 	))
 
@@ -157,17 +162,17 @@ func TestService_CreateCommandExistsError(t *testing.T) {
 }
 
 func TestService_CreateRepositoryError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Create(test_utils.GetReadCloser(
 		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
 			"name": "CREATE",
-			"object_name": "FOO",
+			"object_hash": "%s",
 			"method": "POST",
 			"base_url": "https://link.com/api/v1",
 			"endpoint": "user/settings",
 			"pass_arguments_in_url": true
-		}}`, services.BadAccountHash),
+		}}`, services.BadAccountHash, services.PredefinedTestObject1.Hash),
 	))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
@@ -185,36 +190,39 @@ func TestService_CreateRepositoryError(t *testing.T) {
 }
 
 func TestService_GetAllSuccess(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.GetAll(services.PredefinedAccountHash)
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
-	for expectedCommandIndex, expectedCommand := range repository.Commands[services.PredefinedAccountHash] {
-		currentCommand := response.GetData().([]models.TestCommandRecord)[expectedCommandIndex]
+	for expectedCommandIndex, expectedCommand := range testCommandsRepositoryMock.Commands[services.PredefinedAccountHash] {
+		currentCommand := response.GetData().([]models.GetCommandResponse)[expectedCommandIndex]
+		expectedHeaders, expectedCookies, _ :=
+			testCommandsMetaGetterRepositoryMock.GetCommandHeadersAndCookies(
+				services.PredefinedAccountHash,
+				currentCommand.Hash,
+			)
 
 		test_utils.AssertEqual(currentCommand.Name, expectedCommand.Name, t)
-		test_utils.AssertEqual(currentCommand.ObjectName, expectedCommand.ObjectName, t)
+		test_utils.AssertEqual(currentCommand.ObjectHash, expectedCommand.ObjectHash, t)
 		test_utils.AssertEqual(currentCommand.Method, expectedCommand.Method, t)
 		test_utils.AssertEqual(expectedCommand.BaseURL, currentCommand.BaseURL, t)
 		test_utils.AssertEqual(expectedCommand.Endpoint, currentCommand.Endpoint, t)
 		test_utils.AssertEqual(expectedCommand.PassArgumentsInURL, currentCommand.PassArgumentsInURL, t)
-		test_utils.AssertEqual(
-			expectedCommand.Headers,
-			currentCommand.Headers,
-			t,
-		)
-		test_utils.AssertEqual(
-			expectedCommand.Cookies,
-			currentCommand.Cookies,
-			t,
-		)
+
+		for expectedHeaderIndex, expectedHeader := range expectedHeaders {
+			test_utils.AssertEqual(expectedHeader, currentCommand.Headers[expectedHeaderIndex], t)
+		}
+
+		for expectedCookieIndex, expectedCookie := range expectedCookies {
+			test_utils.AssertEqual(expectedCookie, currentCommand.Cookies[expectedCookieIndex], t)
+		}
 	}
 }
 
 func TestService_GetAllInvalidRequestError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.GetAll("some-hash")
 
@@ -232,7 +240,7 @@ func TestService_GetAllInvalidRequestError(t *testing.T) {
 }
 
 func TestService_GetAllRepositoryError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.GetAll(services.BadAccountHash)
 	test_utils.AssertEqual(
@@ -248,34 +256,37 @@ func TestService_GetAllRepositoryError(t *testing.T) {
 }
 
 func TestService_GetSuccess(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Get(services.PredefinedAccountHash, services.PredefinedTestCommand1.Hash)
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	expectedCommand, currentCommand :=
-		services.PredefinedTestCommand1, response.GetData().(models.TestCommandRecord)
+		services.PredefinedTestCommand1, response.GetData().(models.GetCommandResponse)
+	expectedHeaders, expectedCookies, _ :=
+		testCommandsMetaGetterRepositoryMock.GetCommandHeadersAndCookies(
+			services.PredefinedAccountHash,
+			services.PredefinedTestCommand1.Hash,
+		)
+
 	test_utils.AssertEqual(currentCommand.Name, expectedCommand.Name, t)
-	test_utils.AssertEqual(currentCommand.ObjectName, expectedCommand.ObjectName, t)
+	test_utils.AssertEqual(currentCommand.ObjectHash, expectedCommand.ObjectHash, t)
 	test_utils.AssertEqual(currentCommand.Method, expectedCommand.Method, t)
 	test_utils.AssertEqual(expectedCommand.BaseURL, currentCommand.BaseURL, t)
 	test_utils.AssertEqual(expectedCommand.Endpoint, currentCommand.Endpoint, t)
 	test_utils.AssertEqual(expectedCommand.PassArgumentsInURL, currentCommand.PassArgumentsInURL, t)
-	test_utils.AssertEqual(
-		expectedCommand.Headers,
-		currentCommand.Headers,
-		t,
-	)
-	test_utils.AssertEqual(
-		expectedCommand.Cookies,
-		currentCommand.Cookies,
-		t,
-	)
+	for expectedHeaderIndex, expectedHeader := range expectedHeaders {
+		test_utils.AssertEqual(expectedHeader, currentCommand.Headers[expectedHeaderIndex], t)
+	}
+
+	for expectedCookieIndex, expectedCookie := range expectedCookies {
+		test_utils.AssertEqual(expectedCookie, currentCommand.Cookies[expectedCookieIndex], t)
+	}
 }
 
 func TestService_GetInvalidRequestError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Get("some-hash", "some-hash")
 
@@ -293,7 +304,7 @@ func TestService_GetInvalidRequestError(t *testing.T) {
 }
 
 func TestService_GetRepositoryError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Get(services.BadAccountHash, services.PredefinedTestCommand1.Hash)
 
@@ -311,23 +322,21 @@ func TestService_GetRepositoryError(t *testing.T) {
 }
 
 func TestService_UpdateSuccess(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Update(test_utils.GetReadCloser(
 		fmt.Sprintf(`{
 			"account_hash": "%s",
 			"update_payload": [
-				{"hash": "%s", "field_name": "command_setting:name", "new_value": "FOO"},
-				{"hash": "%s", "field_name": "command:object_name", "new_value": "BAR"}
+				{"hash": "%s", "field_name": "command_setting:name", "new_value": "FOO"}
 			]
 		}`,
 			services.PredefinedAccountHash,
-			services.PredefinedTestCommand1.Hash,
 			services.PredefinedTestCommand1.Hash),
 	))
 
-	var updatedCommand models.TestCommandRecord
-	_ = repository.Get(
+	var updatedCommand models.CommandSettings
+	_ = testCommandsRepositoryMock.Get(
 		services.PredefinedAccountHash,
 		services.PredefinedTestCommand1.Hash,
 		&updatedCommand,
@@ -336,11 +345,10 @@ func TestService_UpdateSuccess(t *testing.T) {
 	test_utils.AssertFalse(response.HasData(), t)
 	test_utils.AssertNil(response.GetData(), t)
 	test_utils.AssertEqual("FOO", updatedCommand.Name, t)
-	test_utils.AssertEqual("BAR", updatedCommand.ObjectName, t)
 }
 
 func TestService_UpdateDecodeBodyError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Update(test_utils.GetReadCloser(`1`))
 
@@ -359,7 +367,7 @@ func TestService_UpdateDecodeBodyError(t *testing.T) {
 }
 
 func TestService_UpdateInvalidRequestError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Update(test_utils.GetReadCloser(
 		fmt.Sprintf(`{
@@ -387,7 +395,7 @@ func TestService_UpdateInvalidRequestError(t *testing.T) {
 }
 
 func TestService_UpdateRepositoryError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Update(test_utils.GetReadCloser(
 		fmt.Sprintf(`{
@@ -416,20 +424,20 @@ func TestService_UpdateRepositoryError(t *testing.T) {
 }
 
 func TestService_DeleteSuccess(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Delete(services.PredefinedAccountHash, services.PredefinedTestCommand1.Hash)
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertFalse(response.HasData(), t)
 	test_utils.AssertNil(response.GetData(), t)
-	for _, command := range repository.Commands[services.PredefinedAccountHash] {
+	for _, command := range testCommandsRepositoryMock.Commands[services.PredefinedAccountHash] {
 		test_utils.AssertNotEqual(services.PredefinedTestCommand1.Hash, command.Hash, t)
 	}
 }
 
 func TestService_DeleteInvalidRequestError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Delete("some-hash", "some-hash")
 
@@ -447,7 +455,7 @@ func TestService_DeleteInvalidRequestError(t *testing.T) {
 }
 
 func TestService_DeleteRepositoryError(t *testing.T) {
-	defer repository.Reset()
+	defer testCommandsRepositoryMock.Reset()
 
 	response := s.Delete(services.BadAccountHash, services.PredefinedTestCommand1.Hash)
 

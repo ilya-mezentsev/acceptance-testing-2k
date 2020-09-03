@@ -7,7 +7,9 @@ import (
 )
 
 const (
-	getCommandInfoQuery     = `SELECT name, hash FROM commands WHERE name = $1 AND object_name = $2`
+	getCommandInfoQuery = `
+	SELECT name, hash FROM commands
+	WHERE name = $1 AND object_hash = (SELECT hash FROM objects WHERE name = $2)`
 	getCommandSettingsQuery = `
 	SELECT method, base_url, endpoint, pass_arguments_in_url
 	FROM commands_settings

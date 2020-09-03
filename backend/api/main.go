@@ -147,7 +147,7 @@ func initServices() {
 	registrationService = registration.New(registrationRepository, filesRootPath)
 	sessionService = session.New(sessionRepository)
 
-	testCommandService = test_command.New(testCommandRepository)
+	testCommandService = test_command.New(testCommandRepository, testCommandMetaRepository)
 	testCommandMetaCreatorService = meta.New(testCommandMetaRepository)
 	testCommandHeadersDeleterService = headers_deleter.New(testCommandMetaRepository)
 	testCommandCookiesDeleterService = cookies_deleter.New(testCommandMetaRepository)

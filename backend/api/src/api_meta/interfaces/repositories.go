@@ -17,6 +17,19 @@ type (
 		UpdateHeadersAndCookies(accountHash string, headers, cookies []models.UpdateModel) error
 	}
 
+	TestCommandMetaGetterRepository interface {
+		GetAllHeadersAndCookies(accountHash string) (
+			headers,
+			cookies []models.KeyValueMapping,
+			err error,
+		)
+		GetCommandHeadersAndCookies(accountHash, commandHash string) (
+			headers,
+			cookies []models.KeyValueMapping,
+			err error,
+		)
+	}
+
 	TestCommandHeadersDeleterRepository interface {
 		DeleteHeader(accountHash, headerHash string) error
 	}

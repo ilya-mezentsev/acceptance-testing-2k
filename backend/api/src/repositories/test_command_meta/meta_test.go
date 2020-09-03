@@ -25,6 +25,110 @@ func init() {
 	r = New(connector)
 }
 
+func TestRepository_GetAllHeadersAndCookiesSuccess(t *testing.T) {
+	test_utils.InitTables(db)
+	defer test_utils.DropTables(db)
+
+	headers, cookies, err := r.GetAllHeadersAndCookies(testHash)
+
+	test_utils.AssertNil(err, t)
+	for i, expectedHeader := range test_utils.Headers {
+		test_utils.AssertEqual(expectedHeader["key"], headers[i].Key, t)
+		test_utils.AssertEqual(expectedHeader["value"], headers[i].Value, t)
+		test_utils.AssertEqual(expectedHeader["hash"], headers[i].Hash, t)
+		test_utils.AssertEqual(expectedHeader["command_hash"], headers[i].CommandHash, t)
+	}
+
+	for i, expectedCookie := range test_utils.Cookies {
+		test_utils.AssertEqual(expectedCookie["key"], cookies[i].Key, t)
+		test_utils.AssertEqual(expectedCookie["value"], cookies[i].Value, t)
+		test_utils.AssertEqual(expectedCookie["hash"], cookies[i].Hash, t)
+		test_utils.AssertEqual(expectedCookie["command_hash"], cookies[i].CommandHash, t)
+	}
+}
+
+func TestRepository_GetAllHeadersAndCookiesBadAccountHash(t *testing.T) {
+	_, _, err := r.GetAllHeadersAndCookies("bad-hash")
+
+	test_utils.AssertNotNil(err, t)
+}
+
+func TestRepository_GetAllHeadersAndCookiesNoHeadersTable(t *testing.T) {
+	test_utils.InitTables(db)
+	test_utils.DropCommandsHeaders(db)
+	defer test_utils.DropTables(db)
+
+	_, _, err := r.GetAllHeadersAndCookies(testHash)
+
+	test_utils.AssertNotNil(err, t)
+}
+
+func TestRepository_GetAllHeadersAndCookiesNoCookiesTable(t *testing.T) {
+	test_utils.InitTables(db)
+	test_utils.DropCommandsCookies(db)
+	defer test_utils.DropTables(db)
+
+	_, _, err := r.GetAllHeadersAndCookies(testHash)
+
+	test_utils.AssertNotNil(err, t)
+}
+
+func TestRepository_GetCommandHeadersAndCookiesSuccess(t *testing.T) {
+	test_utils.InitTables(db)
+	defer test_utils.DropTables(db)
+
+	headers, cookies, err := r.GetCommandHeadersAndCookies(
+		testHash,
+		test_utils.CreateCommandHash,
+	)
+
+	test_utils.AssertNil(err, t)
+	test_utils.AssertEqual(test_utils.Headers[0]["key"], headers[0].Key, t)
+	test_utils.AssertEqual(test_utils.Headers[0]["value"], headers[0].Value, t)
+	test_utils.AssertEqual(test_utils.Headers[0]["hash"], headers[0].Hash, t)
+	test_utils.AssertEqual(test_utils.Headers[0]["command_hash"], headers[0].CommandHash, t)
+
+	test_utils.AssertEqual(test_utils.Cookies[0]["key"], cookies[0].Key, t)
+	test_utils.AssertEqual(test_utils.Cookies[0]["value"], cookies[0].Value, t)
+	test_utils.AssertEqual(test_utils.Cookies[0]["hash"], cookies[0].Hash, t)
+	test_utils.AssertEqual(test_utils.Cookies[0]["command_hash"], cookies[0].CommandHash, t)
+}
+
+func TestRepository_GetCommandHeadersAndCookiesBadAccountHash(t *testing.T) {
+	_, _, err := r.GetCommandHeadersAndCookies(
+		"bad-hash",
+		test_utils.CreateCommandHash,
+	)
+
+	test_utils.AssertNotNil(err, t)
+}
+
+func TestRepository_GetCommandHeadersAndCookiesNoHeadersTable(t *testing.T) {
+	test_utils.InitTables(db)
+	test_utils.DropCommandsHeaders(db)
+	defer test_utils.DropTables(db)
+
+	_, _, err := r.GetCommandHeadersAndCookies(
+		testHash,
+		test_utils.CreateCommandHash,
+	)
+
+	test_utils.AssertNotNil(err, t)
+}
+
+func TestRepository_GetCommandHeadersAndCookiesNoCookiesTable(t *testing.T) {
+	test_utils.InitTables(db)
+	test_utils.DropCommandsCookies(db)
+	defer test_utils.DropTables(db)
+
+	_, _, err := r.GetCommandHeadersAndCookies(
+		testHash,
+		test_utils.CreateCommandHash,
+	)
+
+	test_utils.AssertNotNil(err, t)
+}
+
 func TestRepository_CreateSuccess(t *testing.T) {
 	test_utils.InitTables(db)
 	defer test_utils.DropTables(db)

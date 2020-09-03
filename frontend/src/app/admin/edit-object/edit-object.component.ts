@@ -2,7 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StorageService} from '../services/storage/storage.service';
 import {ErrorHandlerService} from '../../services/errors/error-handler.service';
-import {TestCommandRecord, TestObject} from '../types/types';
+import {KeyValueMapping, TestCommandRecord, TestObject} from '../types/types';
 import {ValidationService} from '../services/validation/validation.service';
 import {ToastNotificationService} from '../../services/notification/toast-notification.service';
 import {DefaultResponse, ErrorResponse, Fetcher} from '../../interfaces/fetcher';
@@ -41,6 +41,14 @@ export class EditObjectComponent implements OnInit {
 
   public setCurrentObjectName(name: string): void {
     this.objectName = name;
+  }
+
+  public reduceKeyValue(mapping: KeyValueMapping[]): string {
+    if (!mapping?.length || mapping.length < 1) {
+      return 'No values provided';
+    }
+
+    return mapping.map(m => `${m.key}=${m.value}`).join(';');
   }
 
   public get updatingDisabled(): boolean {
@@ -135,6 +143,6 @@ export class EditObjectComponent implements OnInit {
   }
 
   private setCurrentCommands(): void {
-    this.commands = this.storage.commands.filter(c => c.object_name === this.currentObject.name);
+    this.commands = this.storage.commands.filter(c => c.object_hash === this.objectHash);
   }
 }

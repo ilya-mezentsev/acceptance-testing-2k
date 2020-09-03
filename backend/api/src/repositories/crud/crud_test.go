@@ -5,11 +5,10 @@ import (
 	"api_meta/models"
 	"api_meta/types"
 	"db_connector"
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"path"
 	"repositories/crud/query_providers"
-	"strings"
+	"services/plugins/hash"
 	"test_utils"
 	"testing"
 	"utils"
@@ -73,7 +72,7 @@ func TestRepository(t *testing.T) {
 func createTestObjectSuccess(t *testing.T) {
 	expectedObject := models.TestObject{
 		Name: "SOME_OBJECT",
-		Hash: "some-hash",
+		Hash: hash.Md5WithTimeAsKey("some-hash"),
 	}
 	err := testObjectRepository.Create(testHash, map[string]interface{}{
 		"name": expectedObject.Name,
@@ -81,7 +80,7 @@ func createTestObjectSuccess(t *testing.T) {
 	})
 
 	var createdObject models.TestObject
-	_ = testObjectRepository.Get(testHash, "some-hash", &createdObject)
+	_ = testObjectRepository.Get(testHash, expectedObject.Hash, &createdObject)
 	test_utils.AssertNil(err, t)
 	test_utils.AssertEqual(expectedObject, createdObject, t)
 }
@@ -196,8 +195,8 @@ func deleteTestObjectBadAccountHash(t *testing.T) {
 func createTestCommandSuccess(t *testing.T) {
 	expectedCommand := models.CommandSettings{
 		Name:       "FOO",
-		Hash:       "some-hash",
-		ObjectName: test_utils.ObjectName,
+		Hash:       hash.Md5WithTimeAsKey("some-hash"),
+		ObjectHash: test_utils.ObjectHash,
 		Method:     "GET",
 		BaseURL:    "https://link.com",
 		Endpoint:   "api/v2/user",
@@ -205,19 +204,19 @@ func createTestCommandSuccess(t *testing.T) {
 	err := testCommandRepository.Create(testHash, map[string]interface{}{
 		"name":                  expectedCommand.Name,
 		"hash":                  expectedCommand.Hash,
-		"object_name":           expectedCommand.ObjectName,
+		"object_hash":           expectedCommand.ObjectHash,
 		"method":                expectedCommand.Method,
 		"base_url":              expectedCommand.BaseURL,
 		"endpoint":              expectedCommand.Endpoint,
 		"pass_arguments_in_url": expectedCommand.PassArgumentsInURL,
 	})
 
-	var createdCommand models.TestCommandRecord
+	var createdCommand models.CommandSettings
 	_ = testCommandRepository.Get(testHash, expectedCommand.Hash, &createdCommand)
 	test_utils.AssertNil(err, t)
 	test_utils.AssertEqual(expectedCommand.Name, createdCommand.Name, t)
 	test_utils.AssertEqual(expectedCommand.Hash, createdCommand.Hash, t)
-	test_utils.AssertEqual(expectedCommand.ObjectName, createdCommand.ObjectName, t)
+	test_utils.AssertEqual(expectedCommand.ObjectHash, createdCommand.ObjectHash, t)
 	test_utils.AssertEqual(expectedCommand.Method, createdCommand.Method, t)
 	test_utils.AssertEqual(expectedCommand.BaseURL, createdCommand.BaseURL, t)
 	test_utils.AssertEqual(expectedCommand.Endpoint, createdCommand.Endpoint, t)
@@ -225,10 +224,10 @@ func createTestCommandSuccess(t *testing.T) {
 }
 
 func getAllTestCommandsSuccess(t *testing.T) {
-	var commands []models.TestCommandRecord
+	var commands []models.CommandSettings
 	err := testCommandRepository.GetAll(testHash, &commands)
 
-	var expectedCommand models.TestCommandRecord
+	var expectedCommand models.CommandSettings
 	_ = testCommandRepository.Get(testHash, test_utils.CreateCommandHash, &expectedCommand)
 	test_utils.AssertNil(err, t)
 	for _, command := range commands {
@@ -239,13 +238,13 @@ func getAllTestCommandsSuccess(t *testing.T) {
 }
 
 func getTestCommandSuccess(t *testing.T) {
-	var command models.TestCommandRecord
+	var command models.CommandSettings
 	err := testCommandRepository.Get(testHash, test_utils.CreateCommandHash, &command)
 
 	test_utils.AssertNil(err, t)
 	test_utils.AssertEqual(test_utils.CreateCommandHash, command.Hash, t)
 	test_utils.AssertEqual(test_utils.CreateCommandName, command.Name, t)
-	test_utils.AssertEqual(test_utils.ObjectName, command.ObjectName, t)
+	test_utils.AssertEqual(test_utils.ObjectHash, command.ObjectHash, t)
 	var foundSettings bool
 	for _, settings := range test_utils.Settings {
 		if settings["command_hash"].(string) == command.Hash {
@@ -257,36 +256,6 @@ func getTestCommandSuccess(t *testing.T) {
 		}
 	}
 	test_utils.AssertTrue(foundSettings, t)
-
-	var headersFound bool
-	for _, headers := range test_utils.Headers {
-		if headers["command_hash"].(string) == command.Hash {
-			headersFound = true
-			test_utils.AssertTrue(
-				strings.Contains(
-					command.Headers,
-					fmt.Sprintf("%s=%s", headers["key"].(string), headers["value"].(string)),
-				),
-				t,
-			)
-		}
-	}
-	test_utils.AssertTrue(headersFound, t)
-
-	var cookiesFound bool
-	for _, cookies := range test_utils.Cookies {
-		if cookies["command_hash"].(string) == command.Hash {
-			cookiesFound = true
-			test_utils.AssertTrue(
-				strings.Contains(
-					command.Cookies,
-					fmt.Sprintf("%s=%s", cookies["key"].(string), cookies["value"].(string)),
-				),
-				t,
-			)
-		}
-	}
-	test_utils.AssertTrue(cookiesFound, t)
 }
 
 func updateTestCommandSuccess(t *testing.T) {
@@ -303,7 +272,7 @@ func updateTestCommandSuccess(t *testing.T) {
 		},
 	})
 
-	var updatedCommand models.TestCommandRecord
+	var updatedCommand models.CommandSettings
 	_ = testCommandRepository.Get(testHash, test_utils.CreateCommandHash, &updatedCommand)
 	test_utils.AssertNil(err, t)
 	test_utils.AssertEqual("FOO", updatedCommand.Name, t)
@@ -328,7 +297,15 @@ func updateTestObjectBadUpdateTarget(t *testing.T) {
 func deleteTestCommandSuccess(t *testing.T) {
 	err := testCommandRepository.Delete(testHash, test_utils.CreateCommandHash)
 
-	var commands []models.TestCommandRecord
+	var headersCount int
+	_ = db.Get(
+		&headersCount,
+		`SELECT count(*) FROM commands_headers WHERE command_hash = ?`,
+		test_utils.CreateCommandHash,
+	)
+	test_utils.AssertEqual(0, headersCount, t)
+
+	var commands []models.CommandSettings
 	_ = testCommandRepository.GetAll(testHash, &commands)
 	test_utils.AssertNil(err, t)
 	for _, command := range commands {

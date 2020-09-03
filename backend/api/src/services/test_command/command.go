@@ -15,14 +15,19 @@ import (
 )
 
 type service struct {
-	logger         logger.CRUDEntityErrorsLogger
-	crudRepository interfaces.CRUDRepository
+	logger                       logger.CRUDEntityErrorsLogger
+	crudRepository               interfaces.CRUDRepository
+	commandsMetaGetterRepository interfaces.TestCommandMetaGetterRepository
 }
 
-func New(crudRepository interfaces.CRUDRepository) interfaces.CRUDService {
+func New(
+	crudRepository interfaces.CRUDRepository,
+	commandsMetaGetterRepository interfaces.TestCommandMetaGetterRepository,
+) interfaces.CRUDService {
 	return service{
-		crudRepository: crudRepository,
-		logger:         logger.CRUDEntityErrorsLogger{EntityName: entityName},
+		crudRepository:               crudRepository,
+		commandsMetaGetterRepository: commandsMetaGetterRepository,
+		logger:                       logger.CRUDEntityErrorsLogger{EntityName: entityName},
 	}
 }
 
@@ -51,7 +56,7 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 	err = s.crudRepository.Create(createTestCommandRequest.AccountHash, map[string]interface{}{
 		"name":                  commandSettings.Name,
 		"hash":                  commandSettings.Hash,
-		"object_name":           commandSettings.ObjectName,
+		"object_hash":           commandSettings.ObjectHash,
 		"method":                commandSettings.Method,
 		"base_url":              commandSettings.BaseURL,
 		"endpoint":              commandSettings.Endpoint,
@@ -90,11 +95,16 @@ func (s service) GetAll(accountHash string) interfaces.Response {
 		})
 	}
 
-	var testCommands []models.TestCommandRecord
-	err := s.crudRepository.GetAll(accountHash, &testCommands)
-	if err != nil {
-		s.logger.LogGetAllEntitiesRepositoryError(err, map[string]interface{}{
-			"account_hash": accountHash,
+	var commandsSettings []models.CommandSettings
+	getCommandsSettingsError := s.crudRepository.GetAll(accountHash, &commandsSettings)
+	headers, cookies, getCommandMetaError :=
+		s.commandsMetaGetterRepository.GetAllHeadersAndCookies(accountHash)
+
+	if getCommandsSettingsError != nil || getCommandMetaError != nil {
+		s.logger.LogGetAllEntitiesRepositoryError(getCommandsSettingsError, map[string]interface{}{
+			"account_hash":              accountHash,
+			"get_command_setting_error": getCommandsSettingsError,
+			"get_command_meta_error":    getCommandMetaError,
 		})
 
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
@@ -103,7 +113,41 @@ func (s service) GetAll(accountHash string) interfaces.Response {
 		})
 	}
 
-	return response_factory.SuccessResponse(testCommands)
+	return response_factory.SuccessResponse(makeGetCommandsResponse(
+		commandsSettings,
+		headers,
+		cookies,
+	))
+}
+
+func makeGetCommandsResponse(
+	commandsSettings []models.CommandSettings,
+	headers,
+	cookies []models.KeyValueMapping,
+) []models.GetCommandResponse {
+	var response []models.GetCommandResponse
+	for _, commandsSettings := range commandsSettings {
+		r := models.GetCommandResponse{
+			CommandSettings: commandsSettings,
+			CommandMeta:     models.CommandMeta{},
+		}
+
+		for _, header := range headers {
+			if header.CommandHash == commandsSettings.Hash {
+				r.Headers = append(r.Headers, header)
+			}
+		}
+
+		for _, cookie := range cookies {
+			if cookie.CommandHash == commandsSettings.Hash {
+				r.Cookies = append(r.Cookies, cookie)
+			}
+		}
+
+		response = append(response, r)
+	}
+
+	return response
 }
 
 func (s service) Get(accountHash, testCommandHash string) interfaces.Response {
@@ -114,12 +158,17 @@ func (s service) Get(accountHash, testCommandHash string) interfaces.Response {
 		})
 	}
 
-	var testCommand models.TestCommandRecord
-	err := s.crudRepository.Get(accountHash, testCommandHash, &testCommand)
-	if err != nil {
-		s.logger.LogGetEntityRepositoryError(err, map[string]interface{}{
-			"account_hash":      accountHash,
-			"test_command_hash": testCommandHash,
+	var commandSettings models.CommandSettings
+	getCommandSettingsError := s.crudRepository.Get(accountHash, testCommandHash, &commandSettings)
+	headers, cookies, getCommandMetaError :=
+		s.commandsMetaGetterRepository.GetCommandHeadersAndCookies(accountHash, testCommandHash)
+
+	if getCommandSettingsError != nil || getCommandMetaError != nil {
+		s.logger.LogGetEntityRepositoryError(getCommandSettingsError, map[string]interface{}{
+			"account_hash":               accountHash,
+			"test_command_hash":          testCommandHash,
+			"get_command_settings_error": getCommandSettingsError,
+			"get_command_meta_error":     getCommandMetaError,
 		})
 
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
@@ -128,7 +177,13 @@ func (s service) Get(accountHash, testCommandHash string) interfaces.Response {
 		})
 	}
 
-	return response_factory.SuccessResponse(testCommand)
+	return response_factory.SuccessResponse(models.GetCommandResponse{
+		CommandSettings: commandSettings,
+		CommandMeta: models.CommandMeta{
+			Headers: headers,
+			Cookies: cookies,
+		},
+	})
 }
 
 func (s service) Update(request io.ReadCloser) interfaces.Response {
@@ -150,7 +205,10 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	err = s.crudRepository.Update(updateTestCommandRequest.AccountHash, updateTestCommandRequest.UpdatePayload)
+	err = s.crudRepository.Update(
+		updateTestCommandRequest.AccountHash,
+		updateTestCommandRequest.UpdatePayload,
+	)
 	if err != nil {
 		s.logger.LogUpdateEntityRepositoryError(err, map[string]interface{}{
 			"account_hash":   updateTestCommandRequest.AccountHash,

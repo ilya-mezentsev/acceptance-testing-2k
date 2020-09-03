@@ -1,22 +1,18 @@
 <div class="col s12">
-  <div *ngIf="hasObjects(); else noObjects">
-    <ul class="collection with-header">
-      <li class="collection-header">
-        <h5>Objects list:</h5>
-      </li>
-      <li
-        class="collection-item"
-        *ngFor="let object of getObjects()"
-      >
-        {{object.name}}
-        <a
-          [routerLink]="['../edit-object', object.hash]"
-          class="secondary-content"
-        ><i class="material-icons">edit</i></a>
-      </li>
-    </ul>
-  </div>
-  <ng-template #noObjects>
-    <h6>No objects created yet</h6>
-  </ng-template>
+  <ul class="collection with-header">
+    <li class="collection-header">
+      <h5>Objects list:</h5>
+    </li>
+    <li
+      class="collection-item"
+      *ngFor="let object of getObjects()"
+    >
+      {{object.name}}
+      <a
+        [routerLink]="['../edit-object', object.hash]"
+        class="secondary-content"
+      ><i class="material-icons">edit</i></a>
+    </li>
+  </ul>
+  <h6 *ngIf="!hasObjects()">No objects created yet</h6>
 </div>

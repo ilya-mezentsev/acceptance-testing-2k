@@ -6,11 +6,11 @@ import (
 )
 
 type TestCommandsRepositoryMock struct {
-	Commands map[string][]models.TestCommandRecord
+	Commands map[string][]models.CommandSettings
 }
 
 func (m *TestCommandsRepositoryMock) Reset() {
-	m.Commands = map[string][]models.TestCommandRecord{
+	m.Commands = map[string][]models.CommandSettings{
 		PredefinedAccountHash: {PredefinedTestCommand1, PredefinedTestCommand2},
 	}
 }
@@ -26,16 +26,14 @@ func (m *TestCommandsRepositoryMock) Create(accountHash string, entity map[strin
 		}
 	}
 
-	m.Commands[accountHash] = append(m.Commands[accountHash], models.TestCommandRecord{
-		CommandSettings: models.CommandSettings{
-			Name:               entity["name"].(string),
-			Hash:               entity["hash"].(string),
-			ObjectName:         entity["object_name"].(string),
-			Method:             entity["method"].(string),
-			BaseURL:            entity["base_url"].(string),
-			Endpoint:           entity["endpoint"].(string),
-			PassArgumentsInURL: entity["pass_arguments_in_url"].(bool),
-		},
+	m.Commands[accountHash] = append(m.Commands[accountHash], models.CommandSettings{
+		Name:               entity["name"].(string),
+		Hash:               entity["hash"].(string),
+		ObjectHash:         entity["object_hash"].(string),
+		Method:             entity["method"].(string),
+		BaseURL:            entity["base_url"].(string),
+		Endpoint:           entity["endpoint"].(string),
+		PassArgumentsInURL: entity["pass_arguments_in_url"].(bool),
 	})
 
 	return nil
@@ -46,7 +44,7 @@ func (m *TestCommandsRepositoryMock) GetAll(accountHash string, dest interface{}
 		return someError
 	}
 
-	destPtr := dest.(*[]models.TestCommandRecord)
+	destPtr := dest.(*[]models.CommandSettings)
 	*destPtr = append(*destPtr, m.Commands[accountHash]...)
 	return nil
 }
@@ -58,15 +56,13 @@ func (m *TestCommandsRepositoryMock) Get(accountHash, entityHash string, dest in
 
 	for _, command := range m.Commands[accountHash] {
 		if command.Hash == entityHash {
-			dest.(*models.TestCommandRecord).Name = command.Name
-			dest.(*models.TestCommandRecord).Hash = command.Hash
-			dest.(*models.TestCommandRecord).ObjectName = command.ObjectName
-			dest.(*models.TestCommandRecord).Method = command.Method
-			dest.(*models.TestCommandRecord).BaseURL = command.BaseURL
-			dest.(*models.TestCommandRecord).Endpoint = command.Endpoint
-			dest.(*models.TestCommandRecord).PassArgumentsInURL = command.PassArgumentsInURL
-			dest.(*models.TestCommandRecord).Headers = command.Headers
-			dest.(*models.TestCommandRecord).Cookies = command.Cookies
+			dest.(*models.CommandSettings).Name = command.Name
+			dest.(*models.CommandSettings).Hash = command.Hash
+			dest.(*models.CommandSettings).ObjectHash = command.ObjectHash
+			dest.(*models.CommandSettings).Method = command.Method
+			dest.(*models.CommandSettings).BaseURL = command.BaseURL
+			dest.(*models.CommandSettings).Endpoint = command.Endpoint
+			dest.(*models.CommandSettings).PassArgumentsInURL = command.PassArgumentsInURL
 			break
 		}
 	}
@@ -88,7 +84,7 @@ func (m *TestCommandsRepositoryMock) Update(accountHash string, entities []model
 				case "hash":
 					m.Commands[accountHash][commandIndex].Hash = entity.NewValue.(string)
 				case "command:object_name":
-					m.Commands[accountHash][commandIndex].ObjectName = entity.NewValue.(string)
+					m.Commands[accountHash][commandIndex].ObjectHash = entity.NewValue.(string)
 				case "method":
 					m.Commands[accountHash][commandIndex].Method = entity.NewValue.(string)
 				case "base_url":
@@ -120,6 +116,67 @@ func (m *TestCommandsRepositoryMock) Delete(accountHash, entityHash string) erro
 	}
 
 	return nil
+}
+
+type TestCommandMetaGetterRepositoryMock struct {
+	Meta map[string][]models.CommandMeta
+}
+
+func (m *TestCommandMetaGetterRepositoryMock) Init() {
+	m.Meta = map[string][]models.CommandMeta{
+		PredefinedAccountHash: {
+			{
+				Headers: []models.KeyValueMapping{PredefinedHeader1, PredefinedHeader2},
+				Cookies: []models.KeyValueMapping{PredefinedCookie1, PredefinedCookie2},
+			},
+		},
+	}
+}
+
+func (m *TestCommandMetaGetterRepositoryMock) GetAllHeadersAndCookies(accountHash string) (
+	headers,
+	cookies []models.KeyValueMapping,
+	err error,
+) {
+	if accountHash == BadAccountHash {
+		return nil, nil, someError
+	}
+
+	for _, meta := range m.Meta[accountHash] {
+		headers = append(headers, meta.Headers...)
+		cookies = append(cookies, meta.Cookies...)
+	}
+
+	return
+}
+
+func (m *TestCommandMetaGetterRepositoryMock) GetCommandHeadersAndCookies(
+	accountHash,
+	commandHash string,
+) (
+	headers,
+	cookies []models.KeyValueMapping,
+	err error,
+) {
+	if accountHash == BadAccountHash {
+		return nil, nil, someError
+	}
+
+	for _, meta := range m.Meta[accountHash] {
+		for _, header := range meta.Headers {
+			if header.CommandHash == commandHash {
+				headers = append(headers, header)
+			}
+		}
+
+		for _, cookie := range meta.Cookies {
+			if cookie.CommandHash == commandHash {
+				cookies = append(cookies, cookie)
+			}
+		}
+	}
+
+	return
 }
 
 type TestCommandMetaRepositoryMock struct {

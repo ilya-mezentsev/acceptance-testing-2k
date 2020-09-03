@@ -30,8 +30,8 @@ const (
 	INSERT INTO objects(name, hash)
 	VALUES(:name, :hash)`
 	addCommandQuery = `
-	INSERT INTO commands(name, hash, object_name)
-	VALUES(:name, :hash, :object_name)`
+	INSERT INTO commands(name, hash, object_hash)
+	VALUES(:name, :hash, :object_hash)`
 	addCommandSettingsQuery = `
 	INSERT INTO commands_settings(method, base_url, endpoint, pass_arguments_in_url, command_hash)
 	VALUES(:method, :base_url, :endpoint, :pass_arguments_in_url, :command_hash)`
@@ -86,22 +86,22 @@ var (
 		{
 			"name":        CreateCommandName,
 			"hash":        CreateCommandHash,
-			"object_name": ObjectName,
+			"object_hash": ObjectHash,
 		},
 		{
 			"name":        GetCommandName,
 			"hash":        GetCommandHash,
-			"object_name": ObjectName,
+			"object_hash": ObjectHash,
 		},
 		{
 			"name":        PatchCommandName,
 			"hash":        PatchCommandHash,
-			"object_name": ObjectName,
+			"object_hash": ObjectHash,
 		},
 		{
 			"name":        DeleteCommandName,
 			"hash":        DeleteCommandHash,
-			"object_name": ObjectName,
+			"object_hash": ObjectHash,
 		},
 	}
 	Settings = []map[string]interface{}{

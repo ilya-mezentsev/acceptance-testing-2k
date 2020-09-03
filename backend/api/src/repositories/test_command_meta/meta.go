@@ -7,6 +7,14 @@ import (
 )
 
 const (
+	getAllHeadersQuery     = `SELECT key, value, hash, command_hash FROM commands_headers`
+	getAllCookiesQuery     = `SELECT key, value, hash, command_hash FROM commands_cookies`
+	getCommandHeadersQuery = `
+	SELECT key, value, hash, command_hash
+	FROM commands_headers WHERE command_hash = ?`
+	getCommandCookiesQuery = `
+	SELECT key, value, hash, command_hash
+	FROM commands_cookies WHERE command_hash = ?`
 	addHeaderQuery = `
 	INSERT INTO commands_headers(key, value, hash, command_hash)
 	VALUES(:key, :value, :hash, :command_hash)`
@@ -27,6 +35,52 @@ type queryToData map[string]map[string]interface{}
 
 func New(connector db_connector.Connector) Repository {
 	return Repository{connector}
+}
+
+func (r Repository) GetAllHeadersAndCookies(accountHash string) (
+	headers,
+	cookies []models.KeyValueMapping,
+	err error,
+) {
+	db, err := r.connector.Connect(accountHash)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = db.Select(&headers, getAllHeadersQuery)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = db.Select(&cookies, getAllCookiesQuery)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return headers, cookies, nil
+}
+
+func (r Repository) GetCommandHeadersAndCookies(accountHash, commandHash string) (
+	headers,
+	cookies []models.KeyValueMapping,
+	err error,
+) {
+	db, err := r.connector.Connect(accountHash)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = db.Select(&headers, getCommandHeadersQuery, commandHash)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = db.Select(&cookies, getCommandCookiesQuery, commandHash)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return headers, cookies, nil
 }
 
 func (r Repository) Create(accountHash string, meta models.CommandMeta) error {

@@ -50,8 +50,8 @@
         <p>Method: {{command.method}}</p>
         <p>Endpoint: {{command.endpoint}}</p>
         <p>Pass arguments in URL: {{command.pass_arguments_in_url}}</p>
-        <p>Headers: {{command.headers || 'No values provided'}}</p>
-        <p>Cookies: {{command.cookies || 'No values provided'}}</p>
+        <p>Headers: {{reduceKeyValue(command.headers)}}</p>
+        <p>Cookies: {{reduceKeyValue(command.cookies)}}</p>
         <app-button-with-icon
           [text]="'Edit'"
           [iconName]="'edit'"

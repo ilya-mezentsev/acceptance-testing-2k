@@ -13,7 +13,7 @@ export class ObjectsListComponent implements OnInit {
   ) { }
 
   public hasObjects(): boolean {
-    return this.storage.hasObjects();
+    return this.storage.objects.length > 0;
   }
 
   public getObjects(): TestObject[] {

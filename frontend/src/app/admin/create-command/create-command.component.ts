@@ -25,7 +25,7 @@ export class CreateCommandComponent implements OnInit {
     base_url: '',
     endpoint: '',
     hash: '',
-    object_name: ''
+    object_hash: ''
   };
   private objectHash = '';
   private objectName = '';
@@ -47,7 +47,7 @@ export class CreateCommandComponent implements OnInit {
   }
 
   public addHeader(): void {
-    this.headers.push({key: '', value: ''});
+    this.headers.push({key: '', value: ''} as any);
   }
 
   public removeHeader(index: number): void {
@@ -59,7 +59,7 @@ export class CreateCommandComponent implements OnInit {
   }
 
   public addCookie(): void {
-    this.cookies.push({key: '', value: ''});
+    this.cookies.push({key: '', value: ''} as any);
   }
 
   public removeCookie(index: number): void {
@@ -71,7 +71,7 @@ export class CreateCommandComponent implements OnInit {
       account_hash: this.session.getSessionId(),
       command_settings: {
         name: this.commandSettings.name,
-        object_name: this.objectName,
+        object_hash: this.objectHash,
         method: this.commandSettings.method,
         base_url: this.commandSettings.base_url,
         endpoint: this.commandSettings.endpoint,
