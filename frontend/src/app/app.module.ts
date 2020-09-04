@@ -19,8 +19,10 @@ import { ButtonComponent } from './shared/button/button.component';
 import { EditObjectComponent } from './admin/edit-object/edit-object.component';
 import { ButtonModalTriggerComponent } from './shared/button-modal-trigger/button-modal-trigger.component';
 import { ButtonWithIconComponent } from './shared/button-with-icon/button-with-icon.component';
-import { CreateCommandComponent } from './admin/create-command/create-command.component';
-import { CommandFieldsComponent } from './admin/create-command/shared/command-fields/command-fields.component';
+import { CreateCommandComponent } from './admin/command/create-command/create-command.component';
+import { CommandFieldsComponent } from './admin/command/shared/command-fields/command-fields.component';
+import { EditCommandComponent } from './admin/command/edit-command/edit-command.component';
+import { FloatingIconComponent } from './shared/floating-icon/floating-icon.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +43,8 @@ import { CommandFieldsComponent } from './admin/create-command/shared/command-fi
     ButtonWithIconComponent,
     CreateCommandComponent,
     CommandFieldsComponent,
+    EditCommandComponent,
+    FloatingIconComponent,
   ],
   imports: [
     BrowserModule,

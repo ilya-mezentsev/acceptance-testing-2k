@@ -5,7 +5,7 @@ import {ErrorHandlerService} from '../../services/errors/error-handler.service';
 import {KeyValueMapping, TestCommandRecord, TestObject} from '../types/types';
 import {ValidationService} from '../services/validation/validation.service';
 import {ToastNotificationService} from '../../services/notification/toast-notification.service';
-import {DefaultResponse, ErrorResponse, Fetcher} from '../../interfaces/fetcher';
+import {DefaultResponse, ErrorResponse, Fetcher, Response} from '../../interfaces/fetcher';
 import {SessionStorageService} from '../../services/session/session-storage.service';
 import {ResponseStatus} from '../../services/fetcher/statuses';
 import {CodesService} from '../services/errors/codes.service';
@@ -129,17 +129,43 @@ export class EditObjectComponent implements OnInit {
   }
 
   private initCurrentObject(): void {
-    for (const object of this.storage.objects) {
-      if (object.hash === this.objectHash) {
-        this.currentObject = object;
-        this.objectName = object.name;
-        this.setCurrentCommands();
-        return;
-      }
+    const currentObject = this.storage.objects.find(o => o.hash === this.objectHash);
+    if (currentObject) {
+      this.currentObject = currentObject;
+      this.objectName = currentObject.name;
+      this.setCurrentCommands();
+    } else {
+      this.tryFetchCurrentObjectAndCommands();
     }
+  }
 
-    this.router.navigate(['/admin'])
-      .catch(err => this.errorHandler.handle(err));
+  private tryFetchCurrentObjectAndCommands(): void {
+    this.fetcher
+      .get(`entity/test-object/${this.sessionStorage.getSessionId()}/${this.objectHash}/`)
+      .then(r => {
+        if (r.status === ResponseStatus.OK) {
+          this.currentObject = (r as Response<TestObject>).data;
+          this.objectName = this.currentObject.name;
+          return this.fetcher.get(`entity/test-command/${this.sessionStorage.getSessionId()}/`);
+        } else {
+          this.toastNotification.error('Unable to fetch test object');
+          return Promise.reject();
+        }
+      })
+      .then(r => {
+        if (r.status === ResponseStatus.OK) {
+          this.storage.commands = (r as Response<TestCommandRecord[]>).data;
+          this.setCurrentCommands();
+        } else {
+          this.toastNotification.error('Unable to fetch test commands');
+          return Promise.reject();
+        }
+      })
+      .catch(err => {
+        this.errorHandler.handle(err);
+        this.router.navigate(['/admin'])
+          .catch(e => this.errorHandler.handle(e));
+      });
   }
 
   private setCurrentCommands(): void {

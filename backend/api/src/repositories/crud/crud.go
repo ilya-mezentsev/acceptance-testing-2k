@@ -67,6 +67,7 @@ func (r Repository) Update(accountHash string, entities []models.UpdateModel) er
 	for _, entity := range entities {
 		err = r.execTransaction(tx, entity)
 		if err != nil {
+			_ = tx.Rollback()
 			return err
 		}
 	}

@@ -1,14 +1,15 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
-import {CreateTestCommandResponse, KeyValueMapping, TestCommandMeta, TestCommandSettings} from '../types/types';
-import {DefaultResponse, ErrorResponse, Fetcher, Response, ServerResponse} from '../../interfaces/fetcher';
-import {SessionStorageService} from '../../services/session/session-storage.service';
+import {MaterializeInitService} from '../../../services/materialize/materialize-init.service';
+import {DefaultResponse, ErrorResponse, Fetcher, Response, ServerResponse} from '../../../interfaces/fetcher';
+import {SessionStorageService} from '../../../services/session/session-storage.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ErrorHandlerService} from '../../services/errors/error-handler.service';
-import {StorageService} from '../services/storage/storage.service';
-import {ResponseStatus} from '../../services/fetcher/statuses';
-import {ToastNotificationService} from '../../services/notification/toast-notification.service';
-import {CodesService} from '../services/errors/codes.service';
+import {ErrorHandlerService} from '../../../services/errors/error-handler.service';
+import {ResponseStatus} from '../../../services/fetcher/statuses';
+import {ToastNotificationService} from '../../../services/notification/toast-notification.service';
+import {CreateTestCommandResponse, KeyValueMapping, TestCommandMeta, TestCommandSettings} from '../../types/types';
+import {StorageService} from '../../services/storage/storage.service';
+import {CodesService} from '../../services/errors/codes.service';
+import {HashService} from '../../../services/hash/hash.service';
 
 @Component({
   selector: 'app-create-command',
@@ -35,6 +36,7 @@ export class CreateCommandComponent implements OnInit {
     private readonly router: Router,
     private readonly session: SessionStorageService,
     private readonly storage: StorageService,
+    private readonly hashService: HashService,
     private readonly errorHandler: ErrorHandlerService,
     private readonly codes: CodesService,
     private readonly materializeInit: MaterializeInitService,
@@ -47,11 +49,11 @@ export class CreateCommandComponent implements OnInit {
   }
 
   public addHeader(): void {
-    this.headers.push({key: '', value: ''} as any);
+    this.headers.push({key: '', value: '', hash: this.hashService.getRandomHash()} as any);
   }
 
-  public removeHeader(index: number): void {
-    this.headers = this.headers.filter((_, i) => i !== index);
+  public removeHeader(hash: string): void {
+    this.headers = this.headers.filter(h => h.hash !== hash);
   }
 
   public hasCookies(): boolean {
@@ -59,11 +61,11 @@ export class CreateCommandComponent implements OnInit {
   }
 
   public addCookie(): void {
-    this.cookies.push({key: '', value: ''} as any);
+    this.cookies.push({key: '', value: '', hash: this.hashService.getRandomHash()} as any);
   }
 
-  public removeCookie(index: number): void {
-    this.cookies = this.cookies.filter((_, i) => i !== index);
+  public removeCookie(hash: string): void {
+    this.cookies = this.cookies.filter(c => c.hash !== hash);
   }
 
   public createCommand(): void {
@@ -124,8 +126,6 @@ export class CreateCommandComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.materializeInit.initSelects();
-
     this.route.paramMap.subscribe(params => {
       this.objectHash = params.get('object_hash');
       this.setCurrentObjectName();

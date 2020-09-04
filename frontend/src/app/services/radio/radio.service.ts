@@ -17,7 +17,7 @@ export class RadioService {
   public emit<T>(event: string, ...args: T[]): void {
     if (this.eventConsumers.hasOwnProperty(event)) {
       for (const consumer of this.eventConsumers[event]) {
-        consumer(...args)
+        consumer(...args);
       }
     }
   }

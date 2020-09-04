@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {TestCommandRecord, TestObject} from '../../types/types';
-import {RadioService} from "../../../services/radio/radio.service";
-import {InvalidateStorage} from "../../../services/radio/const";
+import {RadioService} from '../../../services/radio/radio.service';
+import {InvalidateStorage} from '../../../services/radio/const';
 
 @Injectable({
   providedIn: 'root'

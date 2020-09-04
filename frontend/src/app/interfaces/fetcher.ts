@@ -18,3 +18,9 @@ export type ErrorResponse = Response<{
   code: string
   description: string
 }>;
+
+export type UpdatePayload = {
+  hash: string,
+  field_name: string,
+  new_value: any
+};

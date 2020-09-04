@@ -7,8 +7,8 @@ import {ToastNotificationService} from '../services/notification/toast-notificat
 import {CodesService} from './services/errors/codes.service';
 import {SessionStorageService} from '../services/session/session-storage.service';
 import {StorageService} from './services/storage/storage.service';
-import {RadioService} from "../services/radio/radio.service";
-import {InvalidateStorage} from "../services/radio/const";
+import {RadioService} from '../services/radio/radio.service';
+import {InvalidateStorage} from '../services/radio/const';
 
 @Component({
   selector: 'app-admin',

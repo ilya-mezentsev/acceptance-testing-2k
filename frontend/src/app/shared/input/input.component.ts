@@ -1,5 +1,6 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import {Md5} from 'ts-md5';
+import {HashService} from '../../services/hash/hash.service';
 
 @Component({
   selector: 'app-input',
@@ -13,13 +14,15 @@ export class InputComponent implements OnInit {
   @Input() public readonly type = '';
   @Output() public valueEmitter = new EventEmitter<string>();
 
-  constructor() { }
+  constructor(
+    private readonly hashService: HashService,
+  ) { }
 
   public valueChanged(): void {
     this.valueEmitter.emit(this.value);
   }
 
   ngOnInit(): void {
-    this.id = `${Md5.hashStr((new Date()).getMilliseconds().toString())}${Math.random()}`;
+    this.id = this.hashService.getRandomHash();
   }
 }

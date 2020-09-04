@@ -1,0 +1,40 @@
+<div class="col s12 m8 offset-m2">
+  <app-command-fields
+    [headers]="headers"
+    [cookies]="cookies"
+    [commandSettings]="commandSettings"
+
+    (addHeader)="addHeader()"
+    (removeHeader)="removeHeader($event)"
+
+    (addCookie)="addCookie()"
+    (removeCookie)="removeCookie($event)"
+  ></app-command-fields>
+
+  <div class="col s12 margin-t10">
+    <app-button
+      [text]="'Save'"
+      (clicked)="saveCommand()"
+    ></app-button>
+
+    <app-button-modal-trigger
+      class="margin-l10"
+      [dataTarget]="'deleteCommandConfirm'"
+      [text]="'Delete'"
+    ></app-button-modal-trigger>
+  </div>
+</div>
+
+<div id="deleteCommandConfirm" class="modal">
+  <div class="modal-content">
+    <h4>Are you sure you want to delete this command?</h4>
+  </div>
+  <div class="modal-footer">
+    <a
+      class="modal-close waves-effect waves-green btn-flat"
+      (click)="deleteCommand()"
+    >Delete</a>
+    <a class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+  </div>
+</div>
+
