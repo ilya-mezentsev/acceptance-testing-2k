@@ -270,6 +270,11 @@ func updateTestCommandSuccess(t *testing.T) {
 			FieldName: "command_setting:endpoint",
 			NewValue:  "api/v2/foo",
 		},
+		{
+			Hash:      test_utils.CreateCommandHash,
+			FieldName: "command_setting:base_url",
+			NewValue:  "http://foo.bar.com",
+		},
 	})
 
 	var updatedCommand models.CommandSettings
@@ -277,6 +282,7 @@ func updateTestCommandSuccess(t *testing.T) {
 	test_utils.AssertNil(err, t)
 	test_utils.AssertEqual("FOO", updatedCommand.Name, t)
 	test_utils.AssertEqual("api/v2/foo", updatedCommand.Endpoint, t)
+	test_utils.AssertEqual("http://foo.bar.com", updatedCommand.BaseURL, t)
 }
 
 func updateTestObjectBadUpdateTarget(t *testing.T) {

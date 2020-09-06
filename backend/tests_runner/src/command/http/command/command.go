@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"test_runner_meta/interfaces"
+	"time"
 )
 
 type Command struct {
@@ -117,7 +118,9 @@ func (c Command) setCookiesFromSettings() {
 }
 
 func (c Command) makeRequest() (io.ReadCloser, error) {
-	res, err := (&http.Client{}).Do(c.req)
+	res, err := (&http.Client{
+		Timeout: time.Second * 10, // TODO move it to DB and UI
+	}).Do(c.req)
 	if err != nil {
 		return nil, err
 	}

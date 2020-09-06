@@ -25,3 +25,16 @@ export type KeyValueMapping = {
 };
 
 export type CreateTestCommandResponse = {command_hash: string};
+
+export type TransactionError = {
+  code: string,
+  description: string,
+  transactionText: string,
+  testCaseText: string,
+};
+
+export type TestsReport = {
+  passedCount: number,
+  failedCount: number,
+  errors?: TransactionError[],
+};

@@ -49,8 +49,8 @@ func (p TestCommandQueryProvider) UpdateQuery(updateFieldName string) string {
 	tableName, hashColumnName := varSlice[0], varSlice[1]
 
 	return fmt.Sprintf(
-		"UPDATE %s SET %s = :new_value WHERE %s = :hash AND rowid = (SELECT MIN(rowid) FROM %s)",
-		tableName, fieldName, hashColumnName, tableName,
+		"UPDATE %s SET %s = :new_value WHERE %s = :hash",
+		tableName, fieldName, hashColumnName,
 	)
 }
 

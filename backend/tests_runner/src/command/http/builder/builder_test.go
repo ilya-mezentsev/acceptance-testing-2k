@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"command/http/errors"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"test_runner_meta/interfaces"
@@ -34,6 +35,17 @@ func TestBuilder_BuildSuccess(t *testing.T) {
 
 	test_utils.AssertNil(err, t)
 	test_utils.AssertNotNil(command, t)
+}
+
+func TestBuilder_BuildNoCommand(t *testing.T) {
+	test_utils.InitTables(db)
+	defer test_utils.DropTables(db)
+
+	_, errNoObject := builder.Build("blah-blah", test_utils.CreateCommandName)
+	_, errNoCommand := builder.Build(test_utils.ObjectName, "blah-blah")
+
+	test_utils.AssertErrorsEqual(errors.CommandNotFound, errNoObject, t)
+	test_utils.AssertErrorsEqual(errors.CommandNotFound, errNoCommand, t)
 }
 
 func TestBuilder_BuildNoDB(t *testing.T) {

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import {Fetcher, ServerResponse} from '../../interfaces/fetcher';
+import {ErrorResponse, Fetcher, FileSender, Response, ServerResponse} from '../../interfaces/fetcher';
 import {environment} from '../../../environments/environment';
 import {Md5} from 'ts-md5';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FetcherService implements Fetcher {
+export class FetcherService implements Fetcher, FileSender {
   private publicKey = '';
   private readonly apiPath: string = '/api/web-app';
 
@@ -54,6 +54,13 @@ export class FetcherService implements Fetcher {
         method: 'DELETE'
       }
     );
+  }
+
+  public sendFile<T>(endpoint: string, file: FormData): Promise<ErrorResponse | Response<T>> {
+    return this.fetch(endpoint, {
+      method: 'POST',
+      body: file
+    });
   }
 
   private async fetch(endpoint: string, settings: RequestInit): Promise<ServerResponse> {

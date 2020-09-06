@@ -2,6 +2,8 @@ package builder
 
 import (
 	"command/http/command"
+	"command/http/errors"
+	"database/sql"
 	"github.com/jmoiron/sqlx"
 	"test_runner_meta/interfaces"
 )
@@ -43,6 +45,9 @@ func (b Builder) Build(objectName, commandName string) (interfaces.Command, erro
 func (b Builder) getCommandInfo(objectName, commandName string) (CommandInfo, error) {
 	var info CommandInfo
 	err := b.db.Get(&info, getCommandInfoQuery, commandName, objectName)
+	if err != nil && err == sql.ErrNoRows {
+		err = errors.CommandNotFound
+	}
 
 	return info, err
 }

@@ -12,6 +12,7 @@ message transactionError {
   string code = 1;
   string description = 2;
   string transactionText = 3;
+  string testCaseText = 4;
 }
 
 message testCaseRunReport {

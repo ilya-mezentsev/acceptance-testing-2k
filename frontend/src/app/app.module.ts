@@ -23,6 +23,7 @@ import { CreateCommandComponent } from './admin/command/create-command/create-co
 import { CommandFieldsComponent } from './admin/command/shared/command-fields/command-fields.component';
 import { EditCommandComponent } from './admin/command/edit-command/edit-command.component';
 import { FloatingIconComponent } from './shared/floating-icon/floating-icon.component';
+import { InputFileComponent } from './shared/input-file/input-file.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { FloatingIconComponent } from './shared/floating-icon/floating-icon.comp
     CommandFieldsComponent,
     EditCommandComponent,
     FloatingIconComponent,
+    InputFileComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,7 +54,8 @@ import { FloatingIconComponent } from './shared/floating-icon/floating-icon.comp
     FormsModule,
   ],
   providers: [
-    {provide: 'Fetcher', useClass: FetcherService}
+    {provide: 'Fetcher', useClass: FetcherService},
+    {provide: 'FileSender', useClass: FetcherService},
   ],
   bootstrap: [AppComponent]
 })

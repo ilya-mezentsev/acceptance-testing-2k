@@ -5,6 +5,10 @@ export interface Fetcher {
   delete(endpoint: string): Promise<ServerResponse>;
 }
 
+export interface FileSender {
+  sendFile<T>(endpoint: string, file: FormData): Promise<ErrorResponse | Response<T>>;
+}
+
 export type ServerResponse = DefaultResponse | ErrorResponse | Response<any>;
 
 export type Response<T> = {

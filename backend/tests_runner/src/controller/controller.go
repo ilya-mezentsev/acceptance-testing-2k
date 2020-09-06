@@ -46,6 +46,7 @@ func castReportErrors(errors []models.TransactionError) []*test_case_runner.Tran
 			Code:            err.Code,
 			Description:     err.Description,
 			TransactionText: err.TransactionText,
+			TestCaseText:    err.TestCaseText,
 		})
 	}
 

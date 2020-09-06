@@ -1,3 +1,45 @@
-<div class="col s12">
-  <p>run-tests works!</p>
+<div class="col s12 m8 offset-m2">
+  <app-input-file
+    [label]="'Tests file'"
+    [accept]="'.txt'"
+    (fileChanged)="fileChange($event)"
+  ></app-input-file>
+
+  <app-button
+    [text]="'Run tests'"
+    [isDisabled]="!hasFile"
+    (clicked)="runTests()"
+  ></app-button>
+
+  <div class="progress" *ngIf="awaitingTestsResults">
+    <div class="indeterminate"></div>
+  </div>
+
+  <div *ngIf="hasTestsReport">
+    <p [class.green-text]="!testsReport.failedCount">
+      Passed count: {{testsReport.passedCount || 0}}
+    </p>
+    <p [class.red-text]="testsReport.failedCount > 0">
+      Failed count: {{testsReport.failedCount || 0}}
+    </p>
+
+    <div *ngIf="hasErrors">
+      <p>Failed tests:</p>
+      <div
+        class="failed-test-case margin-t10"
+        *ngFor="let error of testsReport.errors">
+        <b>{{error.description}}</b>
+        <hr />
+        <span
+          *ngFor="let row of getTestCaseRows(error.testCaseText)"
+          class="display-block margin-t5 cursor-pointer"
+          [class.red-text]="row === error.transactionText"
+          [class.with-tooltip]="row === error.transactionText"
+          [attr.data-position]="'left'"
+          [attr.data-tooltip]="error.code">
+          {{row}}
+        </span>
+      </div>
+    </div>
+  </div>
 </div>

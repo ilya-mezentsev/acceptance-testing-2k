@@ -4,6 +4,7 @@ declare namespace M {
   const Modal: any;
   const FormSelect: any;
   const Collapsible: any;
+  const Tooltip: any;
 }
 
 @Injectable({
@@ -22,5 +23,9 @@ export class MaterializeInitService {
     M.Collapsible.init(document.querySelectorAll('.collapsible.popout'), {
       accordion: false
     });
+  }
+
+  public initTooltips(): void {
+    M.Tooltip.init(document.querySelectorAll('.with-tooltip'), {});
   }
 }
