@@ -335,12 +335,32 @@ func TestService_UpdateSuccess(t *testing.T) {
 	response := s.Update(test_utils.GetReadCloser(
 		fmt.Sprintf(`{
 			"account_hash": "%s",
-			"update_payload": [
-				{"hash": "%s", "field_name": "command_setting:name", "new_value": "FOO"}
-			]
+			"exists_command": {
+				"name": "CREATE",
+				"hash": "%s",
+				"object_hash": "%s",
+				"method": "POST",
+				"base_url": "https://link.com/api/v1",
+				"endpoint": "user/settings",
+				"timeout": 3,
+				"pass_arguments_in_url": true
+			},
+			"updated_command": {
+				"name": "FOO",
+				"hash": "%s",
+				"object_hash": "%s",
+				"method": "PATCH",
+				"base_url": "https://link-2.com/api/v1",
+				"endpoint": "user/v1/settings",
+				"timeout": 4,
+				"pass_arguments_in_url": false
+			}
 		}`,
 			services.PredefinedAccountHash,
-			services.PredefinedTestCommand1.Hash),
+			services.PredefinedTestCommand1.Hash,
+			services.PredefinedTestObject1.Hash,
+			services.PredefinedTestCommand1.Hash,
+			services.PredefinedTestObject1.Hash),
 	))
 
 	var updatedCommand models.CommandSettings
@@ -353,6 +373,11 @@ func TestService_UpdateSuccess(t *testing.T) {
 	test_utils.AssertFalse(response.HasData(), t)
 	test_utils.AssertNil(response.GetData(), t)
 	test_utils.AssertEqual("FOO", updatedCommand.Name, t)
+	test_utils.AssertEqual("PATCH", updatedCommand.Method, t)
+	test_utils.AssertEqual("https://link-2.com/api/v1", updatedCommand.BaseURL, t)
+	test_utils.AssertEqual("user/v1/settings", updatedCommand.Endpoint, t)
+	test_utils.AssertEqual(4, updatedCommand.Timeout, t)
+	test_utils.AssertFalse(updatedCommand.PassArgumentsInURL, t)
 }
 
 func TestService_UpdateDecodeBodyError(t *testing.T) {
@@ -379,14 +404,32 @@ func TestService_UpdateInvalidRequestError(t *testing.T) {
 
 	response := s.Update(test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "some-hash",
-			"update_payload": [
-				{"hash": "%s", "field_name": "command_setting:name", "new_value": "FOO"},
-				{"hash": "%s", "field_name": "command:object_name", "new_value": "BAR"}
-			]
+			"account_hash": "blah-blah",
+			"exists_command": {
+				"name": "CREATE",
+				"hash": "%s",
+				"object_hash": "%s",
+				"method": "POST",
+				"base_url": "https://link.com/api/v1",
+				"endpoint": "user/settings",
+				"timeout": 3,
+				"pass_arguments_in_url": true
+			},
+			"updated_command": {
+				"name": "FOO",
+				"hash": "%s",
+				"object_hash": "%s",
+				"method": "POST",
+				"base_url": "https://link.com/api/v1",
+				"endpoint": "user/settings",
+				"timeout": 3,
+				"pass_arguments_in_url": true
+			}
 		}`,
 			services.PredefinedTestCommand1.Hash,
-			services.PredefinedTestCommand1.Hash),
+			services.PredefinedTestObject1.Hash,
+			services.PredefinedTestCommand1.Hash,
+			services.PredefinedTestObject1.Hash),
 	))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
@@ -408,14 +451,32 @@ func TestService_UpdateRepositoryError(t *testing.T) {
 	response := s.Update(test_utils.GetReadCloser(
 		fmt.Sprintf(`{
 			"account_hash": "%s",
-			"update_payload": [
-				{"hash": "%s", "field_name": "command_setting:name", "new_value": "FOO"},
-				{"hash": "%s", "field_name": "command:object_name", "new_value": "BAR"}
-			]
+			"exists_command": {
+				"name": "CREATE",
+				"hash": "%s",
+				"object_hash": "%s",
+				"method": "POST",
+				"base_url": "https://link.com/api/v1",
+				"endpoint": "user/settings",
+				"timeout": 3,
+				"pass_arguments_in_url": true
+			},
+			"updated_command": {
+				"name": "FOO",
+				"hash": "%s",
+				"object_hash": "%s",
+				"method": "POST",
+				"base_url": "https://link.com/api/v1",
+				"endpoint": "user/settings",
+				"timeout": 3,
+				"pass_arguments_in_url": true
+			}
 		}`,
 			services.BadAccountHash,
 			services.PredefinedTestCommand1.Hash,
-			services.PredefinedTestCommand1.Hash),
+			services.PredefinedTestObject1.Hash,
+			services.PredefinedTestCommand1.Hash,
+			services.PredefinedTestObject1.Hash),
 	))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)

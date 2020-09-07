@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {HashService} from "../../services/hash/hash.service";
+import {HashService} from '../../services/hash/hash.service';
 
 @Component({
   selector: 'app-input-number',

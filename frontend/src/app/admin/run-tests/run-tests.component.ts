@@ -1,12 +1,12 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {ErrorResponse, FileSender, Response} from "../../interfaces/fetcher";
-import {SessionStorageService} from "../../services/session/session-storage.service";
-import {ErrorHandlerService} from "../../services/errors/error-handler.service";
-import {ToastNotificationService} from "../../services/notification/toast-notification.service";
-import {TestsReport} from "../types/types";
-import {ResponseStatus} from "../../services/fetcher/statuses";
-import {CodesService} from "../services/errors/codes.service";
-import {MaterializeInitService} from "../../services/materialize/materialize-init.service";
+import {ErrorResponse, FileSender, Response} from '../../interfaces/fetcher';
+import {SessionStorageService} from '../../services/session/session-storage.service';
+import {ErrorHandlerService} from '../../services/errors/error-handler.service';
+import {ToastNotificationService} from '../../services/notification/toast-notification.service';
+import {TestsReport} from '../types/types';
+import {ResponseStatus} from '../../services/fetcher/statuses';
+import {CodesService} from '../services/errors/codes.service';
+import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
 
 @Component({
   selector: 'app-run-tests',

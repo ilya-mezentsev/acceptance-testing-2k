@@ -18,12 +18,18 @@ type (
 	}
 
 	CreateTestCommandRequest struct {
-		AccountHash     string          `json:"account_hash"`
+		AccountHash     string          `json:"account_hash" validation:"md5-hash"`
 		CommandSettings CommandSettings `json:"command_settings"`
 	}
 
 	CreatedTestCommandResponse struct {
 		CommandHash string `json:"command_hash"`
+	}
+
+	UpdateTestCommandRequest struct {
+		AccountHash    string          `json:"account_hash" validation:"md5-hash"`
+		ExistsCommand  CommandSettings `json:"exists_command"`
+		UpdatedCommand CommandSettings `json:"updated_command"`
 	}
 
 	KeyValueMapping struct {

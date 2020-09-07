@@ -22,16 +22,6 @@ import {ResponseStatus} from '../../../services/fetcher/statuses';
   styleUrls: ['./edit-command.component.scss']
 })
 export class EditCommandComponent implements OnInit {
-  public commandSettings: TestCommandSettings = {} as any;
-  private commandHash = '';
-  private newHeaders: KeyValueMapping[] = [];
-  private newCookies: KeyValueMapping[] = [];
-  private existsHeaders: KeyValueMapping[] = [];
-  private existsCookies: KeyValueMapping[] = [];
-  private currentCommand: TestCommandRecord = {} as any;
-  private commandSettingsWereChanged = false;
-  private commandMetaWasChanged = false;
-  private commandMetaWereAdded = false;
 
   constructor(
     private readonly router: Router,
@@ -48,6 +38,50 @@ export class EditCommandComponent implements OnInit {
 
   public get headers(): KeyValueMapping[] {
     return this.newHeaders.concat(this.existsHeaders);
+  }
+
+  public get cookies(): KeyValueMapping[] {
+    return this.newCookies.concat(this.existsCookies);
+  }
+  public commandSettings: TestCommandSettings = {} as any;
+  private commandHash = '';
+  private newHeaders: KeyValueMapping[] = [];
+  private newCookies: KeyValueMapping[] = [];
+  private existsHeaders: KeyValueMapping[] = [];
+  private existsCookies: KeyValueMapping[] = [];
+  private currentCommand: TestCommandRecord = {} as any;
+  private commandSettingsWereChanged = false;
+  private commandMetaWasChanged = false;
+  private commandMetaWereAdded = false;
+  private readonly editableCommandSettingFields = [
+    'method', 'base_url', 'endpoint', 'timeout', 'pass_arguments_in_url'
+  ];
+
+  private static getDiff(
+    storedKeyValues: KeyValueMapping[],
+    keyValues: KeyValueMapping[],
+  ): UpdatePayload[] {
+    return keyValues.reduce((updatePayload, keyValue) => {
+      const storedKeyValue = storedKeyValues.find(h => h.hash === keyValue.hash);
+
+      if (keyValue.key !== storedKeyValue.key) {
+        updatePayload.push({
+          hash: keyValue.hash,
+          field_name: 'key',
+          new_value: keyValue.key,
+        });
+      }
+
+      if (keyValue.value !== storedKeyValue.value) {
+        updatePayload.push({
+          hash: keyValue.hash,
+          field_name: 'value',
+          new_value: keyValue.value,
+        });
+      }
+
+      return updatePayload;
+    }, [] as UpdatePayload[]);
   }
 
   public addHeader(): void {
@@ -69,6 +103,7 @@ export class EditCommandComponent implements OnInit {
       .delete(`entity/test-command-headers/${this.sessionStorage.getSessionId()}/${hash}/`)
       .then(r => this.processRequest(r))
       .then(() => this.currentCommand.headers = this.currentCommand.headers.filter(h => h.hash !== hash))
+      .then(() => this.initCommandSettingsAndMeta())
       .catch(err => this.errorHandler.handle(err));
   }
 
@@ -81,10 +116,6 @@ export class EditCommandComponent implements OnInit {
       ));
       return Promise.reject();
     }
-  }
-
-  public get cookies(): KeyValueMapping[] {
-    return this.newCookies.concat(this.existsCookies);
   }
 
   public addCookie(): void {
@@ -104,6 +135,7 @@ export class EditCommandComponent implements OnInit {
       .delete(`entity/test-command-cookies/${this.sessionStorage.getSessionId()}/${hash}/`)
       .then(r => this.processRequest(r))
       .then(() => this.currentCommand.cookies = this.currentCommand.cookies.filter(c => c.hash !== hash))
+      .then(() => this.initCommandSettingsAndMeta())
       .catch(err => this.errorHandler.handle(err));
   }
 
@@ -118,33 +150,17 @@ export class EditCommandComponent implements OnInit {
   }
 
   private updateCommandSettings(): Promise<void> {
-    const updatePayload: UpdatePayload[] = [];
+    this.commandSettingsWereChanged =
+      this.commandSettings.name !== this.currentCommand.name ||
+      this.editableCommandSettingFields.some(
+        fieldName => this.commandSettings[fieldName] !== this.currentCommand[fieldName]
+      );
 
-    if (this.commandSettings.name !== this.currentCommand.name) {
-      updatePayload.push({
-        hash: this.currentCommand.hash,
-        field_name: 'command:name',
-        new_value: this.commandSettings.name,
-      });
-    }
-
-    for (const commandSettingKey of [
-      'method', 'base_url', 'endpoint', 'timeout', 'pass_arguments_in_url'
-    ]) {
-      if (this.commandSettings[commandSettingKey] !== this.currentCommand[commandSettingKey]) {
-        updatePayload.push({
-          hash: this.currentCommand.hash,
-          field_name: `command_setting:${commandSettingKey}`,
-          new_value: this.commandSettings[commandSettingKey],
-        });
-      }
-    }
-
-    if (updatePayload.length > 0) {
-      this.commandSettingsWereChanged = true;
+    if (this.commandSettingsWereChanged) {
       return this.fetcher.patch(`entity/test-command/`, {
         account_hash: this.sessionStorage.getSessionId(),
-        update_payload: updatePayload
+        exists_command: {...this.currentCommand},
+        updated_command: {...this.commandSettings}
       }).then(r => this.processRequest(r));
     } else {
       return Promise.resolve();
@@ -162,7 +178,7 @@ export class EditCommandComponent implements OnInit {
     const headersChanged = headersUpdatePayload.length > 0;
     const cookiesChanged = cookiesUpdatePayload.length > 0;
     headersChanged && (updatePayload['headers'] = headersUpdatePayload);
-    cookiesChanged && (updatePayload['cookies'] = cookiesUpdatePayload)
+    cookiesChanged && (updatePayload['cookies'] = cookiesUpdatePayload);
 
     if (headersChanged || cookiesChanged) {
       this.commandSettingsWereChanged = true;
@@ -173,33 +189,6 @@ export class EditCommandComponent implements OnInit {
     } else {
       return Promise.resolve();
     }
-  }
-
-  private static getDiff(
-    storedKeyValues: KeyValueMapping[],
-    keyValues: KeyValueMapping[],
-  ): UpdatePayload[] {
-    return keyValues.reduce((updatePayload, keyValue) => {
-      const storedKeyValue = storedKeyValues.find(h => h.hash === keyValue.hash);
-
-      if (keyValue.key !== storedKeyValue.key) {
-        updatePayload.push({
-          hash: keyValue.hash,
-          field_name: 'key',
-          new_value: keyValue.key,
-        })
-      }
-
-      if (keyValue.value !== storedKeyValue.value) {
-        updatePayload.push({
-          hash: keyValue.hash,
-          field_name: 'value',
-          new_value: keyValue.value,
-        })
-      }
-
-      return updatePayload;
-    }, [] as UpdatePayload[]);
   }
 
   private createNewCommandMeta(): Promise<void> {

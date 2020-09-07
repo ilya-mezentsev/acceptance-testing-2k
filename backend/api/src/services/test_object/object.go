@@ -136,7 +136,9 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	if !validation.IsValid(&updateTestObjectRequest) {
+	newName, ok := updateTestObjectRequest.UpdatePayload[0].NewValue.(string)
+	if !validation.IsValid(&updateTestObjectRequest) ||
+		!(ok && validation.IsRegularName(newName)) {
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToUpdateTestObjectCode,
 			Description: servicesErrors.InvalidRequestError,

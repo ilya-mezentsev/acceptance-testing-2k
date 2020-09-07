@@ -188,7 +188,7 @@ func (s service) Get(accountHash, testCommandHash string) interfaces.Response {
 }
 
 func (s service) Update(request io.ReadCloser) interfaces.Response {
-	var updateTestCommandRequest models.UpdateRequest
+	var updateTestCommandRequest models.UpdateTestCommandRequest
 	err := request_decoder.Decode(request, &updateTestCommandRequest)
 	if err != nil {
 		s.logger.LogUpdateEntityDecodeError(err)
@@ -208,12 +208,12 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 
 	err = s.crudRepository.Update(
 		updateTestCommandRequest.AccountHash,
-		updateTestCommandRequest.UpdatePayload,
+		s.getUpdatePayload(updateTestCommandRequest),
 	)
 	if err != nil {
 		s.logger.LogUpdateEntityRepositoryError(err, map[string]interface{}{
-			"account_hash":   updateTestCommandRequest.AccountHash,
-			"update_payload": updateTestCommandRequest.UpdatePayload,
+			"account_hash":        updateTestCommandRequest.AccountHash,
+			"update_test_command": updateTestCommandRequest,
 		})
 
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
@@ -223,6 +223,81 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 	}
 
 	return response_factory.DefaultResponse()
+}
+
+func (s service) getUpdatePayload(
+	updateTestCommandRequest models.UpdateTestCommandRequest,
+) []models.UpdateModel {
+	var entities []models.UpdateModel
+
+	nameChanged :=
+		updateTestCommandRequest.UpdatedCommand.Name != updateTestCommandRequest.ExistsCommand.Name
+
+	methodChanged :=
+		updateTestCommandRequest.UpdatedCommand.Method != updateTestCommandRequest.ExistsCommand.Method
+
+	baseURLChanged :=
+		updateTestCommandRequest.UpdatedCommand.BaseURL != updateTestCommandRequest.ExistsCommand.BaseURL
+
+	endpointChanged :=
+		updateTestCommandRequest.UpdatedCommand.Endpoint != updateTestCommandRequest.ExistsCommand.Endpoint
+
+	timeoutChanged :=
+		updateTestCommandRequest.UpdatedCommand.Timeout != updateTestCommandRequest.ExistsCommand.Timeout
+
+	passArgumentsFlagChanged :=
+		updateTestCommandRequest.UpdatedCommand.PassArgumentsInURL !=
+			updateTestCommandRequest.ExistsCommand.PassArgumentsInURL
+
+	if nameChanged {
+		entities = append(entities, models.UpdateModel{
+			Hash:      updateTestCommandRequest.ExistsCommand.Hash,
+			FieldName: "command:name",
+			NewValue:  updateTestCommandRequest.UpdatedCommand.Name,
+		})
+	}
+
+	if methodChanged {
+		entities = append(entities, models.UpdateModel{
+			Hash:      updateTestCommandRequest.ExistsCommand.Hash,
+			FieldName: "command_setting:method",
+			NewValue:  updateTestCommandRequest.UpdatedCommand.Method,
+		})
+	}
+
+	if baseURLChanged {
+		entities = append(entities, models.UpdateModel{
+			Hash:      updateTestCommandRequest.ExistsCommand.Hash,
+			FieldName: "command_setting:base_url",
+			NewValue:  updateTestCommandRequest.UpdatedCommand.BaseURL,
+		})
+	}
+
+	if endpointChanged {
+		entities = append(entities, models.UpdateModel{
+			Hash:      updateTestCommandRequest.ExistsCommand.Hash,
+			FieldName: "command_setting:endpoint",
+			NewValue:  updateTestCommandRequest.UpdatedCommand.Endpoint,
+		})
+	}
+
+	if timeoutChanged {
+		entities = append(entities, models.UpdateModel{
+			Hash:      updateTestCommandRequest.ExistsCommand.Hash,
+			FieldName: "command_setting:timeout",
+			NewValue:  updateTestCommandRequest.UpdatedCommand.Timeout,
+		})
+	}
+
+	if passArgumentsFlagChanged {
+		entities = append(entities, models.UpdateModel{
+			Hash:      updateTestCommandRequest.ExistsCommand.Hash,
+			FieldName: "command_setting:pass_arguments_in_url",
+			NewValue:  updateTestCommandRequest.UpdatedCommand.PassArgumentsInURL,
+		})
+	}
+
+	return entities
 }
 
 func (s service) Delete(accountHash, testCommandHash string) interfaces.Response {

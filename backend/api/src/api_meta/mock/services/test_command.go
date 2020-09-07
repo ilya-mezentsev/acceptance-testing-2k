@@ -63,6 +63,7 @@ func (m *TestCommandsRepositoryMock) Get(accountHash, entityHash string, dest in
 			dest.(*models.CommandSettings).Method = command.Method
 			dest.(*models.CommandSettings).BaseURL = command.BaseURL
 			dest.(*models.CommandSettings).Endpoint = command.Endpoint
+			dest.(*models.CommandSettings).Timeout = command.Timeout
 			dest.(*models.CommandSettings).PassArgumentsInURL = command.PassArgumentsInURL
 			break
 		}
@@ -80,19 +81,17 @@ func (m *TestCommandsRepositoryMock) Update(accountHash string, entities []model
 		for _, entity := range entities {
 			if command.Hash == entity.Hash {
 				switch entity.FieldName {
-				case "command_setting:name":
+				case "command:name":
 					m.Commands[accountHash][commandIndex].Name = entity.NewValue.(string)
-				case "hash":
-					m.Commands[accountHash][commandIndex].Hash = entity.NewValue.(string)
-				case "command:object_name":
-					m.Commands[accountHash][commandIndex].ObjectHash = entity.NewValue.(string)
-				case "method":
+				case "command_setting:method":
 					m.Commands[accountHash][commandIndex].Method = entity.NewValue.(string)
-				case "base_url":
+				case "command_setting:base_url":
 					m.Commands[accountHash][commandIndex].BaseURL = entity.NewValue.(string)
-				case "endpoint":
+				case "command_setting:endpoint":
 					m.Commands[accountHash][commandIndex].Endpoint = entity.NewValue.(string)
-				case "pass_arguments_in_url":
+				case "command_setting:timeout":
+					m.Commands[accountHash][commandIndex].Timeout = entity.NewValue.(int)
+				case "command_setting:pass_arguments_in_url":
 					m.Commands[accountHash][commandIndex].PassArgumentsInURL = entity.NewValue.(bool)
 				}
 			}

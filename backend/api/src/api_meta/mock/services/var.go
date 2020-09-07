@@ -37,6 +37,7 @@ var (
 		Method:             "GET",
 		BaseURL:            "https://link.com/api/v2",
 		Endpoint:           "user/settings",
+		Timeout:            3,
 		PassArgumentsInURL: true,
 	}
 	PredefinedTestCommand2 = models.CommandSettings{
@@ -46,6 +47,7 @@ var (
 		Method:             "POST",
 		BaseURL:            "https://link.com/api/v2",
 		Endpoint:           "user/settings",
+		Timeout:            3,
 		PassArgumentsInURL: false,
 	}
 	PredefinedHeader1 = models.KeyValueMapping{
