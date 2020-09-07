@@ -7,6 +7,7 @@ export interface TestCommandSettings {
   method: string;
   base_url: string;
   endpoint: string;
+  timeout: number;
   pass_arguments_in_url: boolean;
 }
 

@@ -33,6 +33,7 @@ func (m *TestCommandsRepositoryMock) Create(accountHash string, entity map[strin
 		Method:             entity["method"].(string),
 		BaseURL:            entity["base_url"].(string),
 		Endpoint:           entity["endpoint"].(string),
+		Timeout:            entity["timeout"].(int),
 		PassArgumentsInURL: entity["pass_arguments_in_url"].(bool),
 	})
 

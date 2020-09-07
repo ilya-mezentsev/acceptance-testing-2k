@@ -25,6 +25,7 @@ export class CreateCommandComponent implements OnInit {
     pass_arguments_in_url: false,
     base_url: '',
     endpoint: '',
+    timeout: 0,
     hash: '',
     object_hash: ''
   };
@@ -77,6 +78,7 @@ export class CreateCommandComponent implements OnInit {
         method: this.commandSettings.method,
         base_url: this.commandSettings.base_url,
         endpoint: this.commandSettings.endpoint,
+        timeout: this.commandSettings.timeout,
         pass_arguments_in_url: this.commandSettings.pass_arguments_in_url
       }
     })

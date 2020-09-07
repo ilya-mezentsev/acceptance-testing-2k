@@ -119,7 +119,7 @@ func (c Command) setCookiesFromSettings() {
 
 func (c Command) makeRequest() (io.ReadCloser, error) {
 	res, err := (&http.Client{
-		Timeout: time.Second * 10, // TODO move it to DB and UI
+		Timeout: time.Second * time.Duration(c.settings.GetTimeout()),
 	}).Do(c.req)
 	if err != nil {
 		return nil, err

@@ -3,6 +3,8 @@ package validation
 import (
 	"fmt"
 	"reflect"
+	"strconv"
+	"strings"
 )
 
 func IsValid(data interface{}) bool {
@@ -40,6 +42,13 @@ func validateStruct(dataValue reflect.Value) []bool {
 				validationResults,
 				validateField(dataValue.Type().Field(i), fieldValue.String()),
 			)
+
+			if fieldValue.Kind() == reflect.Int {
+				validationResults = append(
+					validationResults,
+					validIntRanges(dataValue.Type().Field(i), fieldValue.Int()),
+				)
+			}
 		}
 	}
 
@@ -69,4 +78,27 @@ func validateField(field reflect.StructField, value string) bool {
 
 	validationMethod, hasValidationRule := validationRuleToMethod[validationRule]
 	return hasValidationRule && validationMethod(value)
+}
+
+func validIntRanges(field reflect.StructField, value int64) bool {
+	rangeRule, ok := field.Tag.Lookup("range")
+	if !ok {
+		// we do not need to validate if validation tag is not provided
+		return true
+	}
+
+	parsedRange := strings.Split(rangeRule, ",")
+	intMin, errMin := strconv.Atoi(parsedRange[0])
+	intMax, errMax := strconv.Atoi(parsedRange[1])
+
+	if errMin != nil || errMax != nil {
+		switch {
+		case errMin != nil:
+			panic(fmt.Errorf("invalid min range value: %v", parsedRange[0]))
+		case errMax != nil:
+			panic(fmt.Errorf("invalid max range value: %v", parsedRange[1]))
+		}
+	}
+
+	return int64(intMin) <= value && value <= int64(intMax)
 }

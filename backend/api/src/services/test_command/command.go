@@ -60,6 +60,7 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 		"method":                commandSettings.Method,
 		"base_url":              commandSettings.BaseURL,
 		"endpoint":              commandSettings.Endpoint,
+		"timeout":               commandSettings.Timeout,
 		"pass_arguments_in_url": commandSettings.PassArgumentsInURL,
 	})
 	if errors.As(err, &types.UniqueEntityAlreadyExists{}) {

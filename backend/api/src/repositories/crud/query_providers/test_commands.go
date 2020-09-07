@@ -18,13 +18,13 @@ func (p TestCommandQueryProvider) CreateQuery() string {
 	INSERT INTO commands(name, hash, object_hash)
 	VALUES(:name, :hash, :object_hash);
 
-	INSERT INTO commands_settings(method, base_url, endpoint, pass_arguments_in_url, command_hash)
-	VALUES(:method, :base_url, :endpoint, :pass_arguments_in_url, :hash);`
+	INSERT INTO commands_settings(method, base_url, endpoint, timeout, pass_arguments_in_url, command_hash)
+	VALUES(:method, :base_url, :endpoint, :timeout, :pass_arguments_in_url, :hash);`
 }
 
 func (p TestCommandQueryProvider) GetAllQuery() string {
 	return `
-	SELECT c.name, c.object_hash, c.hash, cs.method, cs.base_url, cs.endpoint, cs.pass_arguments_in_url
+	SELECT c.name, c.object_hash, c.hash, cs.method, cs.base_url, cs.endpoint, cs.timeout, cs.pass_arguments_in_url
 	FROM commands c
 	LEFT JOIN commands_settings cs ON cs.command_hash = c.hash
 	GROUP BY c.rowid`
@@ -32,7 +32,7 @@ func (p TestCommandQueryProvider) GetAllQuery() string {
 
 func (p TestCommandQueryProvider) GetQuery() string {
 	return `
-	SELECT c.name, c.object_hash, c.hash, cs.method, cs.base_url, cs.endpoint, cs.pass_arguments_in_url
+	SELECT c.name, c.object_hash, c.hash, cs.method, cs.base_url, cs.endpoint, cs.timeout, cs.pass_arguments_in_url
 	FROM commands c
 	LEFT JOIN commands_settings cs ON cs.command_hash = c.hash
 	WHERE c.hash = $1

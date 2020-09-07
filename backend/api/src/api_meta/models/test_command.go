@@ -8,6 +8,7 @@ type (
 		Method             string `json:"method" db:"method" validation:"meaning-http-method"`
 		BaseURL            string `json:"base_url" db:"base_url" validation:"base-url"`
 		Endpoint           string `json:"endpoint" db:"endpoint" validation:"endpoint"`
+		Timeout            int    `json:"timeout" db:"timeout" range:"1,15"`
 		PassArgumentsInURL bool   `json:"pass_arguments_in_url" db:"pass_arguments_in_url"`
 	}
 

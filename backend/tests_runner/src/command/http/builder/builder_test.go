@@ -78,6 +78,7 @@ func TestBuilder_GetCommandSettingsSuccess(t *testing.T) {
 	test_utils.AssertEqual(test_utils.Settings[0]["method"], settings.GetMethod(), t)
 	test_utils.AssertEqual(test_utils.Settings[0]["base_url"], settings.GetBaseURL(), t)
 	test_utils.AssertEqual(test_utils.Settings[0]["endpoint"], settings.GetEndpoint(), t)
+	test_utils.AssertEqual(test_utils.Settings[0]["timeout"], settings.GetTimeout(), t)
 	test_utils.AssertEqual(
 		test_utils.Settings[0]["pass_arguments_in_url"],
 		settings.ShouldPassArgumentsInURL(),
@@ -87,8 +88,16 @@ func TestBuilder_GetCommandSettingsSuccess(t *testing.T) {
 		test_utils.AssertEqual(header["value"], settings.GetHeaders()[header["key"].(string)], t)
 	}
 	for index, expectedCookie := range test_utils.Cookies {
-		test_utils.AssertEqual(expectedCookie["key"].(string), settings.GetCookies()[index].Name, t)
-		test_utils.AssertEqual(expectedCookie["value"].(string), settings.GetCookies()[index].Value, t)
+		test_utils.AssertEqual(
+			expectedCookie["key"].(string),
+			settings.GetCookies()[index].Name,
+			t,
+		)
+		test_utils.AssertEqual(
+			expectedCookie["value"].(string),
+			settings.GetCookies()[index].Value,
+			t,
+		)
 	}
 }
 

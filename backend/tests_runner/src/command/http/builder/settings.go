@@ -7,6 +7,7 @@ type (
 		Method             string `db:"method"`
 		BaseURL            string `db:"base_url"`
 		Endpoint           string `db:"endpoint"`
+		Timeout            int    `db:"timeout"`
 		PassArgumentsInURL bool   `db:"pass_arguments_in_url"`
 		Headers            []keyValueMapping
 		Cookies            []keyValueMapping
@@ -28,6 +29,10 @@ func (s settings) GetBaseURL() string {
 
 func (s settings) GetEndpoint() string {
 	return s.Endpoint
+}
+
+func (s settings) GetTimeout() int {
+	return s.Timeout
 }
 
 func (s settings) ShouldPassArgumentsInURL() bool {

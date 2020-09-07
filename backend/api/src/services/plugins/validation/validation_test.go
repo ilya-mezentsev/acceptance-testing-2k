@@ -90,6 +90,7 @@ func TestIsValidStruct(t *testing.T) {
 			Method:             "GET",
 			BaseURL:            "https://link.com/api/v2",
 			Endpoint:           "user/settings",
+			Timeout:            10,
 			PassArgumentsInURL: false,
 		}), t)
 	})
@@ -175,4 +176,52 @@ func TestIsKeyOrValue(t *testing.T) {
 	test_utils.AssertTrue(IsKeyOrValue("key"), t)
 	test_utils.AssertTrue(IsKeyOrValue("value"), t)
 	test_utils.AssertFalse(IsKeyOrValue("foo"), t)
+}
+
+func TestIsValid_CheckRanges(t *testing.T) {
+	t.Run("Valid range", func(t *testing.T) {
+		type x struct {
+			y int `range:"1,10"`
+		}
+
+		test_utils.AssertTrue(IsValid(&x{y: 2}), t)
+		test_utils.AssertTrue(IsValid(&x{y: 1}), t)
+		test_utils.AssertTrue(IsValid(&x{y: 10}), t)
+		test_utils.AssertFalse(IsValid(&x{y: 11}), t)
+		test_utils.AssertFalse(IsValid(&x{y: 0}), t)
+	})
+
+	t.Run("Invalid min value", func(t *testing.T) {
+		defer func() {
+			test_utils.AssertEqual(
+				"invalid min range value: blah",
+				recover().(error).Error(),
+				t,
+			)
+		}()
+
+		type x struct {
+			y int `range:"blah,10"`
+		}
+
+		IsValid(&x{y: 2})
+		test_utils.AssertTrue(false, t)
+	})
+
+	t.Run("Invalid max value", func(t *testing.T) {
+		defer func() {
+			test_utils.AssertEqual(
+				"invalid max range value: foo",
+				recover().(error).Error(),
+				t,
+			)
+		}()
+
+		type x struct {
+			y int `range:"1,foo"`
+		}
+
+		IsValid(&x{y: 2})
+		test_utils.AssertTrue(false, t)
+	})
 }

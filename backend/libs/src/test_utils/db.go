@@ -33,8 +33,8 @@ const (
 	INSERT INTO commands(name, hash, object_hash)
 	VALUES(:name, :hash, :object_hash)`
 	addCommandSettingsQuery = `
-	INSERT INTO commands_settings(method, base_url, endpoint, pass_arguments_in_url, command_hash)
-	VALUES(:method, :base_url, :endpoint, :pass_arguments_in_url, :command_hash)`
+	INSERT INTO commands_settings(method, base_url, endpoint, timeout, pass_arguments_in_url, command_hash)
+	VALUES(:method, :base_url, :endpoint, :timeout, :pass_arguments_in_url, :command_hash)`
 	addCommandHeadersQuery = `
 	INSERT INTO commands_headers(key, value, hash, command_hash)
 	VALUES(:key, :value, :hash, :command_hash)`
@@ -109,6 +109,7 @@ var (
 			"method":                "POST",
 			"base_url":              "http://link.com",
 			"endpoint":              "user/",
+			"timeout":               3,
 			"pass_arguments_in_url": false,
 			"command_hash":          CreateCommandHash,
 		},
@@ -116,6 +117,7 @@ var (
 			"method":                "GET",
 			"base_url":              "http://link.com",
 			"endpoint":              "user",
+			"timeout":               3,
 			"pass_arguments_in_url": true,
 			"command_hash":          GetCommandHash,
 		},
@@ -123,6 +125,7 @@ var (
 			"method":                "PATCH",
 			"base_url":              "http://link.com",
 			"endpoint":              "user",
+			"timeout":               3,
 			"pass_arguments_in_url": true,
 			"command_hash":          PatchCommandHash,
 		},
@@ -130,6 +133,7 @@ var (
 			"method":                "DELETE",
 			"base_url":              "http://link.com",
 			"endpoint":              "user",
+			"timeout":               3,
 			"pass_arguments_in_url": true,
 			"command_hash":          DeleteCommandHash,
 		},

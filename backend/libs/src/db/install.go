@@ -24,6 +24,7 @@ const createTablesQuery = `
 		method TEXT NOT NULL,
 		base_url TEXT NOT NULL,
 		endpoint TEXT DEFAULT '',
+		timeout INTEGER NOT NULL,
 		pass_arguments_in_url BOOLEAN NOT NULL CHECK (pass_arguments_in_url IN (0,1)),
 		command_hash VARCHAR(32),
 		FOREIGN KEY(command_hash) REFERENCES commands(hash) ON DELETE CASCADE

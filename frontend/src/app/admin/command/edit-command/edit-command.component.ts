@@ -128,7 +128,9 @@ export class EditCommandComponent implements OnInit {
       });
     }
 
-    for (const commandSettingKey of ['method', 'base_url', 'endpoint', 'pass_arguments_in_url']) {
+    for (const commandSettingKey of [
+      'method', 'base_url', 'endpoint', 'timeout', 'pass_arguments_in_url'
+    ]) {
       if (this.commandSettings[commandSettingKey] !== this.currentCommand[commandSettingKey]) {
         updatePayload.push({
           hash: this.currentCommand.hash,
@@ -294,6 +296,7 @@ export class EditCommandComponent implements OnInit {
       method: this.currentCommand.method,
       base_url: this.currentCommand.base_url,
       endpoint: this.currentCommand.endpoint,
+      timeout: this.currentCommand.timeout,
       pass_arguments_in_url: this.currentCommand.pass_arguments_in_url,
     };
 

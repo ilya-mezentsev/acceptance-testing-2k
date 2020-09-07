@@ -31,6 +31,14 @@
   (valueEmitter)="commandSettings.endpoint = $event"
 ></app-input>
 
+<app-input-number
+  [label]="'Timeout'"
+  [value]="commandSettings.timeout"
+  (valueEmitter)="commandSettings.timeout = $event"
+  [min]="1"
+  [max]="15"
+></app-input-number>
+
 <div class="col s12">
   <p>
     <label>

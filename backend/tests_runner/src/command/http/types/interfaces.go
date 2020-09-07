@@ -7,6 +7,7 @@ type (
 		GetMethod() string
 		GetBaseURL() string
 		GetEndpoint() string
+		GetTimeout() int
 		ShouldPassArgumentsInURL() bool
 		GetHeaders() map[string]string
 		GetCookies() []*http.Cookie

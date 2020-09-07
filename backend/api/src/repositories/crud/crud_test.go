@@ -200,6 +200,7 @@ func createTestCommandSuccess(t *testing.T) {
 		Method:     "GET",
 		BaseURL:    "https://link.com",
 		Endpoint:   "api/v2/user",
+		Timeout:    10,
 	}
 	err := testCommandRepository.Create(testHash, map[string]interface{}{
 		"name":                  expectedCommand.Name,
@@ -208,6 +209,7 @@ func createTestCommandSuccess(t *testing.T) {
 		"method":                expectedCommand.Method,
 		"base_url":              expectedCommand.BaseURL,
 		"endpoint":              expectedCommand.Endpoint,
+		"timeout":               expectedCommand.Timeout,
 		"pass_arguments_in_url": expectedCommand.PassArgumentsInURL,
 	})
 
@@ -220,6 +222,7 @@ func createTestCommandSuccess(t *testing.T) {
 	test_utils.AssertEqual(expectedCommand.Method, createdCommand.Method, t)
 	test_utils.AssertEqual(expectedCommand.BaseURL, createdCommand.BaseURL, t)
 	test_utils.AssertEqual(expectedCommand.Endpoint, createdCommand.Endpoint, t)
+	test_utils.AssertEqual(expectedCommand.Timeout, createdCommand.Timeout, t)
 	test_utils.AssertEqual(expectedCommand.PassArgumentsInURL, createdCommand.PassArgumentsInURL, t)
 }
 
@@ -252,6 +255,7 @@ func getTestCommandSuccess(t *testing.T) {
 			test_utils.AssertEqual(settings["method"].(string), command.Method, t)
 			test_utils.AssertEqual(settings["base_url"].(string), command.BaseURL, t)
 			test_utils.AssertEqual(settings["endpoint"].(string), command.Endpoint, t)
+			test_utils.AssertEqual(settings["timeout"].(int), command.Timeout, t)
 			test_utils.AssertEqual(settings["pass_arguments_in_url"], command.PassArgumentsInURL, t)
 		}
 	}
@@ -275,6 +279,11 @@ func updateTestCommandSuccess(t *testing.T) {
 			FieldName: "command_setting:base_url",
 			NewValue:  "http://foo.bar.com",
 		},
+		{
+			Hash:      test_utils.CreateCommandHash,
+			FieldName: "command_setting:timeout",
+			NewValue:  "111",
+		},
 	})
 
 	var updatedCommand models.CommandSettings
@@ -282,6 +291,7 @@ func updateTestCommandSuccess(t *testing.T) {
 	test_utils.AssertNil(err, t)
 	test_utils.AssertEqual("FOO", updatedCommand.Name, t)
 	test_utils.AssertEqual("api/v2/foo", updatedCommand.Endpoint, t)
+	test_utils.AssertEqual(111, updatedCommand.Timeout, t)
 	test_utils.AssertEqual("http://foo.bar.com", updatedCommand.BaseURL, t)
 }
 

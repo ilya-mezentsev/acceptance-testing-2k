@@ -13,7 +13,7 @@ const (
 	SELECT name, hash FROM commands
 	WHERE name = $1 AND object_hash = (SELECT hash FROM objects WHERE name = $2)`
 	getCommandSettingsQuery = `
-	SELECT method, base_url, endpoint, pass_arguments_in_url
+	SELECT method, base_url, endpoint, timeout, pass_arguments_in_url
 	FROM commands_settings
 	WHERE command_hash = ?`
 	getCommandHeadersQuery = `SELECT key, value FROM commands_headers WHERE command_hash = ?`

@@ -6,6 +6,7 @@ import (
 
 type MockSettings struct {
 	Method, BaseURL, Endpoint string
+	Timeout                   int
 	PassArgumentsInURL        bool
 	Headers                   map[string]string
 	Cookies                   []*http.Cookie
@@ -21,6 +22,10 @@ func (s MockSettings) GetBaseURL() string {
 
 func (s MockSettings) GetEndpoint() string {
 	return s.Endpoint
+}
+
+func (s MockSettings) GetTimeout() int {
+	return s.Timeout
 }
 
 func (s MockSettings) GetHeaders() map[string]string {

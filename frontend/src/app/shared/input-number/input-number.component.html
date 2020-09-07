@@ -1,0 +1,12 @@
+<div class="input-field col s12">
+  <input
+    id="{{id}}"
+    (input)="valueChanged()"
+    [(ngModel)]="value"
+    [min]="min"
+    [max]="max"
+    type="number"
+    class="validate"
+  >
+  <label [class.active]="value != null" for="{{id}}">{{label}}</label>
+</div>

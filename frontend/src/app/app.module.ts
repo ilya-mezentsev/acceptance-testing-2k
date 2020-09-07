@@ -24,6 +24,7 @@ import { CommandFieldsComponent } from './admin/command/shared/command-fields/co
 import { EditCommandComponent } from './admin/command/edit-command/edit-command.component';
 import { FloatingIconComponent } from './shared/floating-icon/floating-icon.component';
 import { InputFileComponent } from './shared/input-file/input-file.component';
+import { InputNumberComponent } from './shared/input-number/input-number.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { InputFileComponent } from './shared/input-file/input-file.component';
     EditCommandComponent,
     FloatingIconComponent,
     InputFileComponent,
+    InputNumberComponent,
   ],
   imports: [
     BrowserModule,

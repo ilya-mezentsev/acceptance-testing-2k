@@ -44,6 +44,7 @@ func TestService_CreateSuccess(t *testing.T) {
 			"method": "POST",
 			"base_url": "https://link.com/api/v1",
 			"endpoint": "user/settings",
+			"timeout": 3,
 			"pass_arguments_in_url": true
 		}}`, services.SomeHash, services.PredefinedTestObject1.Hash),
 	))
@@ -67,18 +68,23 @@ func TestService_CreateSuccess(t *testing.T) {
 		t,
 	)
 	test_utils.AssertEqual(
-		testCommandsRepositoryMock.Commands[services.SomeHash][0].BaseURL,
 		"https://link.com/api/v1",
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].BaseURL,
 		t,
 	)
 	test_utils.AssertEqual(
-		testCommandsRepositoryMock.Commands[services.SomeHash][0].Endpoint,
 		"user/settings",
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].Endpoint,
 		t,
 	)
 	test_utils.AssertEqual(
-		testCommandsRepositoryMock.Commands[services.SomeHash][0].PassArgumentsInURL,
+		3,
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].Timeout,
+		t,
+	)
+	test_utils.AssertEqual(
 		true,
+		testCommandsRepositoryMock.Commands[services.SomeHash][0].PassArgumentsInURL,
 		t,
 	)
 }
@@ -139,6 +145,7 @@ func TestService_CreateCommandExistsError(t *testing.T) {
 			"method": "POST",
 			"base_url": "https://link.com/api/v1",
 			"endpoint": "user/settings",
+			"timeout": 3,
 			"pass_arguments_in_url": true
 		}}`,
 			services.PredefinedAccountHash,
@@ -171,6 +178,7 @@ func TestService_CreateRepositoryError(t *testing.T) {
 			"method": "POST",
 			"base_url": "https://link.com/api/v1",
 			"endpoint": "user/settings",
+			"timeout": 3,
 			"pass_arguments_in_url": true
 		}}`, services.BadAccountHash, services.PredefinedTestObject1.Hash),
 	))
