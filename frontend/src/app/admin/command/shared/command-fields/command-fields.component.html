@@ -7,7 +7,6 @@
 
 <!-- It's placed here coz i couldn't extract it to separate component( -->
 <div class="input-field col s12">
-  <!--suppress TypeScriptUnresolvedVariable -->
   <select id="commandMethod" [(ngModel)]="commandSettings.method">
     <option selected>GET</option>
     <option>POST</option>
@@ -41,99 +40,22 @@
 
 <div class="col s12">
   <p>
-    <label>
-      <input
-        type="checkbox"
-        [checked]="commandSettings.pass_arguments_in_url"
-        (change)="commandSettings.pass_arguments_in_url = !commandSettings.pass_arguments_in_url"
-      />
-      <span>Pass arguments in URL</span>
-    </label>
+    <app-input-checkbox
+      [label]="'Pass arguments in URL'"
+      [value]="commandSettings.pass_arguments_in_url"
+      (valueEmitter)="commandSettings.pass_arguments_in_url = $event"
+    ></app-input-checkbox>
   </p>
 </div>
 
-<div class="col s12">
-  <h5>
-    Headers
-    <app-floating-icon
-      [iconName]="'add'"
-      (click)="addHeader.emit()"
-    ></app-floating-icon>
-  </h5>
-</div>
+<app-headers-adding
+  [headers]="headers"
+  (addHeader)="addHeader.emit()"
+  (removeHeader)="removeHeader.emit($event)"
+></app-headers-adding>
 
-<ng-template #noHeaders>
-  <div class="col s12">
-    <h6>No headers added yet</h6>
-  </div>
-</ng-template>
-
-<div *ngIf="hasHeaders(); else noHeaders">
-  <div
-    class="meta-container"
-    *ngFor="let header of headers; let i = index"
-    [class.blur]="shouldBlurHeader(i)"
-  >
-    <div class="col s1 offset-s11">
-      <app-floating-icon
-        [iconName]="'delete'"
-        (click)="removeHeader.emit(header.hash)"
-        (mouseenter)="activeHeaderIndex = i"
-        (mouseleave)="activeHeaderIndex = noActiveBlocks"
-      ></app-floating-icon>
-    </div>
-
-    <div class="input-field col s6">
-      <input type="text" [(ngModel)]="header.key" id="header-key-{{i}}">
-      <label [class.active]="!!header.key" for="header-key-{{i}}">Header key</label>
-    </div>
-
-    <div class="input-field col s6">
-      <input type="text" [(ngModel)]="header.value" id="header-value-{{i}}">
-      <label [class.active]="!!header.value" for="header-value-{{i}}">Header value</label>
-    </div>
-  </div>
-</div>
-
-<div class="col s12">
-  <h5>
-    Cookies
-    <app-floating-icon
-      [iconName]="'add'"
-      (click)="addCookie.emit()"
-    ></app-floating-icon>
-  </h5>
-</div>
-
-<ng-template #noCookies>
-  <div class="col s12">
-    <h6>No cookies added yet</h6>
-  </div>
-</ng-template>
-
-<div *ngIf="hasCookies(); else noCookies">
-  <div
-    class="meta-container"
-    *ngFor="let cookie of cookies; let i = index"
-    [class.blur]="shouldBlurCookie(i)"
-  >
-    <div class="col s1 offset-s11">
-      <app-floating-icon
-        [iconName]="'delete'"
-        (click)="removeCookie.emit(cookie.hash)"
-        (mouseenter)="activeCookieIndex = i"
-        (mouseleave)="activeCookieIndex = noActiveBlocks"
-      ></app-floating-icon>
-    </div>
-
-    <div class="input-field col s6">
-      <input type="text" [(ngModel)]="cookie.key" id="cookie-key-{{i}}">
-      <label [class.active]="!!cookie.key" for="cookie-key-{{i}}">Cookie key</label>
-    </div>
-
-    <div class="input-field col s6">
-      <input type="text" [(ngModel)]="cookie.value" id="cookie-value-{{i}}">
-      <label [class.active]="!!cookie.value" for="cookie-value-{{i}}">Cookie value</label>
-    </div>
-  </div>
-</div>
+<app-cookies-adding
+  [cookies]="cookies"
+  (addCookie)="addCookie.emit()"
+  (removeCookie)="removeCookie.emit($event)"
+></app-cookies-adding>

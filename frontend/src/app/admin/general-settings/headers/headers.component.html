@@ -1,0 +1,21 @@
+<div class="col s12 m8 offset-m2">
+  <app-headers-adding
+    [headers]="request.headers"
+    (addHeader)="addEmptyHeader()"
+    (removeHeader)="removeHeader($event)"
+  ></app-headers-adding>
+
+  <div class="col s12 margin-t10">
+    <app-button
+      [text]="'Add'"
+      [isDisabled]="addingDisabled"
+      (clicked)="createHeaders()"
+    ></app-button>
+  </div>
+</div>
+
+<div class="col s12">
+  <app-commands-table
+    [generalUpdateRequest]="request"
+  ></app-commands-table>
+</div>

@@ -35,6 +35,15 @@ html, body {
   cursor: pointer !important;
 }
 
+div.meta-container {
+  transition: .3s;
+
+  &.blur {
+    filter: blur(2px);
+    transition: filter .3s;
+  }
+}
+
 .dropdown-content li>span {
   color: #000 !important;
 }

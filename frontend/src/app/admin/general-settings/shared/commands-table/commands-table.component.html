@@ -1,0 +1,50 @@
+<div *ngIf="hasObjects()" class="margin-t10">
+  <app-button
+    [text]="'Choose all'"
+    (clicked)="addAllHashes()"
+  ></app-button>
+
+  <app-button
+    class="margin-l10"
+    [text]="'Reset'"
+    (clicked)="removeAllHashes()"
+  ></app-button>
+
+  <table *ngFor="let object of getObjects()">
+    <colgroup>
+      <col style="width: 60%">
+      <col style="width: 40%">
+    </colgroup>
+
+    <thead>
+    <tr>
+      <th>Object: {{object.name}}</th>
+      <th>
+        <app-input-checkbox
+          [label]="'Choose commands'"
+          [value]="allObjectCommandsIsChosen(object.hash)"
+          (valueEmitter)="$event
+          ? addAllObjectCommands(object.hash)
+          : removeAllObjectCommands(object.hash)"
+        ></app-input-checkbox>
+      </th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr *ngFor="let command of getObjectCommands(object.hash)">
+      <td>{{command.name}}</td>
+      <td>
+        <app-input-checkbox
+          [value]="getChosenHashes().includes(command.hash)"
+          (valueEmitter)="$event
+          ? addHash(command.hash)
+          : removeHash(command.hash)"
+        ></app-input-checkbox>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<h6 *ngIf="!hasObjects()">No objects created yet</h6>

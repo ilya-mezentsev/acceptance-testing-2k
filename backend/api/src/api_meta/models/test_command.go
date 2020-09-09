@@ -32,6 +32,35 @@ type (
 		UpdatedCommand CommandSettings `json:"updated_command"`
 	}
 
+	UpdateTarget struct {
+		Hash string `json:"hash" validation:"md5-hash"`
+	}
+
+	massUpdateRequest struct {
+		AccountHash   string         `json:"account_hash" validation:"md5-hash"`
+		CommandHashes []UpdateTarget `json:"command_hashes"`
+	}
+
+	MassBaseURLsUpdateRequest struct {
+		massUpdateRequest
+		BaseURL string `json:"base_url" validation:"base-url"`
+	}
+
+	MassTimeoutsUpdateRequest struct {
+		massUpdateRequest
+		Timeout int `json:"timeout" range:"1,15"`
+	}
+
+	MassCookiesCreateRequest struct {
+		massUpdateRequest
+		Cookies []KeyValueMapping `json:"cookies"`
+	}
+
+	MassHeadersCreateRequest struct {
+		massUpdateRequest
+		Headers []KeyValueMapping `json:"headers"`
+	}
+
 	KeyValueMapping struct {
 		Hash        string `db:"hash" json:"hash" validation:"md5-hash"`
 		Key         string `db:"key" json:"key" validation:"regular-name"`

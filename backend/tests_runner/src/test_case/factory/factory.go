@@ -47,7 +47,10 @@ func (f Factory) GetAll(testCasesData string) ([]interfaces.TestCaseRunner, erro
 	return testCaseRunners, nil
 }
 
-func (f Factory) getTransaction(transactionText, testCaseText string) (interfaces.Transaction, error) {
+func (f Factory) getTransaction(
+	transactionText,
+	testCaseText string,
+) (interfaces.Transaction, error) {
 	switch {
 	case data.IsAssertion(transactionText):
 		return f.getAssertionTransaction(transactionText, testCaseText)
@@ -60,7 +63,10 @@ func (f Factory) getTransaction(transactionText, testCaseText string) (interface
 	}
 }
 
-func (f Factory) getAssertionTransaction(transactionText, testCaseText string) (interfaces.Transaction, error) {
+func (f Factory) getAssertionTransaction(
+	transactionText,
+	testCaseText string,
+) (interfaces.Transaction, error) {
 	var assertionTransactionData data.AssertionTransactionData
 	err := parser.Parse(
 		data.AssertionTransactionPattern,
@@ -75,7 +81,10 @@ func (f Factory) getAssertionTransaction(transactionText, testCaseText string) (
 	return assertion.New(&assertionTransactionData), nil
 }
 
-func (f Factory) getAssignmentTransaction(transactionText, testCaseText string) (interfaces.Transaction, error) {
+func (f Factory) getAssignmentTransaction(
+	transactionText,
+	testCaseText string,
+) (interfaces.Transaction, error) {
 	var assignmentTransactionData data.AssignmentTransactionData
 	err := parser.Parse(
 		data.AssignmentTransactionPattern,
@@ -90,7 +99,10 @@ func (f Factory) getAssignmentTransaction(transactionText, testCaseText string) 
 	return assignment.New(f.commandBuilder, &assignmentTransactionData), nil
 }
 
-func (f Factory) getSimpleTransaction(transactionText, testCaseText string) (interfaces.Transaction, error) {
+func (f Factory) getSimpleTransaction(
+	transactionText,
+	testCaseText string,
+) (interfaces.Transaction, error) {
 	var simpleTransactionData data.SimpleTransactionData
 	err := parser.Parse(
 		data.SimpleTransactionPattern,

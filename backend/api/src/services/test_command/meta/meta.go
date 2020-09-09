@@ -12,7 +12,7 @@ import (
 	"services/plugins/validation"
 )
 
-// Service for create headers/cookies
+// Service for create and update headers/cookies
 type Service struct {
 	logger     logger.CRUDEntityErrorsLogger
 	repository interfaces.TestCommandMetaRepository

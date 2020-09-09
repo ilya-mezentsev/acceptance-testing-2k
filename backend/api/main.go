@@ -24,6 +24,10 @@ import (
 	"services/test_command"
 	"services/test_command/cookies_deleter"
 	"services/test_command/headers_deleter"
+	"services/test_command/mass_update/base_url"
+	"services/test_command/mass_update/cookies"
+	"services/test_command/mass_update/headers"
+	"services/test_command/mass_update/timeout"
 	"services/test_command/meta"
 	"services/test_object"
 	"services/tests_runner/client"
@@ -42,6 +46,10 @@ var (
 	registrationService              interfaces.CreateService
 	sessionService                   session.Service
 	testCommandService               interfaces.CRUDService
+	massBaseUrlsUpdateService        base_url.Service
+	massTimeoutsUpdaterService       timeout.Service
+	massCookiesCreatorService        cookies.Service
+	massHeadersCreatorService        headers.Service
 	testCommandMetaCreatorService    meta.Service
 	testCommandHeadersDeleterService headers_deleter.Service
 	testCommandCookiesDeleterService cookies_deleter.Service
@@ -102,6 +110,26 @@ func init() {
 		testCommandCookiesDeleterService,
 	)
 	crudServicesPool.AddService(
+		"mass-base-urls",
+		[]string{pool.UpdateServiceOperationType},
+		massBaseUrlsUpdateService,
+	)
+	crudServicesPool.AddService(
+		"mass-timeouts",
+		[]string{pool.UpdateServiceOperationType},
+		massTimeoutsUpdaterService,
+	)
+	crudServicesPool.AddService(
+		"mass-cookies",
+		[]string{pool.CreateServiceOperationType},
+		massCookiesCreatorService,
+	)
+	crudServicesPool.AddService(
+		"mass-headers",
+		[]string{pool.CreateServiceOperationType},
+		massHeadersCreatorService,
+	)
+	crudServicesPool.AddService(
 		"registration",
 		[]string{pool.CreateServiceOperationType},
 		registrationService,
@@ -148,6 +176,10 @@ func initServices() {
 	sessionService = session.New(sessionRepository)
 
 	testCommandService = test_command.New(testCommandRepository, testCommandMetaRepository)
+	massBaseUrlsUpdateService = base_url.New(testCommandRepository)
+	massTimeoutsUpdaterService = timeout.New(testCommandRepository)
+	massCookiesCreatorService = cookies.New(testCommandMetaRepository)
+	massHeadersCreatorService = headers.New(testCommandMetaRepository)
 	testCommandMetaCreatorService = meta.New(testCommandMetaRepository)
 	testCommandHeadersDeleterService = headers_deleter.New(testCommandMetaRepository)
 	testCommandCookiesDeleterService = cookies_deleter.New(testCommandMetaRepository)

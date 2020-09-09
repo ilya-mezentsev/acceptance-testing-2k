@@ -12,9 +12,17 @@ type (
 		CreateAccountCredentials(record models.AccountCredentialsRecord) error
 	}
 
-	TestCommandMetaRepository interface {
+	TestCommandMetaCreatorRepository interface {
 		Create(accountHash string, meta models.CommandMeta) error
+	}
+
+	TestCommandMetaUpdaterRepository interface {
 		UpdateHeadersAndCookies(accountHash string, headers, cookies []models.UpdateModel) error
+	}
+
+	TestCommandMetaRepository interface {
+		TestCommandMetaCreatorRepository
+		TestCommandMetaUpdaterRepository
 	}
 
 	TestCommandMetaGetterRepository interface {
@@ -38,12 +46,28 @@ type (
 		DeleteCookie(accountHash, cookieHash string) error
 	}
 
-	CRUDRepository interface {
+	CreateRepository interface {
 		Create(accountHash string, entity map[string]interface{}) error
+	}
+
+	GetRepository interface {
 		GetAll(accountHash string, dest interface{}) error
 		Get(accountHash, entityHash string, dest interface{}) error
+	}
+
+	UpdateRepository interface {
 		Update(accountHash string, entities []models.UpdateModel) error
+	}
+
+	DeleteRepository interface {
 		Delete(accountHash, entityHash string) error
+	}
+
+	CRUDRepository interface {
+		CreateRepository
+		GetRepository
+		UpdateRepository
+		DeleteRepository
 	}
 
 	QueryProvider interface {

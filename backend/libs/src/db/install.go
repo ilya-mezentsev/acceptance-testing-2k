@@ -35,6 +35,7 @@ const createTablesQuery = `
 		value TEXT NOT NULL,
 		hash VARCHAR(32) NOT NULL UNIQUE,
 		command_hash VARCHAR(32),
+		UNIQUE(key, command_hash),
 		FOREIGN KEY(command_hash) REFERENCES commands(hash) ON DELETE CASCADE
 	);
 	CREATE TABLE IF NOT EXISTS commands_cookies(
@@ -43,6 +44,7 @@ const createTablesQuery = `
 		value TEXT NOT NULL,
 		hash VARCHAR(32) NOT NULL UNIQUE,
 		command_hash VARCHAR(32),
+		UNIQUE(key, command_hash),
 		FOREIGN KEY(command_hash) REFERENCES commands(hash) ON DELETE CASCADE
 	);`
 

@@ -5,6 +5,8 @@ declare namespace M {
   const FormSelect: any;
   const Collapsible: any;
   const Tooltip: any;
+  const Sidenav: any;
+  const Dropdown: any;
 }
 
 @Injectable({
@@ -27,5 +29,13 @@ export class MaterializeInitService {
 
   public initTooltips(): void {
     M.Tooltip.init(document.querySelectorAll('.with-tooltip'), {});
+  }
+
+  public initSidenav(): void {
+    M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
+  }
+
+  public initDropdowns(): void {
+    M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
   }
 }

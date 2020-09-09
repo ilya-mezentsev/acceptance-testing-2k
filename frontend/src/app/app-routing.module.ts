@@ -12,6 +12,10 @@ import {CreateObjectComponent} from './admin/create-object/create-object.compone
 import {EditObjectComponent} from './admin/edit-object/edit-object.component';
 import {CreateCommandComponent} from './admin/command/create-command/create-command.component';
 import {EditCommandComponent} from './admin/command/edit-command/edit-command.component';
+import {BaseUrlsComponent} from './admin/general-settings/base-urls/base-urls.component';
+import {TimeoutsComponent} from './admin/general-settings/timeouts/timeouts.component';
+import {HeadersComponent} from './admin/general-settings/headers/headers.component';
+import {CookiesComponent} from './admin/general-settings/cookies/cookies.component';
 
 
 const routes: Routes = [
@@ -30,6 +34,10 @@ const routes: Routes = [
     {path: 'create-command/:object_hash', component: CreateCommandComponent},
     {path: 'edit-command/:command_hash', component: EditCommandComponent},
     {path: 'run-tests', component: RunTestsComponent},
+    {path: 'general-base-urls', component: BaseUrlsComponent},
+    {path: 'general-timeouts', component: TimeoutsComponent},
+    {path: 'general-headers', component: HeadersComponent},
+    {path: 'general-cookies', component: CookiesComponent},
     {path: '**', redirectTo: 'objects-list'},
   ]},
   {path: '**', component: NotFoundComponent}

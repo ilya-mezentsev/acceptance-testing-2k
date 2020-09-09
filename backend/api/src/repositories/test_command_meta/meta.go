@@ -16,10 +16,10 @@ const (
 	SELECT key, value, hash, command_hash
 	FROM commands_cookies WHERE command_hash = ?`
 	addHeaderQuery = `
-	INSERT INTO commands_headers(key, value, hash, command_hash)
+	INSERT OR REPLACE INTO commands_headers(key, value, hash, command_hash)
 	VALUES(:key, :value, :hash, :command_hash)`
 	addCookieQuery = `
-	INSERT INTO commands_cookies(key, value, hash, command_hash)
+	INSERT OR REPLACE INTO commands_cookies(key, value, hash, command_hash)
 	VALUES(:key, :value, :hash, :command_hash)`
 	updateHeaderQuery = `UPDATE commands_headers SET %s = :new_value WHERE hash = :hash`
 	updateCookieQuery = `UPDATE commands_cookies SET %s = :new_value WHERE hash = :hash`

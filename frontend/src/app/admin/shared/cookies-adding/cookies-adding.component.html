@@ -1,0 +1,52 @@
+<div class="col s12">
+  <h5>
+    Cookies
+    <app-floating-icon
+      [iconName]="'add'"
+      (click)="addCookie.emit()"
+    ></app-floating-icon>
+  </h5>
+</div>
+
+<ng-template #noCookies>
+  <div class="col s12">
+    <h6>No cookies added yet</h6>
+  </div>
+</ng-template>
+
+<div *ngIf="hasCookies(); else noCookies">
+  <div
+    class="meta-container"
+    *ngFor="let cookie of cookies; let i = index"
+    [class.blur]="shouldBlurCookie(i)"
+  >
+    <div class="col s1 offset-s11">
+      <app-floating-icon
+        [iconName]="'delete'"
+        (click)="removeCookie.emit(cookie.hash)"
+        (mouseenter)="activeCookieIndex = i"
+        (mouseleave)="activeCookieIndex = noActiveBlocks"
+      ></app-floating-icon>
+    </div>
+
+    <div class="col s6">
+      <app-input
+        [withLayout]="false"
+        [type]="'text'"
+        [value]="cookie.key"
+        [label]="'Cookie key'"
+        (valueEmitter)="cookie.key = $event"
+      ></app-input>
+    </div>
+
+    <div class="col s6">
+      <app-input
+        [withLayout]="false"
+        [type]="'text'"
+        [value]="cookie.value"
+        [label]="'Cookie value'"
+        (valueEmitter)="cookie.value = $event"
+      ></app-input>
+    </div>
+  </div>
+</div>

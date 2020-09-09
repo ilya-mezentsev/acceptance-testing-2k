@@ -3,12 +3,12 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import {FetcherService} from './services/fetcher/fetcher.service';
+import { FetcherService } from './services/fetcher/fetcher.service';
 import { LoginComponent } from './auth/login/login.component';
 import { RegistrationComponent } from './auth/registration/registration.component';
 import { AuthComponent } from './auth/auth.component';
 import { InputComponent } from './shared/input/input.component';
-import {FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { AdminComponent } from './admin/admin.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { NavigationComponent } from './admin/navigation/navigation.component';
@@ -25,6 +25,14 @@ import { EditCommandComponent } from './admin/command/edit-command/edit-command.
 import { FloatingIconComponent } from './shared/floating-icon/floating-icon.component';
 import { InputFileComponent } from './shared/input-file/input-file.component';
 import { InputNumberComponent } from './shared/input-number/input-number.component';
+import { BaseUrlsComponent } from './admin/general-settings/base-urls/base-urls.component';
+import { TimeoutsComponent } from './admin/general-settings/timeouts/timeouts.component';
+import { HeadersComponent } from './admin/general-settings/headers/headers.component';
+import { CookiesComponent } from './admin/general-settings/cookies/cookies.component';
+import { CommandsTableComponent } from './admin/general-settings/shared/commands-table/commands-table.component';
+import { InputCheckboxComponent } from './shared/input-checkbox/input-checkbox.component';
+import { HeadersAddingComponent } from './admin/shared/headers-adding/headers-adding.component';
+import { CookiesAddingComponent } from './admin/shared/cookies-adding/cookies-adding.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +57,14 @@ import { InputNumberComponent } from './shared/input-number/input-number.compone
     FloatingIconComponent,
     InputFileComponent,
     InputNumberComponent,
+    BaseUrlsComponent,
+    TimeoutsComponent,
+    HeadersComponent,
+    CookiesComponent,
+    CommandsTableComponent,
+    InputCheckboxComponent,
+    HeadersAddingComponent,
+    CookiesAddingComponent,
   ],
   imports: [
     BrowserModule,

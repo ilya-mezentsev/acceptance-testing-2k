@@ -1,8 +1,0 @@
-div.meta-container {
-  transition: .3s;
-
-  &.blur {
-    filter: blur(2px);
-    transition: filter .3s;
-  }
-}

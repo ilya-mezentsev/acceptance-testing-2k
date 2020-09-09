@@ -1,5 +1,4 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
-import {Md5} from 'ts-md5';
 import {HashService} from '../../services/hash/hash.service';
 
 @Component({
@@ -12,6 +11,7 @@ export class InputComponent implements OnInit {
   @Input() public value = '';
   @Input() public readonly label = '';
   @Input() public readonly type = '';
+  @Input() public withLayout = true;
   @Output() public valueEmitter = new EventEmitter<string>();
 
   constructor(

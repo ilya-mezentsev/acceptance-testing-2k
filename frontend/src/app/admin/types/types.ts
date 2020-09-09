@@ -39,3 +39,23 @@ export type TestsReport = {
   failedCount: number,
   errors?: TransactionError[],
 };
+
+export interface GeneralUpdateRequest {
+  command_hashes: string[];
+}
+
+export interface GeneralBaseURLsUpdateRequest extends GeneralUpdateRequest {
+  base_url: string;
+}
+
+export interface GeneralTimeoutUpdateRequest extends GeneralUpdateRequest {
+  timeout: number;
+}
+
+export interface GeneralHeadersCreateRequest extends GeneralUpdateRequest {
+  headers: KeyValueMapping[];
+}
+
+export interface GeneralCookiesCreateRequest extends GeneralUpdateRequest {
+  cookies: KeyValueMapping[];
+}

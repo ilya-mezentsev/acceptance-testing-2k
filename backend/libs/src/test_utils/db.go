@@ -56,9 +56,13 @@ const (
 	PatchCommandHash    = "hash-3"
 	DeleteCommandHash   = "hash-4"
 	HeaderHash1         = "some-hash-1"
+	HeaderKey1          = "X-Test-1"
 	HeaderHash2         = "some-hash-2"
+	HeaderKey2          = "X-Test-2"
 	CookieHash1         = "some-hash-1"
+	CookieKey1          = "Test-Value-1"
 	CookieHash2         = "some-hash-2"
+	CookieKey2          = "Test-Value-2"
 
 	NotExistsAccountHash = "not-exists-account-hash"
 	NotExistsObjectHash  = "not-exists-object-hash"
@@ -141,13 +145,13 @@ var (
 	Headers = []map[string]interface{}{
 		{
 			"hash":         HeaderHash1,
-			"key":          "X-Test-1",
+			"key":          HeaderKey1,
 			"value":        "test1",
 			"command_hash": CreateCommandHash,
 		},
 		{
 			"hash":         HeaderHash2,
-			"key":          "X-Test-2",
+			"key":          HeaderKey2,
 			"value":        "test2",
 			"command_hash": CreateCommandHash,
 		},
@@ -155,13 +159,13 @@ var (
 	Cookies = []map[string]interface{}{
 		{
 			"hash":         CookieHash1,
-			"key":          "Test-Value-1",
+			"key":          CookieKey1,
 			"value":        "test1",
 			"command_hash": CreateCommandHash,
 		},
 		{
 			"hash":         CookieHash2,
-			"key":          "Test-Value-2",
+			"key":          CookieKey2,
 			"value":        "test2",
 			"command_hash": CreateCommandHash,
 		},

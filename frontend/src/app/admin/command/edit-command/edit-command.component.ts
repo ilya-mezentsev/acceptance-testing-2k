@@ -174,11 +174,11 @@ export class EditCommandComponent implements OnInit {
     const cookiesUpdatePayload: UpdatePayload[] =
       EditCommandComponent.getDiff(this.currentCommand.cookies, this.existsCookies);
 
-    const updatePayload = {};
+    const updatePayload: {headers: UpdatePayload[], cookies: UpdatePayload[]} = {} as any;
     const headersChanged = headersUpdatePayload.length > 0;
     const cookiesChanged = cookiesUpdatePayload.length > 0;
-    headersChanged && (updatePayload['headers'] = headersUpdatePayload);
-    cookiesChanged && (updatePayload['cookies'] = cookiesUpdatePayload);
+    headersChanged && (updatePayload.headers = headersUpdatePayload);
+    cookiesChanged && (updatePayload.cookies = cookiesUpdatePayload);
 
     if (headersChanged || cookiesChanged) {
       this.commandSettingsWereChanged = true;

@@ -193,6 +193,12 @@ func TestRepository_CreateFewMetaSuccess(t *testing.T) {
 				Value:       "value-2",
 				CommandHash: test_utils.ObjectHash,
 			},
+			{
+				Hash:        test_utils.HeaderHash1,
+				Key:         test_utils.HeaderKey1,
+				Value:       "FOO_BAR",
+				CommandHash: test_utils.ObjectHash,
+			},
 		},
 		Cookies: []models.KeyValueMapping{
 			{
@@ -207,12 +213,18 @@ func TestRepository_CreateFewMetaSuccess(t *testing.T) {
 				Value:       "value-4",
 				CommandHash: test_utils.ObjectHash,
 			},
+			{
+				Hash:        test_utils.CookieHash1,
+				Key:         test_utils.CookieKey1,
+				Value:       "FOO_BAR",
+				CommandHash: test_utils.ObjectHash,
+			},
 		},
 	})
 
 	var (
-		header1Created, header2Created bool
-		cookie1Created, cookie2Created bool
+		header1Created, header2Created, existsHeaderReplaced bool
+		cookie1Created, cookie2Created, existsCookieReplaced bool
 	)
 	_ = db.Get(
 		&header1Created,
@@ -225,6 +237,11 @@ func TestRepository_CreateFewMetaSuccess(t *testing.T) {
 		"hash-2", test_utils.ObjectHash,
 	)
 	_ = db.Get(
+		&existsHeaderReplaced,
+		`SELECT 1 FROM commands_headers WHERE hash = $1 AND command_hash = $2`,
+		test_utils.HeaderHash1, test_utils.ObjectHash,
+	)
+	_ = db.Get(
 		&cookie1Created,
 		`SELECT 1 FROM commands_cookies WHERE hash = $1 AND command_hash = $2`,
 		"hash-3", test_utils.ObjectHash,
@@ -234,12 +251,19 @@ func TestRepository_CreateFewMetaSuccess(t *testing.T) {
 		`SELECT 1 FROM commands_cookies WHERE hash = $1 AND command_hash = $2`,
 		"hash-4", test_utils.ObjectHash,
 	)
+	_ = db.Get(
+		&existsCookieReplaced,
+		`SELECT 1 FROM commands_cookies WHERE hash = $1 AND command_hash = $2`,
+		test_utils.CookieHash1, test_utils.ObjectHash,
+	)
 
 	test_utils.AssertNil(err, t)
 	test_utils.AssertTrue(header1Created, t)
 	test_utils.AssertTrue(header2Created, t)
+	test_utils.AssertTrue(existsHeaderReplaced, t)
 	test_utils.AssertTrue(cookie1Created, t)
 	test_utils.AssertTrue(cookie2Created, t)
+	test_utils.AssertTrue(existsCookieReplaced, t)
 }
 
 func TestRepository_CreateBadAccountHash(t *testing.T) {

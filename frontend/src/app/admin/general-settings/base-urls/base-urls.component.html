@@ -1,0 +1,20 @@
+<div class="col s12 m8 offset-m2">
+  <app-input
+    [withLayout]="false"
+    [type]="'url'"
+    [label]="'Base URL'"
+    [value]="request.base_url"
+    (valueEmitter)="request.base_url = $event"
+  ></app-input>
+
+  <app-button
+    class="margin-t10"
+    [text]="'Update'"
+    [isDisabled]="updatingDisabled"
+    (clicked)="updateCommandsBaseURLs()"
+  ></app-button>
+</div>
+
+<div class="col s12">
+  <app-commands-table [generalUpdateRequest]="request"></app-commands-table>
+</div>

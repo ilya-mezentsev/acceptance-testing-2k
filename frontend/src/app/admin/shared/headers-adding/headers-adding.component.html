@@ -1,0 +1,52 @@
+<div class="col s12">
+  <h5>
+    Headers
+    <app-floating-icon
+      [iconName]="'add'"
+      (click)="addHeader.emit()"
+    ></app-floating-icon>
+  </h5>
+</div>
+
+<ng-template #noHeaders>
+  <div class="col s12">
+    <h6>No headers added yet</h6>
+  </div>
+</ng-template>
+
+<div *ngIf="hasHeaders(); else noHeaders">
+  <div
+    class="meta-container"
+    *ngFor="let header of headers; let i = index"
+    [class.blur]="shouldBlurHeader(i)"
+  >
+    <div class="col s1 offset-s11">
+      <app-floating-icon
+        [iconName]="'delete'"
+        (click)="removeHeader.emit(header.hash)"
+        (mouseenter)="activeHeaderIndex = i"
+        (mouseleave)="activeHeaderIndex = noActiveBlocks"
+      ></app-floating-icon>
+    </div>
+
+    <div class="col s6">
+      <app-input
+        [withLayout]="false"
+        [type]="'text'"
+        [value]="header.key"
+        [label]="'Header key'"
+        (valueEmitter)="header.key = $event"
+      ></app-input>
+    </div>
+
+    <div class="col s6">
+      <app-input
+        [withLayout]="false"
+        [type]="'text'"
+        [value]="header.value"
+        [label]="'Header value'"
+        (valueEmitter)="header.value = $event"
+      ></app-input>
+    </div>
+  </div>
+</div>
