@@ -1,11 +1,11 @@
 <div class="file-field input-field">
   <div class="btn btn-small purple darken-1">
     <span>{{label}}</span>
-    <input type="file" [accept]="accept" (change)="fileChanged.emit($event)">
+    <input #fileInput type="file" [accept]="accept" (change)="fileChanged.emit($event)">
   </div>
   <div class="file-path-wrapper">
     <label>
-      <input class="file-path validate" type="text">
+      <input #filenameInput class="file-path validate" type="text">
     </label>
   </div>
 </div>

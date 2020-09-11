@@ -13,8 +13,6 @@ func TestFactory_GetAllSuccess(t *testing.T) {
 	testCases := `
 		BEGIN
 			// some comment (will be ignored)
-			CREATE USER {"hash": "some-hash", "userName": "Piter"}
-	
 			user = GET USER {"hash": "some-hash"}
 	
 			ASSERT user.hash EQUALS 'some-hash'
@@ -59,12 +57,6 @@ func TestFactory_GetAssertionTransactionError(t *testing.T) {
 
 func TestFactory_GetAssignmentTransactionError(t *testing.T) {
 	_, err := factory.(Factory).getAssignmentTransaction(``, ``)
-
-	test_utils.AssertErrorsEqual(parseErrors.InvalidTransactionFormat, err, t)
-}
-
-func TestFactory_GetSimpleTransactionError(t *testing.T) {
-	_, err := factory.(Factory).getSimpleTransaction(``, ``)
 
 	test_utils.AssertErrorsEqual(parseErrors.InvalidTransactionFormat, err, t)
 }

@@ -8,7 +8,6 @@ import (
 	"test_case/runner"
 	"test_case/transactions/assertion"
 	"test_case/transactions/assignment"
-	"test_case/transactions/simple"
 	"test_runner_meta/interfaces"
 )
 
@@ -56,8 +55,6 @@ func (f Factory) getTransaction(
 		return f.getAssertionTransaction(transactionText, testCaseText)
 	case data.IsAssignment(transactionText):
 		return f.getAssignmentTransaction(transactionText, testCaseText)
-	case data.IsSimple(transactionText):
-		return f.getSimpleTransaction(transactionText, testCaseText)
 	default:
 		return nil, errors.UnknownTransactionType
 	}
@@ -97,22 +94,4 @@ func (f Factory) getAssignmentTransaction(
 
 	assignmentTransactionData.SetTestCaseText(testCaseText)
 	return assignment.New(f.commandBuilder, &assignmentTransactionData), nil
-}
-
-func (f Factory) getSimpleTransaction(
-	transactionText,
-	testCaseText string,
-) (interfaces.Transaction, error) {
-	var simpleTransactionData data.SimpleTransactionData
-	err := parser.Parse(
-		data.SimpleTransactionPattern,
-		transactionText,
-		&simpleTransactionData,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	simpleTransactionData.SetTestCaseText(testCaseText)
-	return simple.New(f.commandBuilder, &simpleTransactionData), nil
 }

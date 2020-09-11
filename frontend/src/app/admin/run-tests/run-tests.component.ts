@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, EventEmitter} from '@angular/core';
 import {ErrorResponse, FileSender, Response} from '../../interfaces/fetcher';
 import {SessionStorageService} from '../../services/session/session-storage.service';
 import {ErrorHandlerService} from '../../services/errors/error-handler.service';
@@ -18,6 +18,7 @@ export class RunTestsComponent implements OnInit {
   public testsReport: TestsReport;
   public awaitingTestsResults = false;
   public hasTestsReport = false;
+  public readonly resetInput = new EventEmitter();
 
   constructor(
     private readonly codesService: CodesService,
@@ -29,7 +30,7 @@ export class RunTestsComponent implements OnInit {
   ) { }
 
   public fileChange(event): void {
-    if (event.target.files.length > 0) {
+    if (event?.target?.files?.length > 0) {
       this.file = event.target.files[0];
     } else {
       this.file = null;
@@ -68,6 +69,7 @@ export class RunTestsComponent implements OnInit {
       .then(r => {
         this.awaitingTestsResults = false;
         this.processRunTestsRequest(r);
+        this.resetInput.emit();
       })
       .catch(err => this.errorHandler.handle(err));
   }

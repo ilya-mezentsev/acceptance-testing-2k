@@ -2,6 +2,7 @@ package assignment
 
 import (
 	"test_case/errors"
+	"test_case/transactions/plugins/value_path"
 	"test_runner_meta/mock/transaction/assignment"
 	"test_runner_meta/mock/transaction/constant"
 	mockContext "test_runner_meta/mock/transaction/context"
@@ -27,6 +28,22 @@ func TestTransaction_ExecuteNilResultCommand(t *testing.T) {
 				assignment.MockData.GetVariableName()).(map[string]interface{})),
 		t,
 	)
+}
+
+func TestTransaction_ExecuteParseArgumentsError(t *testing.T) {
+	data := assignment.MockData
+	data.SetField("arguments", `{"x": "${x.response}"}`)
+	transaction := New(
+		assignment.MockNilResultCommandBuilder{},
+		&data,
+	)
+
+	err := transaction.Execute(context)
+
+	test_utils.AssertEqual(value_path.CannotAccessValueByPath.Error(), err.Code, t)
+	test_utils.AssertEqual(unableToRunCommand, err.Description, t)
+	test_utils.AssertEqual(assignment.MockData.GetTransactionText(), err.TransactionText, t)
+	test_utils.AssertEqual(assignment.MockData.GetTestCaseText(), err.TestCaseText, t)
 }
 
 func TestTransaction_ExecuteNotNilResultCommand(t *testing.T) {

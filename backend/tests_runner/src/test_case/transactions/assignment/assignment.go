@@ -2,6 +2,7 @@ package assignment
 
 import (
 	"test_case/errors"
+	"test_case/transactions/plugins/arguments_processor"
 	"test_runner_meta/interfaces"
 	"test_runner_meta/models"
 )
@@ -34,7 +35,20 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) models.Transact
 		}
 	}
 
-	result, err := command.Run(t.data.GetArguments())
+	arguments, err := arguments_processor.ReplaceTemplatesWithVariables(
+		context,
+		t.data.GetArguments(),
+	)
+	if err != nil {
+		return models.TransactionError{
+			Code:            err.Error(),
+			Description:     unableToRunCommand,
+			TransactionText: t.data.GetTransactionText(),
+			TestCaseText:    t.data.GetTestCaseText(),
+		}
+	}
+
+	result, err := command.Run(arguments)
 	if err != nil {
 		return models.TransactionError{
 			Code:            err.Error(),

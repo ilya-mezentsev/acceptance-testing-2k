@@ -3,6 +3,7 @@ package assertion
 import (
 	"fmt"
 	"test_case/errors"
+	"test_case/transactions/plugins/value_path"
 	"test_runner_meta/interfaces"
 	"test_runner_meta/models"
 )
@@ -27,7 +28,7 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) models.Transact
 		}
 	}
 
-	currentValue, err := getValueByPath(
+	currentValue, err := value_path.GetByPath(
 		context.GetVariable(t.data.GetVariableName()),
 		t.data.GetDataPath(),
 	)

@@ -2,6 +2,7 @@
   <app-input-file
     [label]="'Tests file'"
     [accept]="'.txt'"
+    [resetEvent]="resetInput"
     (fileChanged)="fileChange($event)"
   ></app-input-file>
 

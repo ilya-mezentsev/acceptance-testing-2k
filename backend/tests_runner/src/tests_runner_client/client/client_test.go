@@ -4,6 +4,8 @@ import (
 	"env"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+	"io/ioutil"
+	"log"
 	"net/http/httptest"
 	"os"
 	"path"
@@ -52,6 +54,7 @@ func init() {
 func TestMain(m *testing.M) {
 	defer server.Close()
 	defer test_utils.DropTables(db)
+	log.SetOutput(ioutil.Discard)
 
 	os.Exit(m.Run())
 }

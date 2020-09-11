@@ -8,20 +8,35 @@ var AssignmentTransactionPattern = regexp.MustCompile(
 
 type AssignmentTransactionData struct {
 	transactionTextContainer
-	SimpleTransactionData
-	variableName string
+	command, object, variableName, arguments string
 }
 
 func (d AssignmentTransactionData) GetVariableName() string {
 	return d.variableName
 }
 
+func (d AssignmentTransactionData) GetCommand() string {
+	return d.command
+}
+
+func (d AssignmentTransactionData) GetObject() string {
+	return d.object
+}
+
+func (d AssignmentTransactionData) GetArguments() string {
+	return d.arguments
+}
+
 func (d *AssignmentTransactionData) SetField(name, value string) {
 	switch name {
 	case variableNameGroupName:
 		d.variableName = value
-	default:
-		d.SimpleTransactionData.SetField(name, value)
+	case commandGroupName:
+		d.command = value
+	case objectGroupName:
+		d.object = value
+	case argumentsGroupName:
+		d.arguments = value
 	}
 }
 

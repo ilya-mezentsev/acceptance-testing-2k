@@ -13,8 +13,6 @@ BEGIN
 	ASSERT userResponse.data.name EQUALS John
 END
 BEGIN
-	CREATE USER {"hash": "hash-3", "name": "Joe"}
-
 	userResponse = GET USER hash-3
 
 	ASSERT userResponse.data.name EQUALS Joe
@@ -27,8 +25,8 @@ END
 `
 
 const (
-	PassedCount = 2
-	FailedCount = 1
+	PassedCount = 1
+	FailedCount = 2
 )
 
 func FillTestCasesFile(filePath string) {

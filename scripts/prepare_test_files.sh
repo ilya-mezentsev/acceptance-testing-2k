@@ -16,8 +16,6 @@ mkdir -p "$1"/backend/test_data/registration
 rm -f "$1"/backend/test_data/33d1ff478677b1ac49e4305785a63d70/test_cases.txt
 echo "BEGIN
 // some comment (will be ignored)
-CREATE USER {\"hash\": \"some-hash\", \"userName\": \"Piter\"}
-
 user = GET USER {\"hash\": \"some-hash\"}
 
 ASSERT user.hash EQUALS 'some-hash'

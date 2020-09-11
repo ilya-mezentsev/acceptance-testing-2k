@@ -1,4 +1,4 @@
-package assertion
+package value_path
 
 import (
 	"strconv"
@@ -6,7 +6,7 @@ import (
 	"type_utils"
 )
 
-func getValueByPath(value interface{}, path string) (interface{}, error) {
+func GetByPath(value interface{}, path string) (interface{}, error) {
 	switch {
 	case path == "":
 		return nil, invalidPath
@@ -15,7 +15,7 @@ func getValueByPath(value interface{}, path string) (interface{}, error) {
 	case type_utils.IsGenericSlice(value):
 		return getValueFromSlice(value, path)
 	default:
-		return nil, cannotAccessValueByPath
+		return nil, CannotAccessValueByPath
 	}
 }
 
@@ -26,7 +26,7 @@ func getValueFromMap(value interface{}, path string) (interface{}, error) {
 	if len(pathComponents) < 2 {
 		return value, nil
 	} else {
-		return getValueByPath(value, strings.Join(pathComponents[1:], "."))
+		return GetByPath(value, strings.Join(pathComponents[1:], "."))
 	}
 }
 
@@ -45,6 +45,6 @@ func getValueFromSlice(value interface{}, path string) (interface{}, error) {
 	if len(pathComponents) < 2 {
 		return supposedValue, nil
 	} else {
-		return getValueByPath(supposedValue, strings.Join(pathComponents[1:], "."))
+		return GetByPath(supposedValue, strings.Join(pathComponents[1:], "."))
 	}
 }
