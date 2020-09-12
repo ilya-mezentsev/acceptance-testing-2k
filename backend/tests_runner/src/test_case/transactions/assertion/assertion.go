@@ -70,7 +70,5 @@ func (t Transaction) assertionFailedDescription(current interface{}) string {
 }
 
 func (t Transaction) equals(current interface{}, expected string) bool {
-	strCurrent, ok := current.(string)
-
-	return ok && strCurrent == expected
+	return fmt.Sprintf("%v", current) == expected
 }

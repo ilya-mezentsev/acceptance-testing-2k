@@ -19,10 +19,11 @@ func TestFactory_GetAllSuccess(t *testing.T) {
 			ASSERT user.userName EQUALS 'Piter'
 		END
 		BEGIN
+			_ = CREATE USER {"hash": "some-hash"}
 			user = GET USER {"hash": "some-hash"}
 	
-			ASSERT user.hash EQUALS 'some-hash'
-			ASSERT user.userName EQUALS 'Piter'
+			ASSERT_TRUE user.exists
+			ASSERT_FALSE user.deleted
 		END
 	`
 	runners, err := factory.GetAll(testCases)
@@ -51,6 +52,18 @@ func TestFactory_GetAllUnknownTransactionType(t *testing.T) {
 
 func TestFactory_GetAssertionTransactionError(t *testing.T) {
 	_, err := factory.(Factory).getAssertionTransaction(``, ``)
+
+	test_utils.AssertErrorsEqual(parseErrors.InvalidTransactionFormat, err, t)
+}
+
+func TestFactory_GetFalseAssertionTransactionError(t *testing.T) {
+	_, err := factory.(Factory).getFalseAssertionTransaction(``, ``)
+
+	test_utils.AssertErrorsEqual(parseErrors.InvalidTransactionFormat, err, t)
+}
+
+func TestFactory_GetTrueAssertionTransactionError(t *testing.T) {
+	_, err := factory.(Factory).getTrueAssertionTransaction(``, ``)
 
 	test_utils.AssertErrorsEqual(parseErrors.InvalidTransactionFormat, err, t)
 }

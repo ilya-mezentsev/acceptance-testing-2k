@@ -35,7 +35,7 @@ services:
     volumes:
       - ./frontend:/var/www/apps/web-frontend
     ports:
-      - 80:80
+      - 8000:80
     links:
       - api
     depends_on:

@@ -123,3 +123,61 @@ func TestParseAssertionTransactionInvalidTransactionFormat(t *testing.T) {
 
 	test_utils.AssertErrorsEqual(errors.InvalidTransactionFormat, err, t)
 }
+
+func TestParseFalseAssertionTransaction(t *testing.T) {
+	var transactionData data.FalseAssertionTransactionData
+	err := Parse(
+		data.FalseAssertionTransactionPattern,
+		`ASSERT_FALSE user.data.exists`,
+		&transactionData,
+	)
+
+	test_utils.AssertNil(err, t)
+	test_utils.AssertEqual("user", transactionData.GetVariableName(), t)
+	test_utils.AssertEqual("false", transactionData.GetNewValue(), t)
+	test_utils.AssertEqual("data.exists", transactionData.GetDataPath(), t)
+	test_utils.AssertEqual(
+		`ASSERT_FALSE user.data.exists`,
+		transactionData.GetTransactionText(),
+		t,
+	)
+}
+
+func TestParseFalseAssertionTransactionInvalidTransactionFormat(t *testing.T) {
+	err := Parse(
+		data.FalseAssertionTransactionPattern,
+		`ASSERT_FALSE `,
+		&data.FalseAssertionTransactionData{},
+	)
+
+	test_utils.AssertErrorsEqual(errors.InvalidTransactionFormat, err, t)
+}
+
+func TestParseTrueAssertionTransaction(t *testing.T) {
+	var transactionData data.TrueAssertionTransactionData
+	err := Parse(
+		data.TrueAssertionTransactionPattern,
+		`ASSERT_TRUE user.data.exists`,
+		&transactionData,
+	)
+
+	test_utils.AssertNil(err, t)
+	test_utils.AssertEqual("user", transactionData.GetVariableName(), t)
+	test_utils.AssertEqual("true", transactionData.GetNewValue(), t)
+	test_utils.AssertEqual("data.exists", transactionData.GetDataPath(), t)
+	test_utils.AssertEqual(
+		`ASSERT_TRUE user.data.exists`,
+		transactionData.GetTransactionText(),
+		t,
+	)
+}
+
+func TestParseTrueAssertionTransactionInvalidTransactionFormat(t *testing.T) {
+	err := Parse(
+		data.FalseAssertionTransactionPattern,
+		`ASSERT_TRUE `,
+		&data.TrueAssertionTransactionData{},
+	)
+
+	test_utils.AssertErrorsEqual(errors.InvalidTransactionFormat, err, t)
+}

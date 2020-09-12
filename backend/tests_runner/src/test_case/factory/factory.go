@@ -53,6 +53,10 @@ func (f Factory) getTransaction(
 	switch {
 	case data.IsAssertion(transactionText):
 		return f.getAssertionTransaction(transactionText, testCaseText)
+	case data.IsFalseAssertion(transactionText):
+		return f.getFalseAssertionTransaction(transactionText, testCaseText)
+	case data.IsTrueAssertion(transactionText):
+		return f.getTrueAssertionTransaction(transactionText, testCaseText)
 	case data.IsAssignment(transactionText):
 		return f.getAssignmentTransaction(transactionText, testCaseText)
 	default:
@@ -76,6 +80,42 @@ func (f Factory) getAssertionTransaction(
 
 	assertionTransactionData.SetTestCaseText(testCaseText)
 	return assertion.New(&assertionTransactionData), nil
+}
+
+func (f Factory) getFalseAssertionTransaction(
+	transactionText,
+	testCaseText string,
+) (interfaces.Transaction, error) {
+	var falseAssertionTransactionData data.FalseAssertionTransactionData
+	err := parser.Parse(
+		data.FalseAssertionTransactionPattern,
+		transactionText,
+		&falseAssertionTransactionData,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	falseAssertionTransactionData.SetTestCaseText(testCaseText)
+	return assertion.New(&falseAssertionTransactionData), nil
+}
+
+func (f Factory) getTrueAssertionTransaction(
+	transactionText,
+	testCaseText string,
+) (interfaces.Transaction, error) {
+	var trueAssertionTransactionData data.TrueAssertionTransactionData
+	err := parser.Parse(
+		data.TrueAssertionTransactionPattern,
+		transactionText,
+		&trueAssertionTransactionData,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	trueAssertionTransactionData.SetTestCaseText(testCaseText)
+	return assertion.New(&trueAssertionTransactionData), nil
 }
 
 func (f Factory) getAssignmentTransaction(

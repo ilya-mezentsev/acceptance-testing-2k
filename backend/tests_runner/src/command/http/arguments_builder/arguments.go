@@ -44,9 +44,20 @@ func (a arguments) AmpersandSeparated() (string, error) {
 
 	var ampersandSeparated []string
 	for key, value := range data {
-		jsonEncodedValue, _ := json.Marshal(value)
+		switch value.(type) {
+		case string, bool, float32, float64:
+			ampersandSeparated = append(
+				ampersandSeparated,
+				fmt.Sprintf("%s=%v", key, value),
+			)
+		default:
+			jsonEncodedValue, _ := json.Marshal(value)
 
-		ampersandSeparated = append(ampersandSeparated, fmt.Sprintf("%s=%s", key, jsonEncodedValue))
+			ampersandSeparated = append(
+				ampersandSeparated,
+				fmt.Sprintf("%s=%s", key, jsonEncodedValue),
+			)
+		}
 	}
 
 	return strings.Join(ampersandSeparated, "&"), nil
