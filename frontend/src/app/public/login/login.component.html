@@ -1,0 +1,27 @@
+<div class="col s12 m8 offset-m2">
+  <div class="row">
+    <div class="col s12">
+      <h6>Enter your login and password to Sign in</h6>
+    </div>
+
+    <app-input
+      [type]="'text'"
+      [label]="'Login'"
+      (valueEmitter)="changeLogin($event)"
+    ></app-input>
+
+    <app-input
+      [type]="'password'"
+      [label]="'Password'"
+      (valueEmitter)="changePassword($event)"
+    ></app-input>
+
+    <div class="col s12">
+      <app-button
+        (clicked)="tryLogin()"
+        [isDisabled]="loginDisabled"
+        [text]="'Sign in'"
+      ></app-button>
+    </div>
+  </div>
+</div>

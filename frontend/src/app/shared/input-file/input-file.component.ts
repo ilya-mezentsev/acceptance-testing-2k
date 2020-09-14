@@ -25,7 +25,7 @@ export class InputFileComponent implements OnInit {
 
   public reset(): void {
     this.fileInput.nativeElement.value = null;
-    this.filenameInput.nativeElement.value = "";
+    this.filenameInput.nativeElement.value = '';
     this.fileChanged.emit();
   }
 

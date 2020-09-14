@@ -1,0 +1,116 @@
+<div class="col s12">
+  <div class="center-align">
+    <h5>
+      Welcome to Script-testing -
+    </h5>
+  </div>
+  <div class="center-align margin-b10">
+    <h5>
+      <a target="_blank" href="{{getRepositoryURL()}}">open-source</a>
+      project for write and run tests for your REST services
+    </h5>
+    <hr />
+  </div>
+
+  <ul class="collection with-header">
+    <li class="collection-header"><h5>Why?</h5></li>
+    <li class="collection-item">
+      This project can help you to test your REST services using only one file with tests.
+    </li>
+    <li class="collection-item">
+      Backend of this project run all your tests in parallel, so it's very quick
+    </li>
+    <li class="collection-item">
+      You don't need to use some script language (such as JS or Python).
+      Support and maintain its infrastructure can be very boring
+    </li>
+    <li class="collection-item">
+      This tests don't require to be written by your software engineer -
+      it can be QA or even (really!?) Manager
+    </li>
+    <li class="collection-item">
+      It's
+      <a target="_blank" href="{{getRepositoryURL()}}">open-source</a>
+      project (if you want to use it locally) and free to use
+    </li>
+  </ul>
+
+  <ul class="collection with-header">
+    <li class="collection-header"><h5>Getting started</h5></li>
+    <li class="collection-item">
+      <i class="material-icons tiny">account_circle</i>
+      Sign up
+    </li>
+    <li class="collection-item">
+      <i class="material-icons tiny">add_box</i>
+      Create objects and commands
+    </li>
+    <li class="collection-item">
+      <i class="material-icons tiny">border_color</i>
+      Write file with tests
+    </li>
+    <li class="collection-item">
+      <i class="material-icons tiny">attach_file</i>
+      Upload it and run tests
+    </li>
+    <li class="collection-item">
+      <i class="material-icons tiny">search</i>
+      Analyze tests report
+    </li>
+  </ul>
+
+  <h5>Example of usage</h5>
+  <h6>Example of service implementation (node.js)</h6>
+  <pre>
+    <code>
+    users.get('/:hash', (req, res) => {{"{"}}
+      const user = usersRepository.find(u => u.hash === req.params.hash);
+
+      if (user) {{"{"}}
+        res.status(200).send({{"{"}}
+          status: 'ok',
+          data: user
+        });
+      } else {{"{"}}
+        res.status(200).send({{"{"}}
+          status: 'error',
+          data: 'user-not-found'
+        });
+      }
+    });
+
+    users.post('/', (req, res) => {{"{"}}
+      const {{"{"}} name } = req.body;
+      const hash = uuid4();
+
+      usersRepository.push({{"{"}}
+        hash, name
+      });
+      res.status(200).send({{"{"}}status: 'ok', hash});
+    });
+    </code>
+  </pre>
+
+  <h6>Tests example</h6>
+  <pre>
+    <code>
+      BEGIN
+        createUserResponse = CREATE USER {{"{"}}"name": "Joe"}
+
+        ASSERT createUserResponse.status EQUALS ok
+
+        userResponse = GET USER ${{"{"}}createUserResponse.hash}
+
+        ASSERT userResponse.status EQUALS ok
+        ASSERT userResponse.data.name EQUALS Joe
+      END
+
+      BEGIN
+        userResponse = GET USER not-exists-hash
+
+        ASSERT userResponse.status EQUALS error
+        ASSERT userResponse.data EQUALS user-not-found
+      END
+    </code>
+  </pre>
+</div>

@@ -27,6 +27,10 @@ export class MaterializeInitService {
     });
   }
 
+  public initCollapsibleWithoutOptions(): void {
+    M.Collapsible.init(document.querySelectorAll('.collapsible'), {});
+  }
+
   public initTooltips(): void {
     M.Tooltip.init(document.querySelectorAll('.with-tooltip'), {});
   }

@@ -4,6 +4,7 @@ import {ErrorHandlerService} from '../../services/errors/error-handler.service';
 import {Router} from '@angular/router';
 import {SessionStorageService} from '../../services/session/session-storage.service';
 import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
+import {StorageService} from '../services/storage/storage.service';
 
 @Component({
   selector: 'app-navigation',
@@ -22,9 +23,14 @@ export class NavigationComponent implements OnInit {
     {path: './general-headers', name: 'Headers'},
     {path: './general-cookies', name: 'Cookies'},
   ];
+  public readonly infoRoutes: Array<{path: string, name: string}> = [
+    {path: './faq', name: 'FAQ'},
+    {path: './about', name: 'About'},
+  ];
 
   constructor(
     private readonly router: Router,
+    private readonly storage: StorageService,
     private readonly materializeInit: MaterializeInitService,
     private readonly sessionStorage: SessionStorageService,
     private readonly errorHandler: ErrorHandlerService,
@@ -34,6 +40,7 @@ export class NavigationComponent implements OnInit {
   public signOut(): void {
     this.fetcher.delete('/session/')
       .then(() => this.sessionStorage.deleteSession())
+      .then(() => this.storage.invalidate())
       .then(() => this.router.navigate(['/']))
       .catch(err => this.errorHandler.handle(err));
   }

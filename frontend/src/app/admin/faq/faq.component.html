@@ -1,0 +1,98 @@
+<div class="col s12">
+  <div class="center-align margin-b10">
+    <h5>Here is collected few frequently asked questions and answers for them</h5>
+    <hr />
+  </div>
+
+  <ul class="collapsible">
+    <li>
+      <div class="collapsible-header">How to create object?</div>
+      <div class="collapsible-body">
+        <span>Just try <a [routerLink]="['../create-object']">this</a> link</span>
+      </div>
+    </li>
+
+    <li>
+      <div class="collapsible-header">How to create command for my object?</div>
+      <div class="collapsible-body">
+        <span>
+          You need to click on edit-icon against name of your object
+          <a [routerLink]="['../objects-list']">here</a>
+        </span>
+      </div>
+    </li>
+
+    <li>
+      <div class="collapsible-header">How to update base URL for all my commands?</div>
+      <div class="collapsible-body">
+        <span>You can do this <a [routerLink]="['../general-base-urls']">here</a></span>
+        <br />
+        <span>
+          Also you can update
+          <a [routerLink]="['../general-timeouts']">timeouts</a>,
+          <a [routerLink]="['../general-headers']">headers</a> and
+          <a [routerLink]="['../general-cookies']">cookies</a> of your commands
+        </span>
+      </div>
+    </li>
+
+    <li>
+      <div class="collapsible-header">How to run my tests?</div>
+      <div class="collapsible-body">
+        <span>
+          <a [routerLink]="['../run-tests']">Here</a> click on button "Tests file",
+          chose file and click on button "Run tests"
+        </span>
+      </div>
+    </li>
+
+    <li>
+      <div class="collapsible-header">How simple test looks like?</div>
+      <div class="collapsible-body">
+        <span>
+          Something like this:
+        </span>
+        <pre>
+          <code>
+            BEGIN
+              createUserResponse = CREATE USER {{"{"}}"name": "Joe"}
+
+              ASSERT createUserResponse.status EQUALS ok
+
+              deleteUserResponse = DELETE USER ${{"{"}}createUserResponse.hash}
+
+              ASSERT deleteUserResponse.status EQUALS ok
+
+              userResponse = GET USER ${{"{"}}createUserResponse.hash}
+
+              ASSERT userResponse.status EQUALS error
+              ASSERT userResponse.data EQUALS user-not-found
+            END
+
+            BEGIN
+              createUserResponse = CREATE USER {{"{"}}"name": "Nick"}
+
+              ASSERT createUserResponse.status EQUALS ok
+
+              userStatResponse = STAT USER {{"{"}}"hash": "${{"{"}}createUserResponse.hash}"}
+
+              ASSERT userStatResponse.status EQUALS ok
+              ASSERT_TRUE userStatResponse.data.exists
+              ASSERT_FALSE userStatResponse.data.deleted
+            END
+          </code>
+        </pre>
+      </div>
+    </li>
+
+    <li>
+      <div class="collapsible-header">Why my account was deleted on next day after registration?</div>
+      <div class="collapsible-body">
+        <span>
+          This is basic rule of this project - each account has no limits of usage but after 24 hours it will be deleted. <br />
+          If community will show interest to this project I will add verification of account; verified accounts won't be deleted
+        </span>
+      </div>
+    </li>
+  </ul>
+</div>

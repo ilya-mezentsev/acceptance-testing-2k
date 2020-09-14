@@ -9,11 +9,22 @@ import {InvalidateStorage} from '../../../services/radio/const';
 export class StorageService {
   private readonly testObjectsKey = 'test-objects';
   private readonly testCommandsKey = 'test-commands';
+  private readonly allStorageKeys: string[] = [
+    this.testObjectsKey,
+    this.testCommandsKey,
+  ];
   private readonly storage: Map<string, any> = new Map<string, any>();
 
   constructor(
     private readonly radio: RadioService
   ) {}
+
+  // invalidate all storage data
+  public invalidate(): void {
+    for (const storageKey of this.allStorageKeys) {
+      this.storage.delete(storageKey);
+    }
+  }
 
   public invalidateObjects(): void {
     this.storage.delete(this.testObjectsKey);

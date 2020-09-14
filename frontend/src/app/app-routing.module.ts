@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import {AuthComponent} from './auth/auth.component';
-import {LoginComponent} from './auth/login/login.component';
-import {RegistrationComponent} from './auth/registration/registration.component';
+import {LoginComponent} from './public/login/login.component';
+import {RegistrationComponent} from './public/registration/registration.component';
 import {AdminComponent} from './admin/admin.component';
-import {NotFoundComponent} from './not-found/not-found.component';
+import {NotFoundComponent} from './public/not-found/not-found.component';
 import {SessionGuard} from './session.guard';
 import {ObjectsListComponent} from './admin/objects-list/objects-list.component';
 import {RunTestsComponent} from './admin/run-tests/run-tests.component';
@@ -16,16 +15,13 @@ import {BaseUrlsComponent} from './admin/general-settings/base-urls/base-urls.co
 import {TimeoutsComponent} from './admin/general-settings/timeouts/timeouts.component';
 import {HeadersComponent} from './admin/general-settings/headers/headers.component';
 import {CookiesComponent} from './admin/general-settings/cookies/cookies.component';
+import {FaqComponent} from './admin/faq/faq.component';
+import {PublicComponent} from './public/public.component';
+import {AboutComponent} from './public/about/about.component';
 
 
 const routes: Routes = [
-  {path: '', redirectTo: 'authorization', pathMatch: 'full'},
-  {path: 'authorization', component: AuthComponent, children: [
-    {path: '', redirectTo: 'login', pathMatch: 'full'},
-    {path: 'login', component: LoginComponent},
-    {path: 'registration', component: RegistrationComponent},
-    {path: '**', redirectTo: 'login'},
-  ]},
+  {path: '', redirectTo: 'public', pathMatch: 'full'},
   {path: 'admin', component: AdminComponent, canActivate: [SessionGuard], children: [
     {path: '', redirectTo: 'objects-list', pathMatch: 'full'},
     {path: 'objects-list', component: ObjectsListComponent},
@@ -38,9 +34,18 @@ const routes: Routes = [
     {path: 'general-timeouts', component: TimeoutsComponent},
     {path: 'general-headers', component: HeadersComponent},
     {path: 'general-cookies', component: CookiesComponent},
-    {path: '**', redirectTo: 'objects-list'},
+    {path: 'faq', component: FaqComponent},
+    {path: 'about', component: AboutComponent},
+    {path: '**', component: NotFoundComponent},
   ]},
-  {path: '**', component: NotFoundComponent}
+  {path: 'public', component: PublicComponent, children: [
+    {path: '', redirectTo: 'sign-in', pathMatch: 'full'},
+    {path: 'sign-in', component: LoginComponent},
+    {path: 'sign-up', component: RegistrationComponent},
+    {path: 'about', component: AboutComponent},
+    {path: '**', component: NotFoundComponent},
+  ]},
+  {path: '**', redirectTo: 'public/not-found'}
 ];
 
 @NgModule({

@@ -12,7 +12,7 @@ export class NavigationService {
   ) {}
 
   public navigateToLogin(): void {
-    this.router.navigate(['/authorization'])
+    this.router.navigate(['/public/sign-in'])
       .catch(err => this.errorHandler.handle(err));
   }
 

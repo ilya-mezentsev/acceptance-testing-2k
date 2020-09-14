@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  csrfPrivateKey: 'ac385b85095bd187e68607f61a580845'
+  csrfPrivateKey: 'ac385b85095bd187e68607f61a580845',
+  projectRepoURL: 'https://github.com/ilya-mezentsev/auto-acceptance-testing',
 };
 
 /*

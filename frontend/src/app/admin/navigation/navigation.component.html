@@ -12,11 +12,20 @@
         >
           <a [routerLink]="[route.path]">{{route.name}}</a>
         </li>
+
         <li>
           <a class="dropdown-trigger" data-target="general-settings">General settings
             <i class="material-icons right">arrow_drop_down</i>
           </a>
         </li>
+
+        <li
+          [routerLinkActive]="['active']"
+          *ngFor="let route of infoRoutes"
+        >
+          <a [routerLink]="[route.path]">{{route.name}}</a>
+        </li>
+
         <li>
           <a (click)="signOut()"><i class="material-icons">exit_to_app</i></a>
         </li>
@@ -48,11 +57,20 @@
   >
     <a [routerLink]="[route.path]">{{route.name}}</a>
   </li>
+
   <li>
     <a class="dropdown-trigger" data-target="general-settings-mobile">General settings
       <i class="material-icons right">arrow_drop_down</i>
     </a>
   </li>
+
+  <li
+    [routerLinkActive]="['active']"
+    *ngFor="let route of infoRoutes"
+  >
+    <a [routerLink]="[route.path]">{{route.name}}</a>
+  </li>
+
   <li>
     <a (click)="signOut()"><i class="material-icons">exit_to_app</i></a>
   </li>

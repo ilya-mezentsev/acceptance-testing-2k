@@ -4,13 +4,12 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FetcherService } from './services/fetcher/fetcher.service';
-import { LoginComponent } from './auth/login/login.component';
-import { RegistrationComponent } from './auth/registration/registration.component';
-import { AuthComponent } from './auth/auth.component';
+import { LoginComponent } from './public/login/login.component';
+import { RegistrationComponent } from './public/registration/registration.component';
 import { InputComponent } from './shared/input/input.component';
 import { FormsModule } from '@angular/forms';
 import { AdminComponent } from './admin/admin.component';
-import { NotFoundComponent } from './not-found/not-found.component';
+import { NotFoundComponent } from './public/not-found/not-found.component';
 import { NavigationComponent } from './admin/navigation/navigation.component';
 import { RunTestsComponent } from './admin/run-tests/run-tests.component';
 import { ObjectsListComponent } from './admin/objects-list/objects-list.component';
@@ -33,13 +32,16 @@ import { CommandsTableComponent } from './admin/general-settings/shared/commands
 import { InputCheckboxComponent } from './shared/input-checkbox/input-checkbox.component';
 import { HeadersAddingComponent } from './admin/shared/headers-adding/headers-adding.component';
 import { CookiesAddingComponent } from './admin/shared/cookies-adding/cookies-adding.component';
+import { PublicComponent } from './public/public.component';
+import { FaqComponent } from './admin/faq/faq.component';
+import { PublicNavigationComponent } from './public/public-navigation/public-navigation.component';
+import { AboutComponent } from './public/about/about.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegistrationComponent,
-    AuthComponent,
     InputComponent,
     AdminComponent,
     NotFoundComponent,
@@ -65,6 +67,10 @@ import { CookiesAddingComponent } from './admin/shared/cookies-adding/cookies-ad
     InputCheckboxComponent,
     HeadersAddingComponent,
     CookiesAddingComponent,
+    PublicComponent,
+    FaqComponent,
+    PublicNavigationComponent,
+    AboutComponent,
   ],
   imports: [
     BrowserModule,
