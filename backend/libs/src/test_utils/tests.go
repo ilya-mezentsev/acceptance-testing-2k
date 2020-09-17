@@ -75,28 +75,29 @@ func GetTestServer(r *mux.Router) *httptest.Server {
 	return httptest.NewServer(r)
 }
 
-func RequestGet(url string) io.ReadCloser {
-	return makeRequest(http.MethodGet, url, "")
+func RequestGet(url, accountHash string) io.ReadCloser {
+	return makeRequest(http.MethodGet, url, "", accountHash)
 }
 
-func RequestPost(url, data string) io.ReadCloser {
-	return makeRequest(http.MethodPost, url, data)
+func RequestPost(url, data, accountHash string) io.ReadCloser {
+	return makeRequest(http.MethodPost, url, data, accountHash)
 }
 
-func RequestPatch(url, data string) io.ReadCloser {
-	return makeRequest(http.MethodPatch, url, data)
+func RequestPatch(url, data, accountHash string) io.ReadCloser {
+	return makeRequest(http.MethodPatch, url, data, accountHash)
 }
 
-func RequestDelete(url string) io.ReadCloser {
-	return makeRequest(http.MethodDelete, url, "")
+func RequestDelete(url, accountHash string) io.ReadCloser {
+	return makeRequest(http.MethodDelete, url, "", accountHash)
 }
 
-func makeRequest(method, url, data string) io.ReadCloser {
+func makeRequest(method, url, data, accountHash string) io.ReadCloser {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(data)))
 	if err != nil {
 		panic(err)
 	}
 
+	req.Header.Add("AAT-Account-Hash", accountHash)
 	return MustDoRequest(req)
 }
 
@@ -131,7 +132,7 @@ func GetMockRequest(data string) *http.Request {
 	)
 }
 
-func MustGetFileUploadRequest(url, paramName, filePath string) *http.Request {
+func MustGetFileUploadRequest(url, paramName, filePath, accountHash string) *http.Request {
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
@@ -172,9 +173,10 @@ func MustGetFileUploadRequest(url, paramName, filePath string) *http.Request {
 	}
 
 	req.Header.Add("Content-Type", writer.FormDataContentType())
+	req.Header.Add("AAT-Account-Hash", accountHash)
 	return req
 }
 
-func MustGetFileUploadMockRequest(paramName, filePath string) *http.Request {
-	return MustGetFileUploadRequest("https://link.com", paramName, filePath)
+func MustGetFileUploadMockRequest(paramName, filePath, accountHash string) *http.Request {
+	return MustGetFileUploadRequest("https://link.com", paramName, filePath, accountHash)
 }

@@ -37,8 +37,8 @@ func TestMain(m *testing.M) {
 func TestService_CreateSuccess(t *testing.T) {
 	defer testCommandsRepositoryMock.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
+	response := s.Create(services.SomeHash, test_utils.GetReadCloser(
+		fmt.Sprintf(`{"command_settings": {
 			"name": "CREATE",
 			"object_hash": "%s",
 			"method": "POST",
@@ -46,7 +46,7 @@ func TestService_CreateSuccess(t *testing.T) {
 			"endpoint": "user/settings",
 			"timeout": 3,
 			"pass_arguments_in_url": true
-		}}`, services.SomeHash, services.PredefinedTestObject1.Hash),
+		}}`, services.PredefinedTestObject1.Hash),
 	))
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
@@ -92,7 +92,7 @@ func TestService_CreateSuccess(t *testing.T) {
 func TestService_CreateDecodeBodyError(t *testing.T) {
 	defer testCommandsRepositoryMock.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(`1`))
+	response := s.Create(``, test_utils.GetReadCloser(`1`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -111,14 +111,14 @@ func TestService_CreateDecodeBodyError(t *testing.T) {
 func TestService_CreateInvalidRequestError(t *testing.T) {
 	defer testCommandsRepositoryMock.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
+	response := s.Create(services.SomeHash, test_utils.GetReadCloser(
+		`{"command_settings": {
 			"name": "@#$!@#4",
 			"object_name": "",
 			"method": "HEAD",
 			"base_url": "bad-url",
 			"endpoint": ""
-		}}`, services.SomeHash),
+		}}`,
 	))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
@@ -138,8 +138,8 @@ func TestService_CreateInvalidRequestError(t *testing.T) {
 func TestService_CreateCommandExistsError(t *testing.T) {
 	defer testCommandsRepositoryMock.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
+	response := s.Create(services.PredefinedAccountHash, test_utils.GetReadCloser(
+		fmt.Sprintf(`{"command_settings": {
 			"name": "%s",
 			"object_hash": "%s",
 			"method": "POST",
@@ -148,7 +148,6 @@ func TestService_CreateCommandExistsError(t *testing.T) {
 			"timeout": 3,
 			"pass_arguments_in_url": true
 		}}`,
-			services.PredefinedAccountHash,
 			services.PredefinedTestCommand1.Name,
 			services.PredefinedTestObject1.Hash,
 		),
@@ -171,8 +170,8 @@ func TestService_CreateCommandExistsError(t *testing.T) {
 func TestService_CreateRepositoryError(t *testing.T) {
 	defer testCommandsRepositoryMock.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(`{"account_hash": "%s", "command_settings": {
+	response := s.Create(services.BadAccountHash, test_utils.GetReadCloser(
+		fmt.Sprintf(`{"command_settings": {
 			"name": "CREATE",
 			"object_hash": "%s",
 			"method": "POST",
@@ -180,7 +179,7 @@ func TestService_CreateRepositoryError(t *testing.T) {
 			"endpoint": "user/settings",
 			"timeout": 3,
 			"pass_arguments_in_url": true
-		}}`, services.BadAccountHash, services.PredefinedTestObject1.Hash),
+		}}`, services.PredefinedTestObject1.Hash),
 	))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
@@ -332,9 +331,8 @@ func TestService_GetRepositoryError(t *testing.T) {
 func TestService_UpdateSuccess(t *testing.T) {
 	defer testCommandsRepositoryMock.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(
+	response := s.Update(services.PredefinedAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"exists_command": {
 				"name": "CREATE",
 				"hash": "%s",
@@ -356,7 +354,6 @@ func TestService_UpdateSuccess(t *testing.T) {
 				"pass_arguments_in_url": false
 			}
 		}`,
-			services.PredefinedAccountHash,
 			services.PredefinedTestCommand1.Hash,
 			services.PredefinedTestObject1.Hash,
 			services.PredefinedTestCommand1.Hash,
@@ -383,7 +380,7 @@ func TestService_UpdateSuccess(t *testing.T) {
 func TestService_UpdateDecodeBodyError(t *testing.T) {
 	defer testCommandsRepositoryMock.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(`1`))
+	response := s.Update(``, test_utils.GetReadCloser(`1`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -402,9 +399,8 @@ func TestService_UpdateDecodeBodyError(t *testing.T) {
 func TestService_UpdateInvalidRequestError(t *testing.T) {
 	defer testCommandsRepositoryMock.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(
+	response := s.Update("blah-blah", test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "blah-blah",
 			"exists_command": {
 				"name": "CREATE",
 				"hash": "%s",
@@ -448,9 +444,8 @@ func TestService_UpdateInvalidRequestError(t *testing.T) {
 func TestService_UpdateRepositoryError(t *testing.T) {
 	defer testCommandsRepositoryMock.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(
+	response := s.Update(services.BadAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"exists_command": {
 				"name": "CREATE",
 				"hash": "%s",
@@ -472,7 +467,6 @@ func TestService_UpdateRepositoryError(t *testing.T) {
 				"pass_arguments_in_url": true
 			}
 		}`,
-			services.BadAccountHash,
 			services.PredefinedTestCommand1.Hash,
 			services.PredefinedTestObject1.Hash,
 			services.PredefinedTestCommand1.Hash,

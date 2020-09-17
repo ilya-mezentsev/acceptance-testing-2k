@@ -24,7 +24,7 @@ func New(repository interfaces.TestCommandMetaCreatorRepository) Service {
 	}
 }
 
-func (s Service) Create(request io.ReadCloser) interfaces.Response {
+func (s Service) Create(accountHash string, request io.ReadCloser) interfaces.Response {
 	var massCookiesCreateRequest models.MassCookiesCreateRequest
 	err := request_decoder.Decode(request, &massCookiesCreateRequest)
 	if err != nil {
@@ -39,7 +39,7 @@ func (s Service) Create(request io.ReadCloser) interfaces.Response {
 	newCommandMeta := models.CommandMeta{
 		Cookies: s.prepareCookiesToCreation(massCookiesCreateRequest),
 	}
-	if !validation.IsMd5Hash(massCookiesCreateRequest.AccountHash) ||
+	if !validation.IsMd5Hash(accountHash) ||
 		!validation.IsValid(&newCommandMeta) {
 		return response_factory.ErrorResponse(errors.ServiceError{
 			Code:        unableToMassAddCookies,
@@ -47,10 +47,11 @@ func (s Service) Create(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	err = s.repository.Create(massCookiesCreateRequest.AccountHash, newCommandMeta)
+	err = s.repository.Create(accountHash, newCommandMeta)
 	if err != nil {
 		s.logger.LogCreateEntityRepositoryError(err, map[string]interface{}{
 			"mass_cookies_create_request": massCookiesCreateRequest,
+			"account_hash":                accountHash,
 		})
 
 		return response_factory.ErrorResponse(errors.ServiceError{

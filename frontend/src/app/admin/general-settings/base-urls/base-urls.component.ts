@@ -2,7 +2,6 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {GeneralBaseURLsUpdateRequest} from '../../types/types';
 import {ToastNotificationService} from '../../../services/notification/toast-notification.service';
 import {DefaultResponse, ErrorResponse, Fetcher} from '../../../interfaces/fetcher';
-import {SessionStorageService} from '../../../services/session/session-storage.service';
 import {ErrorHandlerService} from '../../../services/errors/error-handler.service';
 import {ResponseStatus} from '../../../services/fetcher/statuses';
 import {CodesService} from '../../services/errors/codes.service';
@@ -23,7 +22,6 @@ export class BaseUrlsComponent implements OnInit {
     private readonly storage: StorageService,
     private readonly codesService: CodesService,
     private readonly errorHandler: ErrorHandlerService,
-    private readonly sessionStorage: SessionStorageService,
     private readonly toastNotification: ToastNotificationService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
   ) { }
@@ -38,8 +36,7 @@ export class BaseUrlsComponent implements OnInit {
       return;
     }
 
-    this.fetcher.patch('entity/mass-base-urls/', {
-      account_hash: this.sessionStorage.getSessionId(),
+    this.fetcher.patch('mass-base-urls', {
       base_url: this.request.base_url,
       command_hashes: this.request.command_hashes.map(h => ({hash: h})),
     })

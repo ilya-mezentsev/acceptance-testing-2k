@@ -18,7 +18,6 @@ type (
 	}
 
 	CreateTestCommandRequest struct {
-		AccountHash     string          `json:"account_hash" validation:"md5-hash"`
 		CommandSettings CommandSettings `json:"command_settings"`
 	}
 
@@ -27,7 +26,6 @@ type (
 	}
 
 	UpdateTestCommandRequest struct {
-		AccountHash    string          `json:"account_hash" validation:"md5-hash"`
 		ExistsCommand  CommandSettings `json:"exists_command"`
 		UpdatedCommand CommandSettings `json:"updated_command"`
 	}
@@ -37,7 +35,6 @@ type (
 	}
 
 	massUpdateRequest struct {
-		AccountHash   string         `json:"account_hash" validation:"md5-hash"`
 		CommandHashes []UpdateTarget `json:"command_hashes"`
 	}
 
@@ -74,7 +71,6 @@ type (
 	}
 
 	CreateMetaRequest struct {
-		AccountHash string      `json:"account_hash" validation:"md5-hash"`
 		CommandHash string      `json:"command_hash" validation:"md5-hash"`
 		CommandMeta CommandMeta `json:"command_meta"`
 	}

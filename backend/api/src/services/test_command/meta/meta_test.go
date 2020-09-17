@@ -31,15 +31,14 @@ func TestMain(m *testing.M) {
 func TestService_CreateSuccess(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
+	response := s.Create(services.PredefinedAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"command_hash": "%s",
 			"command_meta": {
 				"headers": [{"key": "X-Token", "value": "token"}],
 				"cookies": [{"key": "CSRF-Token", "value": "csrf-token"}]
 			}
-		}`, services.PredefinedAccountHash, services.PredefinedTestCommand1.Hash),
+		}`, services.PredefinedTestCommand1.Hash),
 	))
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
@@ -67,7 +66,7 @@ func TestService_CreateSuccess(t *testing.T) {
 func TestService_CreateDecodeBodyError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(`1`))
+	response := s.Create(``, test_utils.GetReadCloser(`1`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -86,9 +85,8 @@ func TestService_CreateDecodeBodyError(t *testing.T) {
 func TestService_CreateInvalidRequestError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
+	response := s.Create(``, test_utils.GetReadCloser(
 		`{
-			"account_hash": "bad-hash",
 			"command_hash": "bad-hash",
 			"command_meta": {
 				"headers": [{"key": "!@#@$#@", "value": "token"}]
@@ -113,15 +111,14 @@ func TestService_CreateInvalidRequestError(t *testing.T) {
 func TestService_CreateRepositoryError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
+	response := s.Create(services.BadAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"command_hash": "%s",
 			"command_meta": {
 				"headers": [{"key": "X-Token", "value": "token"}],
 				"cookies": [{"key": "CSRF-Token", "value": "csrf-token"}]
 			}
-		}`, services.BadAccountHash, services.PredefinedTestCommand1.Hash),
+		}`, services.PredefinedTestCommand1.Hash),
 	))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
@@ -141,13 +138,11 @@ func TestService_CreateRepositoryError(t *testing.T) {
 func TestService_UpdateSuccess(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(
+	response := s.Update(services.PredefinedAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"headers": [{"hash": "%s", "field_name": "key", "new_value": "FOO"}],
 			"cookies": [{"hash": "%s", "field_name": "value", "new_value": "BAR"}]
 		}`,
-			services.PredefinedAccountHash,
 			services.PredefinedHeader1.Hash,
 			services.PredefinedCookie1.Hash),
 	))
@@ -179,7 +174,7 @@ func TestService_UpdateSuccess(t *testing.T) {
 func TestService_UpdateDecodeBodyError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(`1`))
+	response := s.Update(``, test_utils.GetReadCloser(`1`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -198,13 +193,11 @@ func TestService_UpdateDecodeBodyError(t *testing.T) {
 func TestService_UpdateInvalidRequestError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(
+	response := s.Update(services.PredefinedAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"headers": [{"hash": "%s", "field_name": "foo", "new_value": "FOO"}],
 			"cookies": [{"hash": "%s", "field_name": "bar", "new_value": "BAR"}]
 		}`,
-			services.PredefinedAccountHash,
 			services.PredefinedHeader1.Hash,
 			services.PredefinedCookie1.Hash),
 	))
@@ -226,13 +219,11 @@ func TestService_UpdateInvalidRequestError(t *testing.T) {
 func TestService_UpdateRepositoryError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(
+	response := s.Update(services.BadAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"headers": [{"hash": "%s", "field_name": "key", "new_value": "FOO"}],
 			"cookies": [{"hash": "%s", "field_name": "value", "new_value": "BAR"}]
 		}`,
-			services.BadAccountHash,
 			services.PredefinedHeader1.Hash,
 			services.PredefinedCookie1.Hash),
 	))

@@ -32,8 +32,8 @@ func TestMain(m *testing.M) {
 func TestService_CreateSuccess(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(`{"account_hash": "%s", "test_object": {"name": "TEST"}}`, services.SomeHash),
+	response := s.Create(services.SomeHash, test_utils.GetReadCloser(
+		fmt.Sprintf(`{"test_object": {"name": "TEST"}}`),
 	))
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
@@ -46,7 +46,7 @@ func TestService_CreateSuccess(t *testing.T) {
 func TestService_CreateDecodeBodyError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(`1`))
+	response := s.Create(``, test_utils.GetReadCloser(`1`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -65,8 +65,8 @@ func TestService_CreateDecodeBodyError(t *testing.T) {
 func TestService_CreateInvalidRequestError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
-		`{"account_hash": "some-hash", "test_object": {"name": "TEST"}}`,
+	response := s.Create("some-hash", test_utils.GetReadCloser(
+		`{"test_object": {"name": "TEST"}}`,
 	))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
@@ -86,10 +86,9 @@ func TestService_CreateInvalidRequestError(t *testing.T) {
 func TestService_CreateObjectExistsError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
+	response := s.Create(services.PredefinedAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(
-			`{"account_hash": "%s", "test_object": {"name": "%s"}}`,
-			services.PredefinedAccountHash, services.PredefinedTestObject1.Name,
+			`{"test_object": {"name": "%s"}}`, services.PredefinedTestObject1.Name,
 		),
 	))
 
@@ -110,11 +109,8 @@ func TestService_CreateObjectExistsError(t *testing.T) {
 func TestService_CreateRepositoryError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
-		fmt.Sprintf(
-			`{"account_hash": "%s", "test_object": {"name": "TEST"}}`,
-			services.BadAccountHash,
-		),
+	response := s.Create(services.BadAccountHash, test_utils.GetReadCloser(
+		fmt.Sprintf(`{"test_object": {"name": "TEST"}}`),
 	))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
@@ -243,13 +239,12 @@ func TestService_GetRepositoryError(t *testing.T) {
 func TestService_UpdateSuccess(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(
+	response := s.Update(services.PredefinedAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(
 			`
-			{"account_hash": "%s",
-			"update_payload": [{"hash": "%s", "field_name": "name", "new_value": "FOO"}]
+			{
+				"update_payload": [{"hash": "%s", "field_name": "name", "new_value": "FOO"}]
 			}`,
-			services.PredefinedAccountHash,
 			services.PredefinedTestObject1.Hash,
 		),
 	))
@@ -263,7 +258,7 @@ func TestService_UpdateSuccess(t *testing.T) {
 func TestService_UpdateDecodeBodyError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(`1`))
+	response := s.Update(``, test_utils.GetReadCloser(`1`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -282,9 +277,8 @@ func TestService_UpdateDecodeBodyError(t *testing.T) {
 func TestService_UpdateInvalidRequestError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(
+	response := s.Update("hash-1", test_utils.GetReadCloser(
 		`{
-			"account_hash": "hash-1",
 			"update_payload": [{"hash": "hash-2", "field_name": "bad-name", "new_value": "FOO"}]
 		}`,
 	))
@@ -306,13 +300,12 @@ func TestService_UpdateInvalidRequestError(t *testing.T) {
 func TestService_UpdateRepositoryError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Update(test_utils.GetReadCloser(
+	response := s.Update(services.BadAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(
 			`
-			{"account_hash": "%s",
-			"update_payload": [{"hash": "%s", "field_name": "name", "new_value": "FOO"}]
+			{
+				"update_payload": [{"hash": "%s", "field_name": "name", "new_value": "FOO"}]
 			}`,
-			services.BadAccountHash,
 			services.PredefinedTestObject1.Hash,
 		),
 	))

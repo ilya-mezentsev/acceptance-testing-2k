@@ -50,7 +50,6 @@ func TestIsValidStruct(t *testing.T) {
 
 	t.Run("valid struct UpdateRequest", func(t *testing.T) {
 		test_utils.AssertTrue(IsValid(&models.UpdateRequest{
-			AccountHash: hash.Md5WithTimeAsKey("hash"),
 			UpdatePayload: []models.UpdateModel{
 				{
 					Hash:      hash.Md5WithTimeAsKey("hash"),
@@ -60,7 +59,6 @@ func TestIsValidStruct(t *testing.T) {
 		}), t)
 
 		test_utils.AssertTrue(IsValid(&models.UpdateRequest{
-			AccountHash: hash.Md5WithTimeAsKey("hash"),
 			UpdatePayload: []models.UpdateModel{
 				{
 					Hash:      hash.Md5WithTimeAsKey("hash"),
@@ -72,7 +70,6 @@ func TestIsValidStruct(t *testing.T) {
 
 	t.Run("invalid field name", func(t *testing.T) {
 		test_utils.AssertFalse(IsValid(&models.UpdateRequest{
-			AccountHash: hash.Md5WithTimeAsKey("hash"),
 			UpdatePayload: []models.UpdateModel{
 				{
 					Hash:      hash.Md5WithTimeAsKey("hash"),

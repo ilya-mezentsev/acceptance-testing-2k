@@ -95,6 +95,7 @@ func TestController_CreateSessionSuccess(t *testing.T) {
 			services.ExistsLogin,
 			services.ExistsPassword,
 		),
+		``,
 	)
 
 	var response response_writer.Response
@@ -115,6 +116,7 @@ func TestController_CreateSessionError(t *testing.T) {
 			services.BadLogin,
 			services.BadPassword,
 		),
+		``,
 	)
 
 	var response response_writer.ResponseWithData
@@ -128,7 +130,10 @@ func TestController_DeleteSession(t *testing.T) {
 	server := test_utils.GetTestServer(r)
 	defer server.Close()
 
-	responseData := test_utils.RequestDelete(fmt.Sprintf("%s/session/", server.URL))
+	responseData := test_utils.RequestDelete(
+		fmt.Sprintf("%s/session/", server.URL),
+		``,
+	)
 
 	var response response_writer.Response
 	err := json.NewDecoder(responseData).Decode(&response)

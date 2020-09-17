@@ -23,7 +23,7 @@ func New(repository interfaces.UpdateRepository) Service {
 	}
 }
 
-func (s Service) Update(request io.ReadCloser) interfaces.Response {
+func (s Service) Update(accountHash string, request io.ReadCloser) interfaces.Response {
 	var massBaseURLsUpdateRequest models.MassBaseURLsUpdateRequest
 	err := request_decoder.Decode(request, &massBaseURLsUpdateRequest)
 	if err != nil {
@@ -35,7 +35,7 @@ func (s Service) Update(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	if !validation.IsValid(&massBaseURLsUpdateRequest) {
+	if !validation.IsMd5Hash(accountHash) || !validation.IsValid(&massBaseURLsUpdateRequest) {
 		return response_factory.ErrorResponse(errors.ServiceError{
 			Code:        unableToMassUpdateBaseURL,
 			Description: errors.InvalidRequestError,
@@ -43,7 +43,7 @@ func (s Service) Update(request io.ReadCloser) interfaces.Response {
 	}
 
 	err = s.repository.Update(
-		massBaseURLsUpdateRequest.AccountHash,
+		accountHash,
 		s.getUpdateModels(massBaseURLsUpdateRequest),
 	)
 	if err != nil {

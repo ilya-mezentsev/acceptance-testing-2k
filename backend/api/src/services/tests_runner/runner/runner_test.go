@@ -58,7 +58,11 @@ func TestService_RunSuccess(t *testing.T) {
 
 	response := New(filesManager, c).Run(
 		testHash,
-		test_utils.MustGetFileUploadMockRequest("tests_cases_file", testCasesPath),
+		test_utils.MustGetFileUploadMockRequest(
+			"tests_cases_file",
+			testCasesPath,
+			testHash,
+		),
 	)
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
@@ -83,7 +87,11 @@ func TestService_RunParseMultipartFormError(t *testing.T) {
 	go test_utils.InitGRPCServer(t.Name(), serviceServerMock)
 	<-serverStarted
 
-	req := test_utils.MustGetFileUploadMockRequest("tests_cases_file", testCasesPath)
+	req := test_utils.MustGetFileUploadMockRequest(
+		"tests_cases_file",
+		testCasesPath,
+		testHash,
+	)
 	req.Header.Del("Content-Type")
 	response := New(filesManager, c).Run(testHash, req)
 
@@ -111,7 +119,11 @@ func TestService_RunWrongFileKey(t *testing.T) {
 
 	response := New(filesManager, c).Run(
 		testHash,
-		test_utils.MustGetFileUploadMockRequest("wrong_key", testCasesPath),
+		test_utils.MustGetFileUploadMockRequest(
+			"wrong_key",
+			testCasesPath,
+			testHash,
+		),
 	)
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
@@ -138,7 +150,11 @@ func TestService_RunCreateFileError(t *testing.T) {
 
 	response := New(tests_file.New("/"), c).Run(
 		testHash,
-		test_utils.MustGetFileUploadMockRequest("tests_cases_file", testCasesPath),
+		test_utils.MustGetFileUploadMockRequest(
+			"tests_cases_file",
+			testCasesPath,
+			testHash,
+		),
 	)
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
@@ -163,7 +179,11 @@ func TestService_RunCalGRPCServiceError(t *testing.T) {
 
 	response := New(filesManager, c).Run(
 		testHash,
-		test_utils.MustGetFileUploadMockRequest("tests_cases_file", testCasesPath),
+		test_utils.MustGetFileUploadMockRequest(
+			"tests_cases_file",
+			testCasesPath,
+			testHash,
+		),
 	)
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)

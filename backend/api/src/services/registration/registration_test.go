@@ -43,7 +43,7 @@ func TestMain(m *testing.M) {
 func TestService_RegisterSuccess(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(`{"login": "some-login", "password": "!@#@!%@#%"}`))
+	response := s.Create(``, test_utils.GetReadCloser(`{"login": "some-login", "password": "!@#@!%@#%"}`))
 
 	expectedHash := account_credentials.GenerateAccountHash("some-login")
 	_, hashCreated := repository.AccountHashes[expectedHash]
@@ -62,7 +62,7 @@ func TestService_RegisterSuccess(t *testing.T) {
 func TestService_RegisterDecodeBodyError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(`1`))
+	response := s.Create(``, test_utils.GetReadCloser(`1`))
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
 	test_utils.AssertEqual(
@@ -80,7 +80,7 @@ func TestService_RegisterDecodeBodyError(t *testing.T) {
 func TestService_RegisterLoginExists(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(fmt.Sprintf(
+	response := s.Create(``, test_utils.GetReadCloser(fmt.Sprintf(
 		`{"login": "%s", "password": "%s"}`,
 		services.ExistsLogin, services.ExistsPassword,
 	)))
@@ -93,7 +93,7 @@ func TestService_RegisterLoginExists(t *testing.T) {
 func TestService_RegisterInvalidLogin(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(`{"login": "", "password": "!@#@!%@#%"}`))
+	response := s.Create(``, test_utils.GetReadCloser(`{"login": "", "password": "!@#@!%@#%"}`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertEqual(unableToRegisterAccountCode, response.GetData().(errors.ServiceError).Code, t)
@@ -103,7 +103,7 @@ func TestService_RegisterInvalidLogin(t *testing.T) {
 func TestService_RegisterBadAccountHash(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(fmt.Sprintf(
+	response := s.Create(``, test_utils.GetReadCloser(fmt.Sprintf(
 		`{"login": "%s", "password": "%s"}`,
 		services.BadLogin, services.BadPassword,
 	)))
@@ -117,7 +117,7 @@ func TestService_RegisterBadAccountHash(t *testing.T) {
 func TestService_RegisterBadLogin(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(fmt.Sprintf(
+	response := s.Create(``, test_utils.GetReadCloser(fmt.Sprintf(
 		`{"login": "%s", "password": "some-password"}`, services.BadLogin,
 	)))
 
@@ -130,7 +130,7 @@ func TestService_RegisterBadLogin(t *testing.T) {
 func TestService_RegisterCannotCreateDir(t *testing.T) {
 	s := New(&repository, "/")
 
-	response := s.Create(test_utils.GetReadCloser(`{"login": "some-login", "password": "!@#@!%@#%"}`))
+	response := s.Create(``, test_utils.GetReadCloser(`{"login": "some-login", "password": "!@#@!%@#%"}`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -144,7 +144,7 @@ func TestService_RegisterCannotCreateDBFile(t *testing.T) {
 	expectedHash := account_credentials.GenerateAccountHash("some-login")
 	_ = os.Chmod(path.Join(filesRootPath, expectedHash, env.DBFilename), 0100)
 
-	response := s.Create(test_utils.GetReadCloser(`{"login": "some-login", "password": "!@#@!%@#%"}`))
+	response := s.Create(``, test_utils.GetReadCloser(`{"login": "some-login", "password": "!@#@!%@#%"}`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)

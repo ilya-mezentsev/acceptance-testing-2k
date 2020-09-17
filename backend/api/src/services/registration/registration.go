@@ -36,7 +36,7 @@ func New(
 	}
 }
 
-func (s Service) Create(request io.ReadCloser) interfaces.Response {
+func (s Service) Create(_ string, request io.ReadCloser) interfaces.Response {
 	var registrationRequest models.RegistrationRequest
 	err := request_decoder.Decode(request, &registrationRequest)
 	if err != nil {

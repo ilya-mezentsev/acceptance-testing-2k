@@ -197,9 +197,9 @@ func initMiddleware() {
 func initControllers() {
 	r.Use(csrfMiddleware.CheckCSRFToken)
 
-	crudController.Init(r, crudServicesPool)
 	sessionController.Init(r, sessionService)
 	tests_runner.Init(r, testsRunnerService)
+	crudController.Init(r, crudServicesPool)
 }
 
 func main() {

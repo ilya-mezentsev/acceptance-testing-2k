@@ -5,7 +5,6 @@ import {DefaultResponse, ErrorResponse, Fetcher} from '../../../interfaces/fetch
 import {StorageService} from '../../services/storage/storage.service';
 import {CodesService} from '../../services/errors/codes.service';
 import {ErrorHandlerService} from '../../../services/errors/error-handler.service';
-import {SessionStorageService} from '../../../services/session/session-storage.service';
 import {ResponseStatus} from '../../../services/fetcher/statuses';
 
 @Component({
@@ -23,7 +22,6 @@ export class TimeoutsComponent implements OnInit {
     private readonly storage: StorageService,
     private readonly codesService: CodesService,
     private readonly errorHandler: ErrorHandlerService,
-    private readonly sessionStorage: SessionStorageService,
     private readonly toastNotification: ToastNotificationService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
   ) { }
@@ -38,8 +36,7 @@ export class TimeoutsComponent implements OnInit {
       return;
     }
 
-    this.fetcher.patch('entity/mass-timeouts/', {
-      account_hash: this.sessionStorage.getSessionId(),
+    this.fetcher.patch('mass-timeouts', {
       timeout: this.request.timeout,
       command_hashes: this.request.command_hashes.map(h => ({hash: h})),
     })

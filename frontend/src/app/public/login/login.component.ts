@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.fetcher.post('session/', {
+    this.fetcher.post('session', {
       login: this.login,
       password: this.password
     })

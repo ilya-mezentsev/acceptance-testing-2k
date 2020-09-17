@@ -26,7 +26,7 @@ func New(repository interfaces.CRUDRepository) interfaces.CRUDService {
 	}
 }
 
-func (s service) Create(request io.ReadCloser) interfaces.Response {
+func (s service) Create(accountHash string, request io.ReadCloser) interfaces.Response {
 	var createTestObjectRequest models.CreateTestObjectRequest
 	err := request_decoder.Decode(request, &createTestObjectRequest)
 	if err != nil {
@@ -41,20 +41,20 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 	createTestObjectRequest.TestObject.Hash = hash.Md5WithTimeAsKey(
 		createTestObjectRequest.TestObject.Name,
 	)
-	if !validation.IsValid(&createTestObjectRequest) {
+	if !validation.IsMd5Hash(accountHash) || !validation.IsValid(&createTestObjectRequest) {
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToCreateTestObjectCode,
 			Description: servicesErrors.InvalidRequestError,
 		})
 	}
 
-	err = s.repository.Create(createTestObjectRequest.AccountHash, map[string]interface{}{
+	err = s.repository.Create(accountHash, map[string]interface{}{
 		"name": createTestObjectRequest.TestObject.Name,
 		"hash": createTestObjectRequest.TestObject.Hash,
 	})
 	if errors.As(err, &types.UniqueEntityAlreadyExists{}) {
 		s.logger.LogCreateEntityUniqueConstraintError(err, map[string]interface{}{
-			"account_hash": createTestObjectRequest.AccountHash,
+			"account_hash": accountHash,
 		})
 
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
@@ -63,7 +63,7 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 		})
 	} else if err != nil {
 		s.logger.LogCreateEntityRepositoryError(err, map[string]interface{}{
-			"account_hash": createTestObjectRequest.AccountHash,
+			"account_hash": accountHash,
 		})
 
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
@@ -124,7 +124,7 @@ func (s service) Get(accountHash, testObjectHash string) interfaces.Response {
 	return response_factory.SuccessResponse(testObject)
 }
 
-func (s service) Update(request io.ReadCloser) interfaces.Response {
+func (s service) Update(accountHash string, request io.ReadCloser) interfaces.Response {
 	var updateTestObjectRequest models.UpdateRequest
 	err := request_decoder.Decode(request, &updateTestObjectRequest)
 	if err != nil {
@@ -137,7 +137,7 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 	}
 
 	newName, ok := updateTestObjectRequest.UpdatePayload[0].NewValue.(string)
-	if !validation.IsValid(&updateTestObjectRequest) ||
+	if !validation.IsMd5Hash(accountHash) || !validation.IsValid(&updateTestObjectRequest) ||
 		!(ok && validation.IsRegularName(newName)) {
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToUpdateTestObjectCode,
@@ -145,10 +145,10 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	err = s.repository.Update(updateTestObjectRequest.AccountHash, updateTestObjectRequest.UpdatePayload)
+	err = s.repository.Update(accountHash, updateTestObjectRequest.UpdatePayload)
 	if err != nil {
 		s.logger.LogUpdateEntityRepositoryError(err, map[string]interface{}{
-			"account_hash":   updateTestObjectRequest.AccountHash,
+			"account_hash":   accountHash,
 			"update_payload": updateTestObjectRequest.UpdatePayload,
 		})
 

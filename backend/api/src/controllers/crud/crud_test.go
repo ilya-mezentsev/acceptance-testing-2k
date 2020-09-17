@@ -35,9 +35,9 @@ func TestController_GetAllSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestGet(fmt.Sprintf(
-		"%s/entity/test/%s/",
-		server.URL, services.SomeHash,
-	))
+		"%s/test/",
+		server.URL,
+	), services.SomeHash)
 
 	var response response_writer.Response
 	err := json.NewDecoder(responseData).Decode(&response)
@@ -53,9 +53,9 @@ func TestController_GetAllError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestGet(fmt.Sprintf(
-		"%s/entity/test/%s/",
-		server.URL, controllers.BadAccountHash,
-	))
+		"%s/test/",
+		server.URL,
+	), controllers.BadAccountHash)
 
 	var response response_writer.ResponseWithData
 	err := json.NewDecoder(responseData).Decode(&response)
@@ -72,9 +72,9 @@ func TestController_GetOneSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestGet(fmt.Sprintf(
-		"%s/entity/test/%s/%s/",
-		server.URL, services.SomeHash, services.PredefinedTestCommand1.Hash,
-	))
+		"%s/test/%s/",
+		server.URL, services.PredefinedTestCommand1.Hash,
+	), services.SomeHash)
 
 	var response response_writer.Response
 	err := json.NewDecoder(responseData).Decode(&response)
@@ -95,9 +95,9 @@ func TestController_GetOneError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestGet(fmt.Sprintf(
-		"%s/entity/test/%s/%s/",
-		server.URL, controllers.BadAccountHash, controllers.BadEntityHash,
-	))
+		"%s/test/%s/",
+		server.URL, controllers.BadEntityHash,
+	), controllers.BadAccountHash)
 
 	var response response_writer.ResponseWithData
 	err := json.NewDecoder(responseData).Decode(&response)
@@ -119,9 +119,9 @@ func TestController_CreateSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestPost(fmt.Sprintf(
-		"%s/entity/test/",
+		"%s/test/",
 		server.URL,
-	), `some-data`)
+	), `some-data`, ``)
 
 	var response response_writer.Response
 	err := json.NewDecoder(responseData).Decode(&response)
@@ -137,9 +137,9 @@ func TestController_CreateError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestPost(fmt.Sprintf(
-		"%s/entity/test/",
+		"%s/test/",
 		server.URL,
-	), controllers.BadRequestData)
+	), controllers.BadRequestData, ``)
 
 	var response response_writer.ResponseWithData
 	err := json.NewDecoder(responseData).Decode(&response)
@@ -156,9 +156,9 @@ func TestController_UpdateSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestPatch(fmt.Sprintf(
-		"%s/entity/test/",
+		"%s/test/",
 		server.URL,
-	), `some-data`)
+	), `some-data`, ``)
 
 	var response response_writer.Response
 	err := json.NewDecoder(responseData).Decode(&response)
@@ -174,9 +174,9 @@ func TestController_UpdateError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestPatch(fmt.Sprintf(
-		"%s/entity/test/",
+		"%s/test/",
 		server.URL,
-	), controllers.BadRequestData)
+	), controllers.BadRequestData, ``)
 
 	var response response_writer.ResponseWithData
 	err := json.NewDecoder(responseData).Decode(&response)
@@ -193,9 +193,9 @@ func TestController_DeleteSuccess(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestDelete(fmt.Sprintf(
-		"%s/entity/test/%s/%s/",
-		server.URL, services.SomeHash, services.PredefinedTestCommand1.Hash,
-	))
+		"%s/test/%s/",
+		server.URL, services.PredefinedTestCommand1.Hash,
+	), services.SomeHash)
 
 	var response response_writer.Response
 	err := json.NewDecoder(responseData).Decode(&response)
@@ -216,9 +216,9 @@ func TestController_DeleteError(t *testing.T) {
 	defer serviceMock.Reset()
 
 	responseData := test_utils.RequestDelete(fmt.Sprintf(
-		"%s/entity/test/%s/%s/",
-		server.URL, controllers.BadAccountHash, controllers.BadEntityHash,
-	))
+		"%s/test/%s/",
+		server.URL, controllers.BadEntityHash,
+	), controllers.BadAccountHash)
 
 	var response response_writer.ResponseWithData
 	err := json.NewDecoder(responseData).Decode(&response)

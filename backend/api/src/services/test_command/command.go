@@ -31,7 +31,7 @@ func New(
 	}
 }
 
-func (s service) Create(request io.ReadCloser) interfaces.Response {
+func (s service) Create(accountHash string, request io.ReadCloser) interfaces.Response {
 	var createTestCommandRequest models.CreateTestCommandRequest
 	err := request_decoder.Decode(request, &createTestCommandRequest)
 	if err != nil {
@@ -46,14 +46,14 @@ func (s service) Create(request io.ReadCloser) interfaces.Response {
 	commandSettings := createTestCommandRequest.CommandSettings
 	commandHash := hash.Md5WithTimeAsKey(commandSettings.Name)
 	commandSettings.Hash = commandHash
-	if !validation.IsValid(&commandSettings) {
+	if !validation.IsMd5Hash(accountHash) || !validation.IsValid(&commandSettings) {
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToCreateTestCommandCode,
 			Description: servicesErrors.InvalidRequestError,
 		})
 	}
 
-	err = s.crudRepository.Create(createTestCommandRequest.AccountHash, map[string]interface{}{
+	err = s.crudRepository.Create(accountHash, map[string]interface{}{
 		"name":                  commandSettings.Name,
 		"hash":                  commandSettings.Hash,
 		"object_hash":           commandSettings.ObjectHash,
@@ -187,7 +187,7 @@ func (s service) Get(accountHash, testCommandHash string) interfaces.Response {
 	})
 }
 
-func (s service) Update(request io.ReadCloser) interfaces.Response {
+func (s service) Update(accountHash string, request io.ReadCloser) interfaces.Response {
 	var updateTestCommandRequest models.UpdateTestCommandRequest
 	err := request_decoder.Decode(request, &updateTestCommandRequest)
 	if err != nil {
@@ -199,7 +199,7 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	if !validation.IsValid(&updateTestCommandRequest) {
+	if !validation.IsMd5Hash(accountHash) || !validation.IsValid(&updateTestCommandRequest) {
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToUpdateTestCommandCode,
 			Description: servicesErrors.InvalidRequestError,
@@ -207,12 +207,12 @@ func (s service) Update(request io.ReadCloser) interfaces.Response {
 	}
 
 	err = s.crudRepository.Update(
-		updateTestCommandRequest.AccountHash,
+		accountHash,
 		s.getUpdatePayload(updateTestCommandRequest),
 	)
 	if err != nil {
 		s.logger.LogUpdateEntityRepositoryError(err, map[string]interface{}{
-			"account_hash":        updateTestCommandRequest.AccountHash,
+			"account_hash":        accountHash,
 			"update_test_command": updateTestCommandRequest,
 		})
 

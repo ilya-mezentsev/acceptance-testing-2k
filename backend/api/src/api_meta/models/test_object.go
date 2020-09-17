@@ -7,7 +7,6 @@ type (
 	}
 
 	CreateTestObjectRequest struct {
-		AccountHash string     `json:"account_hash" validation:"md5-hash"`
-		TestObject  TestObject `json:"test_object"`
+		TestObject TestObject `json:"test_object"`
 	}
 )

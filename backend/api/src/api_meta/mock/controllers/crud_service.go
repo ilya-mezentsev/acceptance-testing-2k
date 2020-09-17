@@ -21,7 +21,7 @@ func (m *CRUDServiceMock) Reset() {
 	m.CalledWith = map[string]interface{}{}
 }
 
-func (m *CRUDServiceMock) Create(request io.ReadCloser) interfaces.Response {
+func (m *CRUDServiceMock) Create(_ string, request io.ReadCloser) interfaces.Response {
 	d, _ := ioutil.ReadAll(request)
 	data := string(d)
 	m.CalledWith["Create"] = data
@@ -55,7 +55,7 @@ func (m *CRUDServiceMock) Get(accountHash, entityHash string) interfaces.Respons
 	return response_factory.DefaultResponse()
 }
 
-func (m *CRUDServiceMock) Update(request io.ReadCloser) interfaces.Response {
+func (m *CRUDServiceMock) Update(_ string, request io.ReadCloser) interfaces.Response {
 	d, _ := ioutil.ReadAll(request)
 	data := string(d)
 	m.CalledWith["Update"] = data

@@ -20,7 +20,7 @@ export class PublicComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.fetcher.get('session/')
+    this.fetcher.get('session')
       .then(r => {
         if (r.status === ResponseStatus.OK) {
           this.sessionStorage.saveSession(r.data);

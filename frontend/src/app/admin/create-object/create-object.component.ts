@@ -1,7 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {ValidationService} from '../services/validation/validation.service';
 import {ToastNotificationService} from '../../services/notification/toast-notification.service';
-import {SessionStorageService} from '../../services/session/session-storage.service';
 import {DefaultResponse, ErrorResponse, Fetcher} from '../../interfaces/fetcher';
 import {Router} from '@angular/router';
 import {ErrorHandlerService} from '../../services/errors/error-handler.service';
@@ -20,7 +19,6 @@ export class CreateObjectComponent implements OnInit {
   constructor(
     private readonly router: Router,
     private readonly validation: ValidationService,
-    private readonly sessionStorage: SessionStorageService,
     private readonly errorHandler: ErrorHandlerService,
     private readonly toastNotification: ToastNotificationService,
     private readonly codesService: CodesService,
@@ -42,8 +40,7 @@ export class CreateObjectComponent implements OnInit {
       return;
     }
 
-    this.fetcher.post('entity/test-object/', {
-      account_hash: this.sessionStorage.getSessionId(),
+    this.fetcher.post('test-object', {
       test_object: {
         name: this.objectName
       }

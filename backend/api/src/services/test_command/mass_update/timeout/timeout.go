@@ -23,7 +23,7 @@ func New(repository interfaces.UpdateRepository) Service {
 	}
 }
 
-func (s Service) Update(request io.ReadCloser) interfaces.Response {
+func (s Service) Update(accountHash string, request io.ReadCloser) interfaces.Response {
 	var massTimeoutsUpdateRequest models.MassTimeoutsUpdateRequest
 	err := request_decoder.Decode(request, &massTimeoutsUpdateRequest)
 	if err != nil {
@@ -35,7 +35,7 @@ func (s Service) Update(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	if !validation.IsValid(&massTimeoutsUpdateRequest) {
+	if !validation.IsMd5Hash(accountHash) || !validation.IsValid(&massTimeoutsUpdateRequest) {
 		return response_factory.ErrorResponse(errors.ServiceError{
 			Code:        unableToMassUpdateTimeout,
 			Description: errors.InvalidRequestError,
@@ -43,7 +43,7 @@ func (s Service) Update(request io.ReadCloser) interfaces.Response {
 	}
 
 	err = s.repository.Update(
-		massTimeoutsUpdateRequest.AccountHash,
+		accountHash,
 		s.getUpdateModels(massTimeoutsUpdateRequest),
 	)
 	if err != nil {

@@ -5,7 +5,6 @@ import {TestCommandRecord, TestObject} from './types/types';
 import {ErrorHandlerService} from '../services/errors/error-handler.service';
 import {ToastNotificationService} from '../services/notification/toast-notification.service';
 import {CodesService} from './services/errors/codes.service';
-import {SessionStorageService} from '../services/session/session-storage.service';
 import {StorageService} from './services/storage/storage.service';
 import {RadioService} from '../services/radio/radio.service';
 import {InvalidateStorage} from '../services/radio/const';
@@ -20,7 +19,6 @@ export class AdminComponent implements OnInit {
     private readonly errorHandler: ErrorHandlerService,
     private readonly toastNotification: ToastNotificationService,
     private readonly codesService: CodesService,
-    private readonly sessionStorage: SessionStorageService,
     private readonly storage: StorageService,
     private readonly radio: RadioService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
@@ -42,7 +40,7 @@ export class AdminComponent implements OnInit {
       return;
     }
 
-    this.fetcher.get(`entity/test-object/${this.sessionStorage.getSessionId()}/`)
+    this.fetcher.get(`test-object`)
       .then(r => {
         if (r.status === ResponseStatus.OK) {
           this.storage.objects = (r as Response<TestObject[]>).data || [];
@@ -58,7 +56,7 @@ export class AdminComponent implements OnInit {
       return;
     }
 
-    this.fetcher.get(`entity/test-command/${this.sessionStorage.getSessionId()}/`)
+    this.fetcher.get(`test-command`)
       .then(r => {
         if (r.status === ResponseStatus.OK) {
           this.storage.commands = (r as Response<TestCommandRecord[]>).data || [];

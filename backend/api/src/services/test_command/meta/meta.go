@@ -25,7 +25,7 @@ func New(repository interfaces.TestCommandMetaRepository) Service {
 	}
 }
 
-func (s Service) Create(request io.ReadCloser) interfaces.Response {
+func (s Service) Create(accountHash string, request io.ReadCloser) interfaces.Response {
 	var createMetaRequest models.CreateMetaRequest
 	err := request_decoder.Decode(request, &createMetaRequest)
 	if err != nil {
@@ -45,17 +45,18 @@ func (s Service) Create(request io.ReadCloser) interfaces.Response {
 		createMetaRequest.CommandHash,
 		createMetaRequest.CommandMeta.Cookies,
 	)
-	if !validation.IsValid(&createMetaRequest) {
+	if !validation.IsMd5Hash(accountHash) || !validation.IsValid(&createMetaRequest) {
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToCreateCommandMeta,
 			Description: servicesErrors.InvalidRequestError,
 		})
 	}
 
-	err = s.repository.Create(createMetaRequest.AccountHash, createMetaRequest.CommandMeta)
+	err = s.repository.Create(accountHash, createMetaRequest.CommandMeta)
 	if err != nil {
 		s.logger.LogCreateEntityRepositoryError(err, map[string]interface{}{
 			"create_meta_request": createMetaRequest,
+			"account_hash":        accountHash,
 		})
 
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
@@ -77,7 +78,7 @@ func (s Service) addHashAndCommandHashToKeyValue(
 	}
 }
 
-func (s Service) Update(request io.ReadCloser) interfaces.Response {
+func (s Service) Update(accountHash string, request io.ReadCloser) interfaces.Response {
 	var updateMetaRequest models.UpdateMetaRequest
 	err := request_decoder.Decode(request, &updateMetaRequest)
 	if err != nil {
@@ -89,8 +90,9 @@ func (s Service) Update(request io.ReadCloser) interfaces.Response {
 		})
 	}
 
-	if !validation.IsValid(&updateMetaRequest) ||
-		!s.isInvalidFieldName(append(updateMetaRequest.Headers, updateMetaRequest.Cookies...)) {
+	if !validation.IsMd5Hash(accountHash) ||
+		!validation.IsValid(&updateMetaRequest) ||
+		!s.isValidFieldName(append(updateMetaRequest.Headers, updateMetaRequest.Cookies...)) {
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
 			Code:        unableToUpdateCommandMeta,
 			Description: servicesErrors.InvalidRequestError,
@@ -98,13 +100,14 @@ func (s Service) Update(request io.ReadCloser) interfaces.Response {
 	}
 
 	err = s.repository.UpdateHeadersAndCookies(
-		updateMetaRequest.AccountHash,
+		accountHash,
 		updateMetaRequest.Headers,
 		updateMetaRequest.Cookies,
 	)
 	if err != nil {
 		s.logger.LogUpdateEntityRepositoryError(err, map[string]interface{}{
 			"update_meta_request": updateMetaRequest,
+			"account_hash":        accountHash,
 		})
 
 		return response_factory.ErrorResponse(servicesErrors.ServiceError{
@@ -116,7 +119,7 @@ func (s Service) Update(request io.ReadCloser) interfaces.Response {
 	return response_factory.DefaultResponse()
 }
 
-func (s Service) isInvalidFieldName(updatePayload []models.UpdateModel) bool {
+func (s Service) isValidFieldName(updatePayload []models.UpdateModel) bool {
 	for _, payload := range updatePayload {
 		if !validation.IsKeyOrValue(payload.FieldName) {
 			return false

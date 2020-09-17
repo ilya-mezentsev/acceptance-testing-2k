@@ -12,7 +12,7 @@ type (
 	}
 
 	CreateService interface {
-		Create(request io.ReadCloser) Response
+		Create(accountHash string, request io.ReadCloser) Response
 	}
 
 	ReadService interface {
@@ -21,7 +21,7 @@ type (
 	}
 
 	UpdateService interface {
-		Update(request io.ReadCloser) Response
+		Update(accountHash string, request io.ReadCloser) Response
 	}
 
 	DeleteService interface {

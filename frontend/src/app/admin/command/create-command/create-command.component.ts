@@ -1,7 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MaterializeInitService} from '../../../services/materialize/materialize-init.service';
 import {DefaultResponse, ErrorResponse, Fetcher, Response, ServerResponse} from '../../../interfaces/fetcher';
-import {SessionStorageService} from '../../../services/session/session-storage.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ErrorHandlerService} from '../../../services/errors/error-handler.service';
 import {ResponseStatus} from '../../../services/fetcher/statuses';
@@ -35,7 +34,6 @@ export class CreateCommandComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly session: SessionStorageService,
     private readonly storage: StorageService,
     private readonly hashService: HashService,
     private readonly errorHandler: ErrorHandlerService,
@@ -70,8 +68,7 @@ export class CreateCommandComponent implements OnInit {
   }
 
   public createCommand(): void {
-    this.fetcher.post('entity/test-command/', {
-      account_hash: this.session.getSessionId(),
+    this.fetcher.post('test-command', {
       command_settings: {
         name: this.commandSettings.name,
         object_hash: this.objectHash,
@@ -93,8 +90,7 @@ export class CreateCommandComponent implements OnInit {
         this.hasHeaders() && (commandMeta.headers = this.headers);
         this.hasCookies() && (commandMeta.cookies = this.cookies);
 
-        this.fetcher.post('entity/test-command-meta/', {
-          account_hash: this.session.getSessionId(),
+        this.fetcher.post('test-command-meta', {
           command_hash: (response as Response<CreateTestCommandResponse>).data.command_hash,
           command_meta: commandMeta
         })

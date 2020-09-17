@@ -38,10 +38,10 @@ export class NavigationComponent implements OnInit {
   ) { }
 
   public signOut(): void {
-    this.fetcher.delete('/session/')
+    this.fetcher.delete('/session')
       .then(() => this.sessionStorage.deleteSession())
       .then(() => this.storage.invalidate())
-      .then(() => this.router.navigate(['/']))
+      .then(() => this.router.navigate(['']))
       .catch(err => this.errorHandler.handle(err));
   }
 

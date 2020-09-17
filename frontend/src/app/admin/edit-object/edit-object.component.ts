@@ -6,7 +6,6 @@ import {KeyValueMapping, TestCommandRecord, TestObject} from '../types/types';
 import {ValidationService} from '../services/validation/validation.service';
 import {ToastNotificationService} from '../../services/notification/toast-notification.service';
 import {DefaultResponse, ErrorResponse, Fetcher, Response} from '../../interfaces/fetcher';
-import {SessionStorageService} from '../../services/session/session-storage.service';
 import {ResponseStatus} from '../../services/fetcher/statuses';
 import {CodesService} from '../services/errors/codes.service';
 import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
@@ -29,7 +28,6 @@ export class EditObjectComponent implements OnInit {
     private readonly codesService: CodesService,
     private readonly validation: ValidationService,
     private readonly errorHandler: ErrorHandlerService,
-    private readonly sessionStorage: SessionStorageService,
     private readonly materializeInit: MaterializeInitService,
     private readonly toastNotification: ToastNotificationService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
@@ -68,8 +66,7 @@ export class EditObjectComponent implements OnInit {
       return;
     }
 
-    this.fetcher.patch('entity/test-object/', {
-      account_hash: this.sessionStorage.getSessionId(),
+    this.fetcher.patch('test-object', {
       update_payload: [
         {
           hash: this.currentObject.hash,
@@ -106,7 +103,7 @@ export class EditObjectComponent implements OnInit {
   }
 
   public deleteObject(): void {
-    this.fetcher.delete(`entity/test-object/${this.sessionStorage.getSessionId()}/${this.currentObject.hash}/`)
+    this.fetcher.delete(`test-object/${this.currentObject.hash}`)
       .then(r => this.processDeleteResponse(r))
       .catch(err => this.errorHandler.handle(err));
   }
@@ -141,12 +138,12 @@ export class EditObjectComponent implements OnInit {
 
   private tryFetchCurrentObjectAndCommands(): void {
     this.fetcher
-      .get(`entity/test-object/${this.sessionStorage.getSessionId()}/${this.objectHash}/`)
+      .get(`test-object/${this.objectHash}`)
       .then(r => {
         if (r.status === ResponseStatus.OK) {
           this.currentObject = (r as Response<TestObject>).data;
           this.objectName = this.currentObject.name;
-          return this.fetcher.get(`entity/test-command/${this.sessionStorage.getSessionId()}/`);
+          return this.fetcher.get(`test-command`);
         } else {
           this.toastNotification.error('Unable to fetch test object');
           return Promise.reject();

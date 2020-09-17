@@ -1,6 +1,5 @@
 import {Component, Inject, OnInit, EventEmitter} from '@angular/core';
 import {ErrorResponse, FileSender, Response} from '../../interfaces/fetcher';
-import {SessionStorageService} from '../../services/session/session-storage.service';
 import {ErrorHandlerService} from '../../services/errors/error-handler.service';
 import {ToastNotificationService} from '../../services/notification/toast-notification.service';
 import {TestsReport} from '../types/types';
@@ -22,7 +21,6 @@ export class RunTestsComponent implements OnInit {
 
   constructor(
     private readonly codesService: CodesService,
-    private readonly sessionStorage: SessionStorageService,
     private readonly errorHandler: ErrorHandlerService,
     private readonly toastNotification: ToastNotificationService,
     private readonly materializeInit: MaterializeInitService,
@@ -62,10 +60,7 @@ export class RunTestsComponent implements OnInit {
     this.hasTestsReport = false;
 
     this.fileSender
-      .sendFile<{report: TestsReport}>(
-        `tests/${this.sessionStorage.getSessionId()}/`,
-        fd,
-      )
+      .sendFile<{report: TestsReport}>(`tests`, fd)
       .then(r => {
         this.awaitingTestsResults = false;
         this.processRunTestsRequest(r);

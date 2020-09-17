@@ -2,6 +2,7 @@ package crud
 
 import (
 	"api_meta/interfaces"
+	"controllers/plugins/account_hash"
 	"controllers/plugins/response_writer"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -13,37 +14,39 @@ type controller struct {
 
 func Init(r *mux.Router, pool interfaces.CRUDServicesPool) {
 	c := controller{crudServicesPool: pool}
-	crudAPI := r.PathPrefix("/entity").Subrouter()
 
-	crudAPI.HandleFunc(
-		"/{entity_type:[a-zA-Z-_]+?}/{account_hash:[a-f0-9]{32}}/",
+	r.HandleFunc(
+		"/{entity_type:[a-zA-Z-_]+?}/",
 		c.getAll,
 	).Methods(http.MethodGet)
-	crudAPI.HandleFunc(
-		"/{entity_type:[a-zA-Z-_]+?}/{account_hash:[a-f0-9]{32}}/{entity_hash:[a-f0-9]{32}}/",
+	r.HandleFunc(
+		"/{entity_type:[a-zA-Z-_]+?}/{entity_hash:[a-f0-9]{32}}/",
 		c.getOne,
 	).Methods(http.MethodGet)
-	crudAPI.HandleFunc("/{entity_type:[a-zA-Z-_]+?}/", c.create).Methods(http.MethodPost)
-	crudAPI.HandleFunc("/{entity_type:[a-zA-Z-_]+?}/", c.update).Methods(http.MethodPatch)
-	crudAPI.HandleFunc(
-		"/{entity_type:[a-zA-Z-_]+?}/{account_hash:[a-f0-9]{32}}/{entity_hash:[a-f0-9]{32}}/",
+	r.HandleFunc("/{entity_type:[a-zA-Z-_]+?}/", c.create).Methods(http.MethodPost)
+	r.HandleFunc("/{entity_type:[a-zA-Z-_]+?}/", c.update).Methods(http.MethodPatch)
+	r.HandleFunc(
+		"/{entity_type:[a-zA-Z-_]+?}/{entity_hash:[a-f0-9]{32}}/",
 		c.delete,
 	).Methods(http.MethodDelete)
 }
 
 func (c controller) getAll(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	entityType, accountHash := vars["entity_type"], vars["account_hash"]
+	entityType := vars["entity_type"]
 
-	response := c.crudServicesPool.GetReadService(entityType).GetAll(accountHash)
+	response := c.crudServicesPool.GetReadService(entityType).GetAll(account_hash.ExtractFromRequest(r))
 	response_writer.Write(w, response)
 }
 
 func (c controller) getOne(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	entityType, accountHash, entityHash := vars["entity_type"], vars["account_hash"], vars["entity_hash"]
+	entityType, entityHash := vars["entity_type"], vars["entity_hash"]
 
-	response := c.crudServicesPool.GetReadService(entityType).Get(accountHash, entityHash)
+	response := c.crudServicesPool.GetReadService(entityType).Get(
+		account_hash.ExtractFromRequest(r),
+		entityHash,
+	)
 	response_writer.Write(w, response)
 }
 
@@ -51,7 +54,10 @@ func (c controller) create(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	entityType := vars["entity_type"]
 
-	response := c.crudServicesPool.GetCreateService(entityType).Create(r.Body)
+	response := c.crudServicesPool.GetCreateService(entityType).Create(
+		account_hash.ExtractFromRequest(r),
+		r.Body,
+	)
 	response_writer.Write(w, response)
 }
 
@@ -59,14 +65,20 @@ func (c controller) update(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	entityType := vars["entity_type"]
 
-	response := c.crudServicesPool.GetUpdateService(entityType).Update(r.Body)
+	response := c.crudServicesPool.GetUpdateService(entityType).Update(
+		account_hash.ExtractFromRequest(r),
+		r.Body,
+	)
 	response_writer.Write(w, response)
 }
 
 func (c controller) delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	entityType, accountHash, entityHash := vars["entity_type"], vars["account_hash"], vars["entity_hash"]
+	entityType, entityHash := vars["entity_type"], vars["entity_hash"]
 
-	response := c.crudServicesPool.GetDeleteService(entityType).Delete(accountHash, entityHash)
+	response := c.crudServicesPool.GetDeleteService(entityType).Delete(
+		account_hash.ExtractFromRequest(r),
+		entityHash,
+	)
 	response_writer.Write(w, response)
 }

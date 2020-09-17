@@ -1,6 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {ErrorHandlerService} from '../../../services/errors/error-handler.service';
-import {SessionStorageService} from '../../../services/session/session-storage.service';
 import {MaterializeInitService} from '../../../services/materialize/materialize-init.service';
 import {ToastNotificationService} from '../../../services/notification/toast-notification.service';
 import {DefaultResponse, ErrorResponse, Fetcher, Response, UpdatePayload} from '../../../interfaces/fetcher';
@@ -30,7 +29,6 @@ export class EditCommandComponent implements OnInit {
     private readonly hashService: HashService,
     private readonly codesService: CodesService,
     private readonly errorHandler: ErrorHandlerService,
-    private readonly sessionStorage: SessionStorageService,
     private readonly materializeInit: MaterializeInitService,
     private readonly toastNotification: ToastNotificationService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
@@ -100,9 +98,10 @@ export class EditCommandComponent implements OnInit {
 
   private removeExistsHeader(hash: string): void {
     this.fetcher
-      .delete(`entity/test-command-headers/${this.sessionStorage.getSessionId()}/${hash}/`)
+      .delete(`test-command-headers/${hash}`)
       .then(r => this.processRequest(r))
-      .then(() => this.currentCommand.headers = this.currentCommand.headers.filter(h => h.hash !== hash))
+      .then(() => this.currentCommand.headers = this.currentCommand.headers
+        .filter(h => h.hash !== hash))
       .then(() => this.initCommandSettingsAndMeta())
       .catch(err => this.errorHandler.handle(err));
   }
@@ -132,7 +131,7 @@ export class EditCommandComponent implements OnInit {
 
   private removeExistsCookie(hash: string): void {
     this.fetcher
-      .delete(`entity/test-command-cookies/${this.sessionStorage.getSessionId()}/${hash}/`)
+      .delete(`test-command-cookies/${hash}`)
       .then(r => this.processRequest(r))
       .then(() => this.currentCommand.cookies = this.currentCommand.cookies.filter(c => c.hash !== hash))
       .then(() => this.initCommandSettingsAndMeta())
@@ -157,8 +156,7 @@ export class EditCommandComponent implements OnInit {
       );
 
     if (this.commandSettingsWereChanged) {
-      return this.fetcher.patch(`entity/test-command/`, {
-        account_hash: this.sessionStorage.getSessionId(),
+      return this.fetcher.patch(`test-command`, {
         exists_command: {...this.currentCommand},
         updated_command: {...this.commandSettings}
       }).then(r => this.processRequest(r));
@@ -182,10 +180,8 @@ export class EditCommandComponent implements OnInit {
 
     if (headersChanged || cookiesChanged) {
       this.commandSettingsWereChanged = true;
-      return this.fetcher.patch(`entity/test-command-meta/`, {
-        account_hash: this.sessionStorage.getSessionId(),
-        ...updatePayload
-      }).then(r => this.processRequest(r));
+      return this.fetcher.patch(`test-command-meta`, updatePayload)
+        .then(r => this.processRequest(r));
     } else {
       return Promise.resolve();
     }
@@ -203,8 +199,7 @@ export class EditCommandComponent implements OnInit {
     hasNewHeaders && (commandMeta.headers = this.newHeaders);
     hasNewCookies && (commandMeta.cookies = this.newCookies);
 
-    return this.fetcher.post('entity/test-command-meta/', {
-      account_hash: this.sessionStorage.getSessionId(),
+    return this.fetcher.post('test-command-meta', {
       command_hash: this.currentCommand.hash,
       command_meta: commandMeta
     }).then(r => this.processRequest(r));
@@ -227,8 +222,7 @@ export class EditCommandComponent implements OnInit {
   }
 
   public deleteCommand(): void {
-    this.fetcher.delete(`entity/test-command/${
-      this.sessionStorage.getSessionId()}/${this.currentCommand.hash}/`)
+    this.fetcher.delete(`test-command/${this.currentCommand.hash}`)
       .then(r => this.processRequest(r))
       .then(() => {
         this.storage.invalidateCommands();
@@ -260,7 +254,7 @@ export class EditCommandComponent implements OnInit {
 
   private tryFetchCurrentCommand(): void {
     this.fetcher
-      .get(`entity/test-command/${this.sessionStorage.getSessionId()}/${this.commandHash}/`)
+      .get(`test-command/${this.commandHash}`)
       .then(r => {
         if (r.status === ResponseStatus.OK) {
           this.currentCommand = (r as Response<TestCommandRecord>).data;

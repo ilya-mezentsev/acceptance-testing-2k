@@ -85,7 +85,7 @@ func TestCRUDServicesPool_GetNotExistsService(t *testing.T) {
 	test_utils.AssertTrue(ok, t)
 
 	var (
-		response     = createService.Create(nil)
+		response     = createService.Create(``, nil)
 		responseData errors.ServiceError
 	)
 	responseData = response.GetData().(errors.ServiceError)
@@ -122,7 +122,7 @@ func TestCRUDServicesPool_GetNotExistsService(t *testing.T) {
 	)
 
 	updateService := pool.GetUpdateService("test")
-	response = updateService.Update(nil)
+	response = updateService.Update(``, nil)
 	responseData = response.GetData().(errors.ServiceError)
 	test_utils.AssertEqual("error", response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)

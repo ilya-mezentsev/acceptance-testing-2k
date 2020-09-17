@@ -5,7 +5,6 @@ import {ToastNotificationService} from '../../../services/notification/toast-not
 import {StorageService} from '../../services/storage/storage.service';
 import {CodesService} from '../../services/errors/codes.service';
 import {ErrorHandlerService} from '../../../services/errors/error-handler.service';
-import {SessionStorageService} from '../../../services/session/session-storage.service';
 import {DefaultResponse, ErrorResponse, Fetcher} from '../../../interfaces/fetcher';
 import {ResponseStatus} from '../../../services/fetcher/statuses';
 
@@ -25,7 +24,6 @@ export class HeadersComponent implements OnInit {
     private readonly hashService: HashService,
     private readonly codesService: CodesService,
     private readonly errorHandler: ErrorHandlerService,
-    private readonly sessionStorage: SessionStorageService,
     private readonly toastNotification: ToastNotificationService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
   ) { }
@@ -55,8 +53,7 @@ export class HeadersComponent implements OnInit {
       return;
     }
 
-    this.fetcher.post('entity/mass-headers/', {
-      account_hash: this.sessionStorage.getSessionId(),
+    this.fetcher.post('mass-headers', {
       headers: this.request.headers,
       command_hashes: this.request.command_hashes.map(h => ({hash: h}))
     })

@@ -31,13 +31,11 @@ func TestMain(m *testing.M) {
 func TestService_CreateSuccess(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
+	response := s.Create(services.PredefinedAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"headers": [{"key": "Some-header", "value": "some-value"}],
 			"command_hashes": [{"hash": "%s"}, {"hash": "%s"}]
 		}`,
-			services.PredefinedAccountHash,
 			services.PredefinedCommandHash1,
 			services.PredefinedCommandHash2),
 	))
@@ -58,7 +56,7 @@ func TestService_CreateSuccess(t *testing.T) {
 func TestService_CreateDecodeBodyError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(`1`))
+	response := s.Create(``, test_utils.GetReadCloser(`1`))
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -77,13 +75,11 @@ func TestService_CreateDecodeBodyError(t *testing.T) {
 func TestService_CreateInvalidRequestError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
+	response := s.Create(services.PredefinedAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"headers": [{"key": "++==", "value": "some-value"}],
 			"command_hashes": [{"hash": "%s"}, {"hash": "%s"}]
 		}`,
-			services.PredefinedAccountHash,
 			services.PredefinedCommandHash1,
 			services.PredefinedCommandHash2),
 	))
@@ -105,13 +101,11 @@ func TestService_CreateInvalidRequestError(t *testing.T) {
 func TestService_CreateRepositoryError(t *testing.T) {
 	defer repository.Reset()
 
-	response := s.Create(test_utils.GetReadCloser(
+	response := s.Create(services.BadAccountHash, test_utils.GetReadCloser(
 		fmt.Sprintf(`{
-			"account_hash": "%s",
 			"headers": [{"key": "Some-cookie", "value": "some-value"}],
 			"command_hashes": [{"hash": "%s"}, {"hash": "%s"}]
 		}`,
-			services.BadAccountHash,
 			services.PredefinedCommandHash1,
 			services.PredefinedCommandHash2),
 	))
