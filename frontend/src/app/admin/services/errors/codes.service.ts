@@ -8,6 +8,14 @@ export class CodesService extends Codes {
   constructor() {
     super();
 
-    this.descriptionsToErrorMessage.set('unique-entity-exists', 'Object already exists');
+    [
+      ['unique-entity-exists', 'Object already exists'],
+      ['no-test-cases', 'No tests in sent file'],
+    ].forEach(descriptionToErrorMessage => {
+      this.descriptionsToErrorMessage.set(
+        descriptionToErrorMessage[0],
+        descriptionToErrorMessage[1]
+      );
+    });
   }
 }

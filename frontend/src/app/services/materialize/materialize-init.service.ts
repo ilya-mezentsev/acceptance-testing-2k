@@ -17,6 +17,10 @@ export class MaterializeInitService {
     M.Modal.init(document.querySelectorAll('.modal'), {});
   }
 
+  public showModalWithId(id: string): void {
+    M.Modal.getInstance(document.getElementById(id)).open();
+  }
+
   public initSelects(): void {
     M.FormSelect.init(document.querySelectorAll('select'), {});
   }

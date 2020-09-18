@@ -38,7 +38,12 @@ export type TestsReport = {
   passedCount: number,
   failedCount: number,
   errors?: TransactionError[],
-};
+}
+
+export interface RunTestsResponse {
+  report: TestsReport;
+  applicationError: TransactionError;
+}
 
 export interface GeneralUpdateRequest {
   command_hashes: string[];

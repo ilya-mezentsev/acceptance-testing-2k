@@ -2,7 +2,7 @@ import {Component, Inject, OnInit, EventEmitter} from '@angular/core';
 import {ErrorResponse, FileSender, Response} from '../../interfaces/fetcher';
 import {ErrorHandlerService} from '../../services/errors/error-handler.service';
 import {ToastNotificationService} from '../../services/notification/toast-notification.service';
-import {TestsReport} from '../types/types';
+import {RunTestsResponse, TestsReport} from '../types/types';
 import {ResponseStatus} from '../../services/fetcher/statuses';
 import {CodesService} from '../services/errors/codes.service';
 import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
@@ -18,6 +18,7 @@ export class RunTestsComponent implements OnInit {
   public awaitingTestsResults = false;
   public hasTestsReport = false;
   public readonly resetInput = new EventEmitter();
+  private readonly maxFileSize = 32 * 1024 * 1024;  // 32 MB
 
   constructor(
     private readonly codesService: CodesService,
@@ -51,6 +52,9 @@ export class RunTestsComponent implements OnInit {
     if (!this.hasFile) {
       this.toastNotification.info('You need to choose file first');
       return;
+    } else if (this.file.size > this.maxFileSize) {
+      this.toastNotification.error('File is too large');
+      return;
     }
 
     const fd = new FormData();
@@ -60,27 +64,36 @@ export class RunTestsComponent implements OnInit {
     this.hasTestsReport = false;
 
     this.fileSender
-      .sendFile<{report: TestsReport}>(`tests`, fd)
+      .sendFile<RunTestsResponse>(`tests`, fd)
       .then(r => {
         this.awaitingTestsResults = false;
         this.processRunTestsRequest(r);
         this.resetInput.emit();
       })
-      .catch(err => this.errorHandler.handle(err));
+      .catch(err => {
+        this.awaitingTestsResults = false;
+        this.errorHandler.handle(err)
+      });
   }
 
   private processRunTestsRequest(
-    response: Response<{report: TestsReport}> | ErrorResponse
+    response: Response<RunTestsResponse> | ErrorResponse
   ): void {
-    if (response.status === ResponseStatus.OK) {
-      this.testsReport = (response as Response<{report: TestsReport}>).data.report;
-      this.hasTestsReport = true;
+    const runTestsResponse = response as Response<RunTestsResponse>
 
-      setTimeout(() => this.materializeInit.initTooltips(), 0);
-    } else {
+    if (runTestsResponse.data.applicationError) {
+      this.toastNotification.error(this.codesService.getMessageByDescription(
+        (response as Response<RunTestsResponse>).data.applicationError.description
+      ));
+    } else if (response.status === ResponseStatus.ERROR) {
       this.toastNotification.error(this.codesService.getMessageByDescription(
         (response as ErrorResponse).data.description
       ));
+    } else {
+      this.testsReport = runTestsResponse.data.report;
+      this.hasTestsReport = true;
+
+      setTimeout(() => this.materializeInit.initTooltips(), 0);
     }
   }
 
