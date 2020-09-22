@@ -2,18 +2,14 @@ import { Injectable } from '@angular/core';
 import {ErrorResponse, Fetcher, FileSender, Response, ServerResponse} from '../../interfaces/fetcher';
 import {environment} from '../../../environments/environment';
 import {Md5} from 'ts-md5';
-import {SessionStorageService} from '../session/session-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FetcherService implements Fetcher, FileSender {
   private publicKey = '';
-  private readonly apiPath: string = '/api/web-app';
 
-  constructor(
-    private readonly sessionStorage: SessionStorageService,
-  ) {}
+  constructor() {}
 
   private static trimSlashes(endpoint: string): string {
     if (endpoint.startsWith('/')) {
@@ -76,10 +72,9 @@ export class FetcherService implements Fetcher, FileSender {
     settings.headers = {
       ...settings.headers,
       'X-CSRF-Token': this.getCSRFToken(),
-      'AAT-Account-Hash': this.sessionStorage.getSessionId(),
     };
     const response = await fetch(
-      `${this.apiPath}/${FetcherService.trimSlashes(endpoint)}/`,
+      `/${environment.apiPrefix}/${FetcherService.trimSlashes(endpoint)}/`,
       settings
     );
     this.publicKey = response.headers.get('X-CSRF-Public-Token');

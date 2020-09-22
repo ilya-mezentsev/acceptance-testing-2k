@@ -1,81 +1,64 @@
 package runner
 
 import (
-	"api_meta/interfaces"
+	"github.com/gorilla/websocket"
 	"logger"
 	"net/http"
 	"services/errors"
-	"services/plugins/response_factory"
 	"services/tests_runner/client"
-	"services/tests_runner/tests_file"
+	"services/tests_runner/plugins/tests_file_path"
 )
 
 type Service struct {
-	client           client.Grpc
-	testsFileManager tests_file.Manager
+	client   client.Grpc
+	upgrader websocket.Upgrader
 }
 
-func New(
-	testsFileManager tests_file.Manager,
-	client client.Grpc,
-) Service {
+func New(client client.Grpc) Service {
 	return Service{
-		testsFileManager: testsFileManager,
-		client:           client,
+		client: client,
+		upgrader: websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		},
 	}
 }
 
-func (s Service) Run(accountHash string, r *http.Request) interfaces.Response {
-	err := r.ParseMultipartForm(defaultMaxMemory)
+func (s Service) Run(
+	accountHash string,
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	filename := r.URL.Query().Get("filename")
+	c, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		return response_factory.ErrorResponse(errors.ServiceError{
-			Code:        unableToRunTestsCode,
-			Description: parseFormError,
-		})
+		logger.ErrorF("Unable to upgrade connection: %v", err)
+		return
 	}
-
-	file, _, err := r.FormFile("tests_cases_file")
+	var response interface{} = nil
+	report, err := s.client.Call(
+		accountHash,
+		tests_file_path.BuildFilePath(accountHash, filename),
+	)
 	if err != nil {
-		return response_factory.ErrorResponse(errors.ServiceError{
-			Code:        unableToRunTestsCode,
-			Description: getFileFromRequestError,
-		})
-	}
-	defer func() {
-		_ = file.Close()
-	}()
-
-	testCasesFilePath, err := s.testsFileManager.CreateTestCasesFile(accountHash, file)
-	if err != nil {
-		return response_factory.ErrorResponse(errors.ServiceError{
-			Code:        unableToRunTestsCode,
-			Description: createTestFileError,
-		})
-	}
-	defer s.silentlyRemoveTestCasesFile(testCasesFilePath)
-
-	testsReport, err := s.client.Call(accountHash, testCasesFilePath)
-	if err != nil {
-		return response_factory.ErrorResponse(errors.ServiceError{
+		response = errors.ServiceError{
 			Code:        unableToRunTestsCode,
 			Description: callRemoteProcedureError,
-		})
+		}
+	} else {
+		response = report
 	}
 
-	return response_factory.SuccessResponse(testsReport)
-}
+	err = c.WriteJSON(response)
+	defer func() {
+		_ = c.Close()
+	}()
 
-func (s Service) silentlyRemoveTestCasesFile(filePath string) {
-	err := s.testsFileManager.RemoveFile(filePath)
 	if err != nil {
-		logger.WithFields(logger.Fields{
-			MessageTemplate: "Unable to remove file: %v",
-			Args: []interface{}{
-				err,
-			},
-			Optional: map[string]interface{}{
-				"file_path": filePath,
-			},
-		}, logger.Error)
+		logger.WarningF("Unable to send response to connection: %v", err)
+		return
 	}
 }

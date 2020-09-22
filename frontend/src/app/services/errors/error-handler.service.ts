@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {MaterializeInitService} from "../materialize/materialize-init.service";
+import {MaterializeInitService} from '../materialize/materialize-init.service';
 
 @Injectable({
   providedIn: 'root'

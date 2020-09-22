@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -97,7 +98,10 @@ func makeRequest(method, url, data, accountHash string) io.ReadCloser {
 		panic(err)
 	}
 
-	req.Header.Add("AAT-Account-Hash", accountHash)
+	req.AddCookie(&http.Cookie{
+		Name:  "AAT-Session",
+		Value: accountHash,
+	})
 	return MustDoRequest(req)
 }
 
@@ -179,4 +183,18 @@ func MustGetFileUploadRequest(url, paramName, filePath, accountHash string) *htt
 
 func MustGetFileUploadMockRequest(paramName, filePath, accountHash string) *http.Request {
 	return MustGetFileUploadRequest("https://link.com", paramName, filePath, accountHash)
+}
+
+func MustGetWS(serverURL, endpoint string) *websocket.Conn {
+	path := "ws" + strings.TrimPrefix(serverURL, "http") + endpoint
+	ws, res, err := websocket.DefaultDialer.Dial(path, nil)
+	if err != nil {
+		if err == websocket.ErrBadHandshake && res != nil {
+			fmt.Printf("ErrBadHandshake. Status: %s\n", res.Status)
+		}
+
+		panic(err)
+	}
+
+	return ws
 }

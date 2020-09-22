@@ -41,7 +41,8 @@ func (m Middleware) CheckCSRFToken(next http.Handler) http.Handler {
 			return
 		}
 
-		if cookieToken == headerToken {
+		if cookieToken == headerToken ||
+			(cookieToken != "" && r.Header.Get(websocketRequestKey) == "1") {
 			m.setTokens(w)
 			next.ServeHTTP(w, r)
 		} else {

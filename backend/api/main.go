@@ -31,8 +31,8 @@ import (
 	"services/test_command/meta"
 	"services/test_object"
 	"services/tests_runner/client"
+	"services/tests_runner/file_creator"
 	"services/tests_runner/runner"
-	"services/tests_runner/tests_file"
 	"time"
 	"utils"
 )
@@ -54,9 +54,9 @@ var (
 	testCommandHeadersDeleterService headers_deleter.Service
 	testCommandCookiesDeleterService cookies_deleter.Service
 	testObjectService                interfaces.CRUDService
+	testsFileCreatorService          file_creator.Service
 	testsRunnerService               runner.Service
 	testsRunnerClient                client.Grpc
-	testsFileManager                 tests_file.Manager
 
 	registrationRepository    interfaces.RegistrationRepository
 	sessionRepository         interfaces.SessionRepository
@@ -186,8 +186,8 @@ func initServices() {
 	testObjectService = test_object.New(testObjectRepository)
 
 	testsRunnerClient = client.New(testsRunnerAddress)
-	testsFileManager = tests_file.New(filesRootPath)
-	testsRunnerService = runner.New(testsFileManager, testsRunnerClient)
+	testsRunnerService = runner.New(testsRunnerClient)
+	testsFileCreatorService = file_creator.New()
 }
 
 func initMiddleware() {
@@ -198,7 +198,7 @@ func initControllers() {
 	r.Use(csrfMiddleware.CheckCSRFToken)
 
 	sessionController.Init(r, sessionService)
-	tests_runner.Init(r, testsRunnerService)
+	tests_runner.Init(r, testsFileCreatorService, testsRunnerService)
 	crudController.Init(r, crudServicesPool)
 }
 

@@ -11,6 +11,7 @@ services:
       DB_FILES_ROOT_PATH: "/var/www/apps/data"
     volumes:
       - ./data:/var/www/apps/data
+      - ./data:/tmp
     ports:
       - 6789:6789
 
@@ -27,6 +28,7 @@ services:
       API_ADDRESS: "0.0.0.0:8080"
     volumes:
       - ./data:/var/www/apps/data
+      - ./data:/tmp
     ports:
       - 8080:8080
 

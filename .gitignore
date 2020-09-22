@@ -37,3 +37,5 @@ google.golang.org
 
 # protoc generated
 *.pb.go
+
+data

@@ -27,22 +27,29 @@ export type KeyValueMapping = {
 
 export type CreateTestCommandResponse = {command_hash: string};
 
+export type CreateTestsFile = {filename: string};
+
 export type TransactionError = {
   code: string,
   description: string,
-  transactionText: string,
-  testCaseText: string,
+  transactionText?: string,
+  testCaseText?: string,
 };
 
 export type TestsReport = {
   passedCount: number,
   failedCount: number,
   errors?: TransactionError[],
-}
+};
 
-export interface RunTestsResponse {
-  report: TestsReport;
-  applicationError: TransactionError;
+export type RunTestsResult = {
+  report: TestsReport,
+  applicationError: TransactionError,
+};
+
+export type ServiceError = {
+  code: string,
+  description: string,
 }
 
 export interface GeneralUpdateRequest {
