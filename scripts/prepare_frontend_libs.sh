@@ -6,4 +6,4 @@ if [[ ${rootFolder} = '' ]]; then
 fi
 
 cd "${rootFolder}"/frontend || exit
-npm i && npm run build
+npm i
