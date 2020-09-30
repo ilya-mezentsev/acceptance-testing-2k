@@ -6,9 +6,9 @@ import (
 )
 
 func ExtractFromRequest(r *http.Request) string {
-	accountHash, err := r.Cookie("AAT-Session")
+	accountHash, err := r.Cookie("AT2K-Session")
 	if err != nil {
-		logger.WarningF("AAT-Session cookie is not provided")
+		logger.WarningF("AT2K-Session cookie is not provided")
 		return ""
 	}
 

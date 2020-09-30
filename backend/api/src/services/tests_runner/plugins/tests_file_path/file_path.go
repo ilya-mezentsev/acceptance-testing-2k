@@ -5,7 +5,7 @@ import (
 	"path"
 )
 
-const prefix = "aat-tmp"
+const prefix = "at2k-tmp"
 
 func BuildDirPath(accountHash string) string {
 	return path.Join(

@@ -12,5 +12,5 @@ const (
 )
 
 const (
-	CookieName = "AAT-Session"
+	CookieName = "AT2K-Session"
 )

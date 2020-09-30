@@ -7,7 +7,7 @@ type Session = {account_hash: string};
 })
 export class SessionStorageService {
   private session: Session;
-  private readonly sessionKey = 'AAT-Session';
+  private readonly sessionKey = 'AT2K-Session';
 
   public deleteSession(): void {
     this.saveSession(null);
