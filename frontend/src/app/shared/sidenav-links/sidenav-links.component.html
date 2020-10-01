@@ -1,0 +1,6 @@
+<li
+  *ngFor="let link of links"
+  [routerLinkActive]="['active']"
+>
+  <a class="sidenav-close" [routerLink]="[link.path]">{{link.name}}</a>
+</li>

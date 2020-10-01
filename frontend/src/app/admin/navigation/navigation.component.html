@@ -6,12 +6,7 @@
       </a>
 
       <ul class="left hide-on-med-and-down">
-        <li
-          [routerLinkActive]="['active']"
-          *ngFor="let route of mainRoutes"
-        >
-          <a [routerLink]="[route.path]">{{route.name}}</a>
-        </li>
+        <app-sidenav-links [links]="mainRoutes"></app-sidenav-links>
 
         <li>
           <a class="dropdown-trigger" data-target="general-settings">General settings
@@ -19,12 +14,7 @@
           </a>
         </li>
 
-        <li
-          [routerLinkActive]="['active']"
-          *ngFor="let route of infoRoutes"
-        >
-          <a [routerLink]="[route.path]">{{route.name}}</a>
-        </li>
+        <app-sidenav-links [links]="infoRoutes"></app-sidenav-links>
 
         <li>
           <a (click)="signOut()"><i class="material-icons">exit_to_app</i></a>
@@ -35,28 +25,15 @@
 </div>
 
 <ul id="general-settings" class="dropdown-content">
-  <li
-    *ngFor="let route of generalSettingsRoutes"
-  >
-    <a [routerLink]="[route.path]">{{route.name}}</a>
-  </li>
+  <app-sidenav-links [links]="generalSettingsRoutes"></app-sidenav-links>
 </ul>
 
 <ul id="general-settings-mobile" class="dropdown-content">
-  <li
-    *ngFor="let route of generalSettingsRoutes"
-  >
-    <a [routerLink]="[route.path]">{{route.name}}</a>
-  </li>
+  <app-sidenav-links [links]="generalSettingsRoutes"></app-sidenav-links>
 </ul>
 
 <ul class="sidenav" id="mobile-navbar">
-  <li
-    [routerLinkActive]="['active']"
-    *ngFor="let route of mainRoutes"
-  >
-    <a [routerLink]="[route.path]">{{route.name}}</a>
-  </li>
+  <app-sidenav-links [links]="mainRoutes"></app-sidenav-links>
 
   <li>
     <a class="dropdown-trigger" data-target="general-settings-mobile">General settings
@@ -64,12 +41,7 @@
     </a>
   </li>
 
-  <li
-    [routerLinkActive]="['active']"
-    *ngFor="let route of infoRoutes"
-  >
-    <a [routerLink]="[route.path]">{{route.name}}</a>
-  </li>
+  <app-sidenav-links [links]="infoRoutes"></app-sidenav-links>
 
   <li>
     <a (click)="signOut()"><i class="material-icons">exit_to_app</i></a>

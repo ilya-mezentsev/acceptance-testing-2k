@@ -5,6 +5,7 @@ import {Router} from '@angular/router';
 import {SessionStorageService} from '../../services/session/session-storage.service';
 import {MaterializeInitService} from '../../services/materialize/materialize-init.service';
 import {StorageService} from '../services/storage/storage.service';
+import {Link} from '../../shared/sidenav-links/sidenav-links.component';
 
 @Component({
   selector: 'app-navigation',
@@ -12,18 +13,18 @@ import {StorageService} from '../services/storage/storage.service';
   styleUrls: ['./navigation.component.scss']
 })
 export class NavigationComponent implements OnInit {
-  public readonly mainRoutes: Array<{path: string, name: string}> = [
+  public readonly mainRoutes: Link[] = [
     {path: './objects-list', name: 'Objects list'},
     {path: './create-object', name: 'Create object'},
     {path: './run-tests', name: 'Run tests'},
   ];
-  public readonly generalSettingsRoutes: Array<{path: string, name: string}> = [
+  public readonly generalSettingsRoutes: Link[] = [
     {path: './general-base-urls', name: 'Base URLs'},
     {path: './general-timeouts', name: 'Timeouts'},
     {path: './general-headers', name: 'Headers'},
     {path: './general-cookies', name: 'Cookies'},
   ];
-  public readonly infoRoutes: Array<{path: string, name: string}> = [
+  public readonly infoRoutes: Link[] = [
     {path: './faq', name: 'FAQ'},
     {path: './about', name: 'About'},
   ];

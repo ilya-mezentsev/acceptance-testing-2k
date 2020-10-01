@@ -36,6 +36,7 @@ import { PublicComponent } from './public/public.component';
 import { FaqComponent } from './admin/faq/faq.component';
 import { PublicNavigationComponent } from './public/public-navigation/public-navigation.component';
 import { AboutComponent } from './public/about/about.component';
+import { SidenavLinksComponent } from './shared/sidenav-links/sidenav-links.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { AboutComponent } from './public/about/about.component';
     FaqComponent,
     PublicNavigationComponent,
     AboutComponent,
+    SidenavLinksComponent,
   ],
   imports: [
     BrowserModule,
