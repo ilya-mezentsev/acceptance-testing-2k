@@ -41,7 +41,7 @@ export class StorageService {
       return [];
     }
 
-    return this.storage.get(this.testObjectsKey);
+    return this.storage.get(this.testObjectsKey) || [];
   }
 
   public set objects(objects: TestObject[]) {
@@ -57,7 +57,7 @@ export class StorageService {
       return [];
     }
 
-    return this.storage.get(this.testCommandsKey);
+    return this.storage.get(this.testCommandsKey) || [];
   }
 
   public set commands(commands: TestCommandRecord[]) {

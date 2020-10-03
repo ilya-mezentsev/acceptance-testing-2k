@@ -9,6 +9,7 @@ import {CreateTestCommandResponse, KeyValueMapping, TestCommandMeta, TestCommand
 import {StorageService} from '../../services/storage/storage.service';
 import {CodesService} from '../../services/errors/codes.service';
 import {HashService} from '../../../services/hash/hash.service';
+import {FieldsProcessorService} from '../shared/services/fields-processor/fields-processor.service';
 
 @Component({
   selector: 'app-create-command',
@@ -40,6 +41,7 @@ export class CreateCommandComponent implements OnInit {
     private readonly codes: CodesService,
     private readonly materializeInit: MaterializeInitService,
     private readonly toastNotification: ToastNotificationService,
+    private readonly commandFieldsProcessor: FieldsProcessorService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
   ) {}
 
@@ -69,7 +71,8 @@ export class CreateCommandComponent implements OnInit {
 
   public createCommand(): void {
     this.fetcher.post('test-command', {
-      command_settings: {
+      command_settings: this.commandFieldsProcessor.prepareSettings({
+        hash: '', // type matching
         name: this.commandSettings.name,
         object_hash: this.objectHash,
         method: this.commandSettings.method,
@@ -77,7 +80,7 @@ export class CreateCommandComponent implements OnInit {
         endpoint: this.commandSettings.endpoint,
         timeout: this.commandSettings.timeout,
         pass_arguments_in_url: this.commandSettings.pass_arguments_in_url
-      }
+      })
     })
       .then(r => this.tryCreateCommandMeta(r))
       .catch(err => this.errorHandler.handle(err));

@@ -50,7 +50,7 @@ export type RunTestsResult = {
 export type ServiceError = {
   code: string,
   description: string,
-}
+};
 
 export interface GeneralUpdateRequest {
   command_hashes: string[];

@@ -14,6 +14,7 @@ import {
 } from '../../types/types';
 import {HashService} from '../../../services/hash/hash.service';
 import {ResponseStatus} from '../../../services/fetcher/statuses';
+import {FieldsProcessorService} from '../shared/services/fields-processor/fields-processor.service';
 
 @Component({
   selector: 'app-edit-command',
@@ -31,6 +32,7 @@ export class EditCommandComponent implements OnInit {
     private readonly errorHandler: ErrorHandlerService,
     private readonly materializeInit: MaterializeInitService,
     private readonly toastNotification: ToastNotificationService,
+    private readonly commandFieldsProcessor: FieldsProcessorService,
     @Inject('Fetcher') private readonly fetcher: Fetcher,
   ) { }
 
@@ -41,6 +43,7 @@ export class EditCommandComponent implements OnInit {
   public get cookies(): KeyValueMapping[] {
     return this.newCookies.concat(this.existsCookies);
   }
+
   public commandSettings: TestCommandSettings = {} as any;
   private commandHash = '';
   private newHeaders: KeyValueMapping[] = [];
@@ -149,6 +152,7 @@ export class EditCommandComponent implements OnInit {
   }
 
   private updateCommandSettings(): Promise<void> {
+    this.commandSettings = this.commandFieldsProcessor.prepareSettings(this.commandSettings);
     this.commandSettingsWereChanged =
       this.commandSettings.name !== this.currentCommand.name ||
       this.editableCommandSettingFields.some(

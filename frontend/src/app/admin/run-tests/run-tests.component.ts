@@ -19,7 +19,6 @@ export class RunTestsComponent implements OnInit {
   public awaitingTestsResults = false;
   public hasTestsReport = false;
   public readonly resetInput = new EventEmitter();
-  private readonly maxFileSize = 32 * 1024 * 1024;  // 32 MB
 
   constructor(
     private readonly codesService: CodesService,
@@ -54,11 +53,20 @@ export class RunTestsComponent implements OnInit {
     if (!this.hasFile) {
       this.toastNotification.info('You need to choose file first');
       return;
-    } else if (this.file.size > this.maxFileSize) {
-      this.toastNotification.error('File is too large');
-      return;
     }
 
+    this.testsRunner.getFileCheckError(this.file)
+      .then(fileCheckError => {
+        if (fileCheckError === undefined) {
+          this.run();
+        } else {
+          this.toastNotification.error(fileCheckError);
+        }
+      })
+      .catch(err => this.errorHandler.handle(err));
+  }
+
+  private run(): void {
     const fd = new FormData();
     fd.append('tests_cases_file', this.file);
 
