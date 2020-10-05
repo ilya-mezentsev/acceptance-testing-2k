@@ -84,7 +84,7 @@ export class FetcherService implements Fetcher, FileSender {
 
   private getCSRFToken(): string {
     return btoa(
-      `${Md5.hashStr(environment.csrfPrivateKey)}|${Md5.hashStr(this.publicKey)}`
+      `${Md5.hashStr(environment.csrfPrivateKey)}|${Md5.hashStr(this.publicKey || '')}`
     );
   }
 }
