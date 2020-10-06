@@ -18,10 +18,10 @@ const (
 
 type repository struct {
 	db        *sqlx.DB
-	connector db_connector.Connector
+	connector *db_connector.Connector
 }
 
-func New(db *sqlx.DB, connector db_connector.Connector) interfaces.RegistrationRepository {
+func New(db *sqlx.DB, connector *db_connector.Connector) interfaces.RegistrationRepository {
 	return repository{db: db, connector: connector}
 }
 

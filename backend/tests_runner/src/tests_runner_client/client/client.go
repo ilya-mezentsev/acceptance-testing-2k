@@ -18,7 +18,7 @@ const (
 )
 
 type Client struct {
-	dbConnector db_connector.Connector
+	dbConnector *db_connector.Connector
 }
 
 func New(dbRootPath string) interfaces.TestsRunnerClient {

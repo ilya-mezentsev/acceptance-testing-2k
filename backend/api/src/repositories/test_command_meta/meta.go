@@ -28,12 +28,12 @@ const (
 )
 
 type Repository struct {
-	connector db_connector.Connector
+	connector *db_connector.Connector
 }
 
 type queryToData map[string]map[string]interface{}
 
-func New(connector db_connector.Connector) Repository {
+func New(connector *db_connector.Connector) Repository {
 	return Repository{connector}
 }
 

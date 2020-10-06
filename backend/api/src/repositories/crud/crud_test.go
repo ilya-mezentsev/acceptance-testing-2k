@@ -17,7 +17,7 @@ import (
 var (
 	testHash              string
 	db                    *sqlx.DB
-	connector             db_connector.Connector
+	connector             *db_connector.Connector
 	testObjectRepository  interfaces.CRUDRepository
 	testCommandRepository interfaces.CRUDRepository
 )

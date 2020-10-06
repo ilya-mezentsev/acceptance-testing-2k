@@ -7,19 +7,35 @@ import (
 	"logger"
 	"os"
 	"path"
+	"sync"
 	"time"
 )
 
 type Connector struct {
+	sync.Mutex
 	dbRootPath              string
-	accountHashToConnection map[string]*sqlx.DB
+	accountHashToConnection map[string]ConnectionContainer
 }
 
-func New(dbRootPath string) Connector {
-	return Connector{dbRootPath: dbRootPath, accountHashToConnection: map[string]*sqlx.DB{}}
+var (
+	connectionLifetime         = time.Hour
+	connectionCacheCleanTimout = connectionLifetime / 3
+)
+
+func New(dbRootPath string) *Connector {
+	c := &Connector{
+		dbRootPath:              dbRootPath,
+		accountHashToConnection: map[string]ConnectionContainer{},
+	}
+	go c.runTimers()
+
+	return c
 }
 
 func (c *Connector) Connect(accountHash string) (*sqlx.DB, error) {
+	c.Lock()
+	defer c.Unlock()
+
 	_, found := c.accountHashToConnection[accountHash]
 	if !found {
 		connection, err := c.connect(accountHash)
@@ -27,13 +43,16 @@ func (c *Connector) Connect(accountHash string) (*sqlx.DB, error) {
 			return nil, err
 		}
 
-		c.accountHashToConnection[accountHash] = c.configureConnection(connection)
+		c.accountHashToConnection[accountHash] = ConnectionContainer{
+			db:      c.configureConnection(connection),
+			created: time.Now(),
+		}
 	}
 
-	return c.accountHashToConnection[accountHash], nil
+	return c.accountHashToConnection[accountHash].GetConnection(), nil
 }
 
-func (c Connector) connect(accountHash string) (*sqlx.DB, error) {
+func (c *Connector) connect(accountHash string) (*sqlx.DB, error) {
 	dbFilePath := path.Join(c.dbRootPath, accountHash, env.DBFilename)
 	if _, err := os.Stat(dbFilePath); err == nil {
 		return sqlx.Open("sqlite3", dbFilePath)
@@ -55,10 +74,34 @@ func (c Connector) connect(accountHash string) (*sqlx.DB, error) {
 	}
 }
 
-func (c Connector) configureConnection(connection *sqlx.DB) *sqlx.DB {
+func (c *Connector) configureConnection(connection *sqlx.DB) *sqlx.DB {
 	connection.SetMaxOpenConns(50)
 	connection.SetMaxIdleConns(50)
-	connection.SetConnMaxLifetime(time.Hour)
+	connection.SetConnMaxLifetime(connectionLifetime)
 
 	return connection
+}
+
+func (c *Connector) runTimers() {
+	cacheCleanTimeout := time.NewTicker(connectionCacheCleanTimout)
+
+	for {
+		select {
+		case <-cacheCleanTimeout.C:
+			c.cleanExpiredConnections()
+		}
+	}
+}
+
+func (c *Connector) cleanExpiredConnections() {
+	c.Lock()
+	defer c.Unlock()
+
+	for accountHash, connection := range c.accountHashToConnection {
+		if connection.IsExpired() {
+			connection.Close()
+
+			delete(c.accountHashToConnection, accountHash)
+		}
+	}
 }

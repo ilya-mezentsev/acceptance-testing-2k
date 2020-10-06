@@ -7,10 +7,10 @@ import (
 )
 
 type repository struct {
-	connector db_connector.Connector
+	connector *db_connector.Connector
 }
 
-func New(connector db_connector.Connector) interfaces.SessionRepository {
+func New(connector *db_connector.Connector) interfaces.SessionRepository {
 	return repository{connector}
 }
 

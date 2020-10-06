@@ -40,7 +40,7 @@ import (
 var (
 	r                *mux.Router
 	db               *sqlx.DB
-	connector        db_connector.Connector
+	connector        *db_connector.Connector
 	crudServicesPool pool.CRUDServicesPool
 
 	registrationService              interfaces.CreateService

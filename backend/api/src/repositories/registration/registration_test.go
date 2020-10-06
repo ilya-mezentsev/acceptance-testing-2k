@@ -17,7 +17,7 @@ import (
 var (
 	testHash  string
 	db        *sqlx.DB
-	connector db_connector.Connector
+	connector *db_connector.Connector
 	r         interfaces.RegistrationRepository
 )
 

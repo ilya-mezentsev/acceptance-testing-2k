@@ -7,6 +7,7 @@ import (
 	"path"
 	"test_utils"
 	"testing"
+	"time"
 	"utils"
 )
 
@@ -48,4 +49,22 @@ func TestConnector_ConnectUnknownError(t *testing.T) {
 	_, err := connector.Connect(testHash)
 
 	test_utils.AssertErrorsEqual(UnknownError, err, t)
+}
+
+func TestConnector_ConnectExpirationCheck(t *testing.T) {
+	connectionCacheCleanTimout = time.Millisecond * 20
+	connectionCacheLifetime = time.Microsecond
+
+	connector := New(testDataPath)
+	db, err := connector.Connect(testHash)
+
+	test_utils.AssertNil(err, t)
+	test_utils.AssertNotNil(db, t)
+	test_utils.AssertNil(db.Ping(), t)
+
+	time.Sleep(connectionCacheCleanTimout * 2)
+
+	_, found := connector.accountHashToConnection[testHash]
+
+	test_utils.AssertFalse(found, t)
 }

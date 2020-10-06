@@ -10,12 +10,12 @@ import (
 )
 
 type Repository struct {
-	connector     db_connector.Connector
+	connector     *db_connector.Connector
 	queryProvider interfaces.QueryProvider
 }
 
 func New(
-	connector db_connector.Connector,
+	connector *db_connector.Connector,
 	queryProvider interfaces.QueryProvider,
 ) interfaces.CRUDRepository {
 	return Repository{connector: connector, queryProvider: queryProvider}
