@@ -1,4 +1,4 @@
-FROM golang:1.14.6 AS build
+FROM golang:1.15.2 AS build
 
 ARG API_SRC
 WORKDIR $API_SRC

@@ -17,3 +17,8 @@ cd api && \
   GOPATH=${BACKEND_API_PATH}:${PROTO_PATH}:${BACKEND_LIBS_PATH} go build main.go && \
   cd ..
 echo "API is built"
+
+cd timers && \
+  GOPATH=${BACKEND_TIMERS_PATH}:${BACKEND_LIBS_PATH} go build main.go && \
+  cd ..
+echo "Timers is built"

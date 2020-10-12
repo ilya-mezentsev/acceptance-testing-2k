@@ -1,4 +1,4 @@
-FROM golang:1.14.6 AS build
+FROM golang:1.15.2 AS build
 
 ARG TESTS_RUNNER_SRC
 WORKDIR $TESTS_RUNNER_SRC

@@ -2,6 +2,7 @@ package db_connector
 
 import (
 	"env"
+	"events/listener"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"logger"
@@ -17,17 +18,18 @@ type Connector struct {
 	accountHashToConnection map[string]ConnectionContainer
 }
 
-var (
-	connectionLifetime         = time.Hour
-	connectionCacheCleanTimout = connectionLifetime / 3
-)
-
 func New(dbRootPath string) *Connector {
 	c := &Connector{
 		dbRootPath:              dbRootPath,
 		accountHashToConnection: map[string]ConnectionContainer{},
 	}
-	go c.runTimers()
+
+	listener.Get().Subscribe.System.CleanExpiredDBConnections(
+		c.cleanExpiredConnections,
+	)
+	listener.Get().Subscribe.Admin.DeleteAccount(
+		c.closeAccountConnection,
+	)
 
 	return c
 }
@@ -77,31 +79,33 @@ func (c *Connector) connect(accountHash string) (*sqlx.DB, error) {
 func (c *Connector) configureConnection(connection *sqlx.DB) *sqlx.DB {
 	connection.SetMaxOpenConns(50)
 	connection.SetMaxIdleConns(50)
-	connection.SetConnMaxLifetime(connectionLifetime)
+	connection.SetConnMaxLifetime(time.Hour)
 
 	return connection
 }
 
-func (c *Connector) runTimers() {
-	cacheCleanTimeout := time.NewTicker(connectionCacheCleanTimout)
-
-	for {
-		select {
-		case <-cacheCleanTimeout.C:
-			c.cleanExpiredConnections()
-		}
-	}
-}
-
-func (c *Connector) cleanExpiredConnections() {
+func (c *Connector) cleanExpiredConnections(d time.Duration) {
 	c.Lock()
 	defer c.Unlock()
 
 	for accountHash, connection := range c.accountHashToConnection {
-		if connection.IsExpired() {
+		if connection.IsExpired(d) {
 			connection.Close()
 
 			delete(c.accountHashToConnection, accountHash)
 		}
 	}
+}
+
+func (c *Connector) closeAccountConnection(accountHash string) {
+	c.Lock()
+	defer c.Unlock()
+
+	connection, ok := c.accountHashToConnection[accountHash]
+	if !ok {
+		return
+	}
+
+	connection.Close()
+	delete(c.accountHashToConnection, accountHash)
 }

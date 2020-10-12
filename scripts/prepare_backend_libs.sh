@@ -12,6 +12,7 @@ declare -a backendDeps=(
   "google.golang.org/grpc"
   "github.com/gorilla/mux"
   "github.com/gorilla/websocket"
+  "github.com/streadway/amqp"
 )
 for lib in "${backendDeps[@]}"
 do

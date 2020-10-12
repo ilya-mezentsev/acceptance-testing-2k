@@ -1,0 +1,7 @@
+FROM golang:1.15.2 AS build
+
+ARG TIMERS_SRC
+WORKDIR $TIMERS_SRC
+COPY main $TIMERS_SRC
+
+CMD ./main

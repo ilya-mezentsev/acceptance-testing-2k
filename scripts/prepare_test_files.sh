@@ -7,6 +7,7 @@ fi
 
 mkdir -p "$1"/backend/tests_runner/test_report
 mkdir -p "$1"/backend/api/test_report
+mkdir -p "$1"/backend/timers/test_report
 mkdir -p "$1"/backend/libs/test_report
 
 mkdir -p "$1"/backend/test_data

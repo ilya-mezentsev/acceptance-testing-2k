@@ -5,7 +5,9 @@ import (
 	crudController "controllers/crud"
 	sessionController "controllers/session"
 	"controllers/tests_runner"
+	db2 "db"
 	"db_connector"
+	"events/listener"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -68,6 +70,7 @@ var (
 
 	projectDBFilePath  string
 	filesRootPath      string
+	rabbitConnection   string
 	testsRunnerAddress string
 	csrfPrivateKey     string
 	apiAddress         string
@@ -78,6 +81,9 @@ func init() {
 	crudServicesPool = pool.New()
 
 	readEnv()
+
+	listener.Get().Init(rabbitConnection)
+
 	connector = db_connector.New(filesRootPath)
 	var err error
 	db, err = sqlx.Open("sqlite3", projectDBFilePath)
@@ -142,13 +148,7 @@ func init() {
 }
 
 func initProjectDB() {
-	_, err := db.Exec(`
-	CREATE TABLE IF NOT EXISTS accounts(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		hash VARCHAR(32) NOT NULL UNIQUE,
-		verified BOOLEAN NOT NULL DEFAULT 0 CHECK (verified IN (0,1)),
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	);`)
+	err := db2.InitProjectDB(db)
 	if err != nil {
 		panic(err)
 	}
@@ -167,6 +167,7 @@ func readEnv() {
 	testsRunnerAddress = utils.MustGetEnv("TESTS_RUNNER_ADDRESS")
 	projectDBFilePath = utils.MustGetEnv("PROJECT_DB_FILE_PATH")
 	filesRootPath = utils.MustGetEnv("FILES_ROOT_PATH")
+	rabbitConnection = utils.MustGetEnv("RABBIT_CONNECTION")
 	csrfPrivateKey = utils.MustGetEnv("CSRF_PRIVATE_KEY")
 	apiAddress = utils.MustGetEnv("API_ADDRESS")
 }

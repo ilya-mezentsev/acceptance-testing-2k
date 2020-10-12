@@ -52,3 +52,15 @@ func Install(db *sqlx.DB) error {
 	_, err := db.Exec(createTablesQuery)
 	return err
 }
+
+func InitProjectDB(db *sqlx.DB) error {
+	_, err := db.Exec(`
+	CREATE TABLE IF NOT EXISTS accounts(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		hash VARCHAR(32) NOT NULL UNIQUE,
+		verified BOOLEAN NOT NULL DEFAULT 0 CHECK (verified IN (0,1)),
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);`)
+
+	return err
+}

@@ -20,17 +20,49 @@ services:
       context: backend/api
       args:
         API_SRC: "/var/www/apps/api"
+    depends_on:
+      - rabbitmq
     environment:
       TESTS_RUNNER_ADDRESS: "tests_runner:6789"
       PROJECT_DB_FILE_PATH: "/var/www/apps/data/data.db"
       FILES_ROOT_PATH: "/var/www/apps/data"
       CSRF_PRIVATE_KEY: "ac385b85095bd187e68607f61a580845"
       API_ADDRESS: "0.0.0.0:8080"
+      RABBIT_CONNECTION: "amqp://user:password@rabbitmq:5672"
     volumes:
       - ./data:/var/www/apps/data
       - ./data:/tmp
     ports:
       - 8080:8080
+
+  timers:
+    build:
+      context: backend/timers
+      args:
+        TIMERS_SRC: "/var/www/apps/api"
+    depends_on:
+      - rabbitmq
+    environment:
+      PROJECT_DB_FILE_PATH: "/var/www/apps/data/data.db"
+      FILES_ROOT_PATH: "/var/www/apps/data"
+      RABBIT_CONNECTION: "amqp://user:password@rabbitmq:5672"
+    volumes:
+      - ./data:/var/www/apps/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    volumes:
+      - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "user"
+      RABBITMQ_DEFAULT_PASS: "password"
+    ports:
+      - 5672:5672
+      - 15672:15672
 
   nginx:
     build: nginx

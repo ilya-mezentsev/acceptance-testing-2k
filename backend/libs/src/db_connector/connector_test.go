@@ -1,6 +1,7 @@
 package db_connector
 
 import (
+	"events/listener"
 	"io/ioutil"
 	"log"
 	"os"
@@ -51,20 +52,34 @@ func TestConnector_ConnectUnknownError(t *testing.T) {
 	test_utils.AssertErrorsEqual(UnknownError, err, t)
 }
 
-func TestConnector_ConnectExpirationCheck(t *testing.T) {
-	connectionCacheCleanTimout = time.Millisecond * 20
-	connectionCacheLifetime = time.Microsecond
-
+func TestConnector_CleanExpired(t *testing.T) {
 	connector := New(testDataPath)
+
 	db, err := connector.Connect(testHash)
 
 	test_utils.AssertNil(err, t)
 	test_utils.AssertNotNil(db, t)
-	test_utils.AssertNil(db.Ping(), t)
 
-	time.Sleep(connectionCacheCleanTimout * 2)
+	container := connector.accountHashToConnection[testHash]
+	container.created = time.Now().AddDate(0, -1, 0)
+	connector.accountHashToConnection[testHash] = container
+
+	listener.Get().Subscribe.System.(*listener.System).EmitCleanExpiredDBConnections(time.Hour)
 
 	_, found := connector.accountHashToConnection[testHash]
+	test_utils.AssertFalse(found, t)
+}
 
+func TestConnector_OnDeleteAccount(t *testing.T) {
+	connector := New(testDataPath)
+
+	db, err := connector.Connect(testHash)
+
+	test_utils.AssertNil(err, t)
+	test_utils.AssertNotNil(db, t)
+
+	listener.Get().Subscribe.Admin.(*listener.Admin).EmitDeleteAccount(testHash)
+
+	_, found := connector.accountHashToConnection[testHash]
 	test_utils.AssertFalse(found, t)
 }

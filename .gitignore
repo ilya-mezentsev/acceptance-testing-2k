@@ -26,6 +26,7 @@ static
 # env
 .env
 .idea
+.docker
 
 # golang libs and built
 main

@@ -14,13 +14,6 @@ const (
 	dropCommandsHeadersQuery    = `DROP TABLE IF EXISTS commands_headers;`
 	dropCommandsCookiesQuery    = `DROP TABLE IF EXISTS commands_cookies;`
 
-	addAccountsQuery = `
-	CREATE TABLE IF NOT EXISTS accounts(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		hash VARCHAR(32) NOT NULL UNIQUE,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	);`
-
 	addAccountQuery = `
 	INSERT INTO accounts(hash) VALUES(:hash)`
 	addAccountCredentialsQuery = `
@@ -215,7 +208,7 @@ func ReplaceBaseURLAndInitTables(db *sqlx.DB, baseURL string) {
 func InitTablesWithAccounts(db *sqlx.DB) {
 	DropTables(db)
 
-	_, err := db.Exec(addAccountsQuery)
+	err := db2.InitProjectDB(db)
 	if err != nil {
 		panic(err)
 	}

@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-var connectionCacheLifetime = connectionLifetime / 2
-
 type ConnectionContainer struct {
 	db      *sqlx.DB
 	created time.Time
@@ -20,6 +18,6 @@ func (cc ConnectionContainer) Close() {
 	_ = cc.db.Close()
 }
 
-func (cc ConnectionContainer) IsExpired() bool {
-	return cc.created.Add(connectionCacheLifetime).Before(time.Now())
+func (cc ConnectionContainer) IsExpired(d time.Duration) bool {
+	return cc.created.Add(d).Before(time.Now())
 }
