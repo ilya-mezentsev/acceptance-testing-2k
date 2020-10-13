@@ -34,6 +34,7 @@ func main() {
 	logger.Info("Start timers ...")
 
 	connectionCacheCleanTimer := time.NewTicker(timers.ConnectionCacheCleanTimout())
+	deletedAccountHashesCleanTimer := time.NewTicker(timers.DeletedAccountHashesCleanTimeout())
 	checkExpiredAccountTimer := time.NewTicker(timers.CheckExpiredAccountTimeout())
 
 	for {
@@ -41,12 +42,12 @@ func main() {
 		case <-connectionCacheCleanTimer.C:
 			radio.Emit.System.CleanExpiredDBConnections(timers.ConnectionCacheLifetime())
 
+		case <-deletedAccountHashesCleanTimer.C:
+			radio.Emit.System.CleanExpiredDeletedAccountHashes(timers.DeletedAccountHashesCacheLifetime())
+
 		case <-checkExpiredAccountTimer.C:
-			expiredAccountHashes := accountsService.DeleteExpiredAccounts()
-			if len(expiredAccountHashes) > 0 {
-				for _, hash := range expiredAccountHashes {
-					radio.Emit.Admin.DeleteAccount(hash)
-				}
+			for _, hash := range accountsService.DeleteExpiredAccounts() {
+				radio.Emit.Admin.DeleteAccount(hash)
 			}
 		}
 	}

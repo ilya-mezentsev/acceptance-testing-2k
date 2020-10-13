@@ -46,7 +46,7 @@ var (
 	crudServicesPool pool.CRUDServicesPool
 
 	registrationService              interfaces.CreateService
-	sessionService                   session.Service
+	sessionService                   *session.Service
 	testCommandService               interfaces.CRUDService
 	massBaseUrlsUpdateService        base_url.Service
 	massTimeoutsUpdaterService       timeout.Service

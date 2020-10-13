@@ -3,6 +3,7 @@ package session
 import (
 	"api_meta/mock/services"
 	"api_meta/models"
+	"events/listener"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -13,6 +14,7 @@ import (
 	"services/plugins/response_factory"
 	"test_utils"
 	"testing"
+	"time"
 )
 
 var (
@@ -44,11 +46,6 @@ func TestService_CreateSessionSuccess(t *testing.T) {
 	test_utils.AssertEqual(
 		services.ExistsAccountHash,
 		response.GetData().(models.SessionResponse).AccountHash,
-		t,
-	)
-	test_utils.AssertEqual(
-		services.ExistsLogin,
-		response.GetData().(models.SessionResponse).Login,
 		t,
 	)
 
@@ -154,7 +151,7 @@ func TestService_GetSessionSuccess(t *testing.T) {
 		Value: "some-hash",
 	})
 
-	response := s.GetSession(request)
+	response := s.GetSession(httptest.NewRecorder(), request)
 
 	test_utils.AssertEqual(expectedSuccessStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -172,7 +169,7 @@ func TestService_GetSessionNoSessionCookieError(t *testing.T) {
 		services.BadPassword,
 	))
 
-	response := s.GetSession(request)
+	response := s.GetSession(httptest.NewRecorder(), request)
 
 	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
 	test_utils.AssertTrue(response.HasData(), t)
@@ -186,6 +183,41 @@ func TestService_GetSessionNoSessionCookieError(t *testing.T) {
 		response.GetData().(errors.ServiceError).Description,
 		t,
 	)
+}
+
+func TestService_GetSessionWithDeletedAccountHash(t *testing.T) {
+	responseRecorder := httptest.NewRecorder()
+	request := test_utils.GetMockRequest(fmt.Sprintf(
+		`{"login": "%s", "password": "%s"}`,
+		services.ExistsLogin,
+		services.BadPassword,
+	))
+	request.AddCookie(&http.Cookie{
+		Name:  CookieName,
+		Value: "some-hash",
+	})
+	listener.Get().Subscribe.Admin.(*listener.Admin).EmitDeleteAccount("some-hash")
+
+	response := s.GetSession(responseRecorder, request)
+
+	test_utils.AssertEqual(expectedErrorStatus, response.GetStatus(), t)
+	test_utils.AssertTrue(response.HasData(), t)
+	test_utils.AssertEqual(
+		unableToGetSessionCode,
+		response.GetData().(errors.ServiceError).Code,
+		t,
+	)
+	test_utils.AssertEqual(
+		accountIsDeleted,
+		response.GetData().(errors.ServiceError).Description,
+		t,
+	)
+
+	cookie := responseRecorder.Result().Cookies()[0]
+	test_utils.AssertEqual(CookieName, cookie.Name, t)
+	test_utils.AssertEqual("", cookie.Value, t)
+	test_utils.AssertEqual("/", cookie.Path, t)
+	test_utils.AssertTrue(cookie.HttpOnly, t)
 }
 
 func TestService_DeleteSession(t *testing.T) {
@@ -208,4 +240,18 @@ func TestService_DeleteSession(t *testing.T) {
 	test_utils.AssertEqual("", cookie.Value, t)
 	test_utils.AssertEqual("/", cookie.Path, t)
 	test_utils.AssertTrue(cookie.HttpOnly, t)
+}
+
+func TestService_CleanExpiredDeletedAccountHashes(t *testing.T) {
+	s := New(repository)
+
+	listener.Get().Subscribe.Admin.(*listener.Admin).EmitDeleteAccount("some-hash")
+
+	test_utils.AssertEqual("some-hash", s.deletedAccountHashes[0].GetValue(), t)
+
+	s.deletedAccountHashes[0].Created = time.Now().AddDate(0, -1, 0)
+
+	listener.Get().Subscribe.System.(*listener.System).EmitCleanExpiredAccountHashes(time.Second)
+
+	test_utils.AssertEqual(0, len(s.deletedAccountHashes), t)
 }

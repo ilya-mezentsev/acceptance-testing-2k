@@ -8,6 +8,7 @@ const (
 const (
 	accountDoesNotExistsError  = "account-does-not-exists"
 	sessionCookieNotFoundError = "session-cookie-not-found"
+	accountIsDeleted           = "account-is-deleted"
 	entityName                 = "session"
 )
 

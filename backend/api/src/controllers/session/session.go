@@ -8,10 +8,10 @@ import (
 )
 
 type controller struct {
-	service session.Service
+	service *session.Service
 }
 
-func Init(r *mux.Router, service session.Service) {
+func Init(r *mux.Router, service *session.Service) {
 	c := controller{service}
 	sessionAPI := r.PathPrefix("/session").Subrouter()
 
@@ -21,7 +21,7 @@ func Init(r *mux.Router, service session.Service) {
 }
 
 func (c controller) getSession(w http.ResponseWriter, r *http.Request) {
-	response_writer.Write(w, c.service.GetSession(r))
+	response_writer.Write(w, c.service.GetSession(w, r))
 }
 
 func (c controller) createSession(w http.ResponseWriter, r *http.Request) {

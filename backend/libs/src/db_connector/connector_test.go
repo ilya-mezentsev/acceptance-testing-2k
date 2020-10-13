@@ -61,7 +61,7 @@ func TestConnector_CleanExpired(t *testing.T) {
 	test_utils.AssertNotNil(db, t)
 
 	container := connector.accountHashToConnection[testHash]
-	container.created = time.Now().AddDate(0, -1, 0)
+	container.Created = time.Now().AddDate(0, -1, 0)
 	connector.accountHashToConnection[testHash] = container
 
 	listener.Get().Subscribe.System.(*listener.System).EmitCleanExpiredDBConnections(time.Hour)

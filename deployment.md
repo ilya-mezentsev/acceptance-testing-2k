@@ -40,9 +40,5 @@ $ make build.project
 ```
 ### Run backend containers:
 ```bash
-$ docker-compose up
-```
-### ... and frontend:
-```bash
-$ cd frontend && npm run start
+$ make start.project
 ```

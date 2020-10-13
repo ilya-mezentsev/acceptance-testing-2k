@@ -1,4 +1,6 @@
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+AT2K_NGINX_PORT ?= 8000
+PROJECT_NAME = "at2k"
 
 dev.push_all:
 	git add .
@@ -58,6 +60,14 @@ build.frontend:
 	bash $(ROOT_DIR)/scripts/build_frontend.sh $(ROOT_DIR)
 
 build.containers:
-	docker-compose build
+	AT2K_NGINX_PORT=$(AT2K_NGINX_PORT) docker-compose -p $(PROJECT_NAME) build
 
 build.project: build.backend build.frontend build.containers
+
+start.project:
+	AT2K_NGINX_PORT=$(AT2K_NGINX_PORT) docker-compose -p $(PROJECT_NAME) up -d
+
+stop.project:
+	AT2K_NGINX_PORT=$(AT2K_NGINX_PORT) docker-compose -p $(PROJECT_NAME) down
+
+restart.project: stop.project start.project

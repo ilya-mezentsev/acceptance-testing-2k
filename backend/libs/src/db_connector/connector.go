@@ -1,6 +1,7 @@
 package db_connector
 
 import (
+	"containers/expirable"
 	"env"
 	"events/listener"
 	"github.com/jmoiron/sqlx"
@@ -15,13 +16,13 @@ import (
 type Connector struct {
 	sync.Mutex
 	dbRootPath              string
-	accountHashToConnection map[string]ConnectionContainer
+	accountHashToConnection map[string]expirable.Container
 }
 
 func New(dbRootPath string) *Connector {
 	c := &Connector{
 		dbRootPath:              dbRootPath,
-		accountHashToConnection: map[string]ConnectionContainer{},
+		accountHashToConnection: map[string]expirable.Container{},
 	}
 
 	listener.Get().Subscribe.System.CleanExpiredDBConnections(
@@ -45,13 +46,12 @@ func (c *Connector) Connect(accountHash string) (*sqlx.DB, error) {
 			return nil, err
 		}
 
-		c.accountHashToConnection[accountHash] = ConnectionContainer{
-			db:      c.configureConnection(connection),
-			created: time.Now(),
-		}
+		c.accountHashToConnection[accountHash] = expirable.Init(
+			c.configureConnection(connection),
+		)
 	}
 
-	return c.accountHashToConnection[accountHash].GetConnection(), nil
+	return c.accountHashToConnection[accountHash].GetValue().(*sqlx.DB), nil
 }
 
 func (c *Connector) connect(accountHash string) (*sqlx.DB, error) {
@@ -88,9 +88,9 @@ func (c *Connector) cleanExpiredConnections(d time.Duration) {
 	c.Lock()
 	defer c.Unlock()
 
-	for accountHash, connection := range c.accountHashToConnection {
-		if connection.IsExpired(d) {
-			connection.Close()
+	for accountHash, container := range c.accountHashToConnection {
+		if container.IsExpired(d) {
+			_ = container.GetValue().(*sqlx.DB).Close()
 
 			delete(c.accountHashToConnection, accountHash)
 		}
@@ -101,11 +101,11 @@ func (c *Connector) closeAccountConnection(accountHash string) {
 	c.Lock()
 	defer c.Unlock()
 
-	connection, ok := c.accountHashToConnection[accountHash]
+	container, ok := c.accountHashToConnection[accountHash]
 	if !ok {
 		return
 	}
 
-	connection.Close()
+	_ = container.GetValue().(*sqlx.DB).Close()
 	delete(c.accountHashToConnection, accountHash)
 }

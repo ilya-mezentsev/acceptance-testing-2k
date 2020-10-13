@@ -16,3 +16,10 @@ func (s System) CleanExpiredDBConnections(d time.Duration) {
 		Data:      d.Seconds(),
 	}
 }
+
+func (s System) CleanExpiredDeletedAccountHashes(d time.Duration) {
+	s.messages <- types.Message{
+		EventName: env.SystemCleanExpiredAccountHashes,
+		Data:      d.Seconds(),
+	}
+}

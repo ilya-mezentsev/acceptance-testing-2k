@@ -3,7 +3,9 @@ package session
 import (
 	"api_meta/interfaces"
 	"api_meta/models"
+	"containers/expirable"
 	"db_connector"
+	"events/listener"
 	"net/http"
 	"services/errors"
 	"services/plugins/account_credentials"
@@ -11,21 +13,30 @@ import (
 	"services/plugins/request_decoder"
 	"services/plugins/response_factory"
 	"services/plugins/validation"
+	"sync"
+	"time"
 )
 
 type Service struct {
-	logger     logger.CRUDEntityErrorsLogger
-	repository interfaces.SessionRepository
+	sync.Mutex
+	logger               logger.CRUDEntityErrorsLogger
+	repository           interfaces.SessionRepository
+	deletedAccountHashes []expirable.Container
 }
 
-func New(repository interfaces.SessionRepository) Service {
-	return Service{
+func New(repository interfaces.SessionRepository) *Service {
+	s := Service{
 		repository: repository,
 		logger:     logger.CRUDEntityErrorsLogger{EntityName: entityName},
 	}
+
+	listener.Get().Subscribe.Admin.DeleteAccount(s.addDeletedAccountHash)
+	listener.Get().Subscribe.System.CleanExpiredAccountHashes(s.cleanExpiredDeletedAccounts)
+
+	return &s
 }
 
-func (s Service) CreateSession(w http.ResponseWriter, r *http.Request) interfaces.Response {
+func (s *Service) CreateSession(w http.ResponseWriter, r *http.Request) interfaces.Response {
 	var createSessionRequest models.CreateSessionRequest
 	err := request_decoder.Decode(r.Body, &createSessionRequest)
 	if err != nil {
@@ -71,7 +82,6 @@ func (s Service) CreateSession(w http.ResponseWriter, r *http.Request) interface
 	if accountExists && credentialsExists {
 		setSessionCookie(w, accountHash)
 		return response_factory.SuccessResponse(models.SessionResponse{
-			Login:       createSessionRequest.Login,
 			AccountHash: accountHash,
 		})
 	} else {
@@ -82,12 +92,19 @@ func (s Service) CreateSession(w http.ResponseWriter, r *http.Request) interface
 	}
 }
 
-func (s Service) GetSession(r *http.Request) interfaces.Response {
+func (s *Service) GetSession(w http.ResponseWriter, r *http.Request) interfaces.Response {
 	cookie, err := getSessionCookie(r)
 	if err != nil {
 		return response_factory.ErrorResponse(errors.ServiceError{
 			Code:        unableToGetSessionCode,
 			Description: sessionCookieNotFoundError,
+		})
+	} else if s.isAccountHashDeleted(cookie.Value) {
+		unsetSessionCookie(w)
+
+		return response_factory.ErrorResponse(errors.ServiceError{
+			Code:        unableToGetSessionCode,
+			Description: accountIsDeleted,
 		})
 	} else {
 		return response_factory.SuccessResponse(models.SessionResponse{
@@ -96,7 +113,41 @@ func (s Service) GetSession(r *http.Request) interfaces.Response {
 	}
 }
 
-func (s Service) DeleteSession(w http.ResponseWriter) interfaces.Response {
+func (s *Service) isAccountHashDeleted(accountHash string) bool {
+	s.Lock()
+	defer s.Unlock()
+
+	for _, container := range s.deletedAccountHashes {
+		if container.GetValue().(string) == accountHash {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (s *Service) DeleteSession(w http.ResponseWriter) interfaces.Response {
 	unsetSessionCookie(w)
 	return response_factory.DefaultResponse()
+}
+
+func (s *Service) addDeletedAccountHash(accountHash string) {
+	s.Lock()
+	defer s.Unlock()
+
+	s.deletedAccountHashes = append(s.deletedAccountHashes, expirable.Init(accountHash))
+}
+
+func (s *Service) cleanExpiredDeletedAccounts(d time.Duration) {
+	s.Lock()
+	defer s.Unlock()
+
+	for i, hashContainer := range s.deletedAccountHashes {
+		if hashContainer.IsExpired(d) {
+			s.deletedAccountHashes = append(
+				s.deletedAccountHashes[:i],
+				s.deletedAccountHashes[i+1:]...,
+			)
+		}
+	}
 }

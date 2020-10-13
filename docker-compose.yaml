@@ -51,7 +51,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: rabbitmq
     volumes:
       - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
       - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
@@ -69,7 +68,7 @@ services:
     volumes:
       - ./frontend:/var/www/apps/web-frontend
     ports:
-      - 8000:80
+      - ${AT2K_NGINX_PORT}:80
     links:
       - api
     depends_on:

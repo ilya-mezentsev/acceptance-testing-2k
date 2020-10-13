@@ -108,13 +108,19 @@ func (l Listener) onMessage(data []byte) {
 
 		l.admin.EmitDeleteAccount(accountHash)
 
-	case env.SystemCleanExpiredDBConnections:
+	case env.SystemCleanExpiredAccountHashes, env.SystemCleanExpiredDBConnections:
 		seconds, ok := message.Data.(float64)
 		if !ok {
 			logger.ErrorF("Incompatible type of connection cache duration: %v", message.Data)
 			break
 		}
 
-		l.system.EmitCleanExpiredDBConnections(time.Duration(seconds) * time.Second)
+		d := time.Duration(seconds) * time.Second
+		switch message.EventName {
+		case env.SystemCleanExpiredAccountHashes:
+			l.system.EmitCleanExpiredAccountHashes(d)
+		case env.SystemCleanExpiredDBConnections:
+			l.system.EmitCleanExpiredDBConnections(d)
+		}
 	}
 }
