@@ -6,6 +6,7 @@ import {environment} from '../../../../environments/environment';
 })
 export class TestsRunnerService {
   private readonly maxFileSize = 32 * 1024 * 1024;  // 32 MB
+  private readonly wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 
   public async getFileCheckError(file: File): Promise<string | undefined> {
     if (file.size > this.maxFileSize) {
@@ -31,8 +32,7 @@ export class TestsRunnerService {
   public run<T>(filename: string): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       const ws = new WebSocket(
-        `ws://${
-          window.location.host}/${environment.apiPrefix}/run-tests/?filename=${filename}`,
+        `${this.wsProtocol}://${window.location.host}/${environment.apiPrefix}/run-tests/?filename=${filename}`,
       );
 
       ws.onmessage = message => resolve(JSON.parse(message.data));

@@ -1,4 +1,7 @@
 FROM nginx:latest
 
-COPY nginx.conf /etc/nginx/nginx.conf
+ARG NGINX_CONF_FILE
+COPY ./conf /etc/nginx/at2k
+COPY $NGINX_CONF_FILE /etc/nginx/nginx.conf
 EXPOSE 80
+EXPOSE 443
