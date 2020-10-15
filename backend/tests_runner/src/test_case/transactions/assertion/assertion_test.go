@@ -40,6 +40,38 @@ func TestTransaction_ExecuteSuccessAssertionFailed(t *testing.T) {
 	test_utils.AssertEqual(mockAssertion.MockDataScore10.GetTestCaseText(), err.TestCaseText, t)
 }
 
+func TestTransaction_ExecuteSuccessTemplateReplacement(t *testing.T) {
+	defer context.ClearScope()
+
+	context.SetVariable("response", map[string]interface{}{
+		"data": map[string]interface{}{"score": "11"},
+	})
+	context.SetVariable("foo", map[string]interface{}{
+		"bar": "11",
+	})
+	transaction := New(&mockAssertion.MockDataTemplateNewValue)
+
+	err := transaction.Execute(context)
+
+	test_utils.AssertEqual(errors.EmptyTransactionError, err, t)
+}
+
+func TestTransaction_ExecuteFailedTemplateReplacement(t *testing.T) {
+	defer context.ClearScope()
+
+	context.SetVariable("response", map[string]interface{}{
+		"data": map[string]interface{}{"score": "11"},
+	})
+	transaction := New(&mockAssertion.MockDataTemplateNewValue)
+
+	err := transaction.Execute(context)
+
+	test_utils.AssertEqual(value_path.CannotAccessValueByPath.Error(), err.Code, t)
+	test_utils.AssertEqual("Unable to process new value: ${foo.bar}", err.Description, t)
+	test_utils.AssertEqual(mockAssertion.MockDataTemplateNewValue.GetTransactionText(), err.TransactionText, t)
+	test_utils.AssertEqual(mockAssertion.MockDataTemplateNewValue.GetTestCaseText(), err.TestCaseText, t)
+}
+
 func TestTransaction_ExecuteSuccessArrayValue(t *testing.T) {
 	defer context.ClearScope()
 

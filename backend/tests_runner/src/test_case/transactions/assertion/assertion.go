@@ -3,6 +3,7 @@ package assertion
 import (
 	"fmt"
 	"test_case/errors"
+	"test_case/transactions/plugins/arguments_processor"
 	"test_case/transactions/plugins/value_path"
 	"test_runner_meta/interfaces"
 	"test_runner_meta/models"
@@ -41,7 +42,20 @@ func (t Transaction) Execute(context interfaces.TestCaseContext) models.Transact
 		}
 	}
 
-	if t.equals(currentValue, t.data.GetNewValue()) {
+	newValue, err := arguments_processor.ReplaceTemplatesWithVariables(
+		context,
+		t.data.GetNewValue(),
+	)
+	if err != nil {
+		return models.TransactionError{
+			Code:            err.Error(),
+			Description:     t.unableToProcessNewValue(),
+			TransactionText: t.data.GetTransactionText(),
+			TestCaseText:    t.data.GetTestCaseText(),
+		}
+	}
+
+	if t.equals(currentValue, newValue) {
 		return errors.EmptyTransactionError
 	} else {
 		return models.TransactionError{
@@ -63,6 +77,10 @@ func (t Transaction) variableIsNotDefinedDescription() string {
 
 func (t Transaction) unableToGetValueByPathDescription() string {
 	return fmt.Sprintf("Unable to get value by path: %s", t.data.GetDataPath())
+}
+
+func (t Transaction) unableToProcessNewValue() string {
+	return fmt.Sprintf("Unable to process new value: %s", t.data.GetNewValue())
 }
 
 func (t Transaction) assertionFailedDescription(current interface{}) string {
