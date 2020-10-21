@@ -20,16 +20,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'auto-acceptance-testing'`, () => {
+  it(`should have as title 'acceptance-testing-2k'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('auto-acceptance-testing');
+    expect(app.title).toEqual('acceptance-testing-2k');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('auto-acceptance-testing app is running!');
+    expect(compiled.querySelector('.content span').textContent).toContain('acceptance-testing-2k app is running!');
   });
 });
