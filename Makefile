@@ -51,10 +51,10 @@ tests.api:
 tests.timers:
 	bash $(ROOT_DIR)/scripts/timers_tests.sh $(ROOT_DIR)
 
-tests.backend_libs:
-	bash $(ROOT_DIR)/scripts/backend_libs_tests.sh $(ROOT_DIR)
+tests.backend_shared:
+	bash $(ROOT_DIR)/scripts/backend_shared_tests.sh $(ROOT_DIR)
 
-tests.backend: tests.test_runner tests.api tests.timers tests.backend_libs
+tests.backend: tests.test_runner tests.api tests.timers tests.backend_shared
 
 build.backend:
 	bash $(ROOT_DIR)/scripts/build_backend.sh $(ROOT_DIR)

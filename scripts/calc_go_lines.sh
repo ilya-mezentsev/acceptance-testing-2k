@@ -6,7 +6,11 @@ if [[ ${rootFolder} = '' ]]; then
 fi
 set -o allexport; source ${rootFolder}/.env; set +o allexport
 
-for appsDir in "${TEST_RUNNER_PATH}" "${BACKEND_LIBS_PATH}" "${BACKEND_API_PATH}" "${BACKEND_TIMERS_PATH}"
+for appsDir in \
+  "${TEST_RUNNER_PATH}" \
+  "${BACKEND_SHARED_PATH}" \
+  "${BACKEND_API_PATH}" \
+  "${BACKEND_TIMERS_PATH}"
 do
   if test -f "${appsDir}"/main.go; then
     (( linesCount=linesCount+$(wc -l  < "${appsDir}"/main.go) ))

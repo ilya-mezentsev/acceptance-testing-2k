@@ -6,11 +6,11 @@ if [[ ${rootFolder} = '' ]]; then
 fi
 set -o allexport; source ${rootFolder}/.env; set +o allexport
 
-echo "Running Backend libs tests..."
+echo "Running Backend shared tests..."
 
-export GOPATH=${BACKEND_LIBS_PATH}
-export GO_SRC=${BACKEND_LIBS_PATH}
-export REPORT_FOLDER=${BACKEND_LIBS_REPORT_FOLDER}
+export GOPATH=${BACKEND_SHARED_PATH}
+export GO_SRC=${BACKEND_SHARED_PATH}
+export REPORT_FOLDER=${BACKEND_SHARED_REPORT_FOLDER}
 cd "${PROJECT_ROOT}" && source scripts/go_tests.sh
 
 echo

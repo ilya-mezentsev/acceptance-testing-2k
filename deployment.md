@@ -6,7 +6,6 @@
 * protoc, 3.11
 * Node.js, 14.5
 * NPM, 6.14
-* Angular CLI, 10.0
 * Docker, 19.03
 * Docker-compose, 1.25
 * GNU Make, 4.2
