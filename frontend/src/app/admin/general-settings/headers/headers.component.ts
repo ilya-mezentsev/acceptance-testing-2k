@@ -49,7 +49,7 @@ export class HeadersComponent implements OnInit {
 
   public createHeaders(): void {
     if (this.addingDisabled) {
-      this.toastNotification.info('You need to add header of choose command');
+      this.toastNotification.info('You need to add header or choose command');
       return;
     }
 
