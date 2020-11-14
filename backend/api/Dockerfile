@@ -1,4 +1,4 @@
-FROM golang:1.15.2 AS build
+FROM ubuntu:20.10
 
 ARG API_SRC
 WORKDIR $API_SRC
