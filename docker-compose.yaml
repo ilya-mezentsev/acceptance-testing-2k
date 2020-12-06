@@ -39,7 +39,7 @@ services:
     build:
       context: backend/timers
       args:
-        TIMERS_SRC: "/var/www/apps/api"
+        TIMERS_SRC: "/var/www/apps/timers"
     depends_on:
       - rabbitmq
     environment:
